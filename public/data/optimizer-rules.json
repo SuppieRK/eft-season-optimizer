@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "dailyDocumentLimits": {
+    "pve": 10,
+    "pvp": 15,
+    "pvp-seasonal": 25
+  },
+  "exchange": {
+    "regularDocumentsPerBlackDivisionGearCrate": 10,
+    "regularDocumentsPerOtherDocuments": 5
+  },
+  "tarCoinBundles": [
+    {
+      "tarCoins": 500,
+      "bonusTarCoins": 0,
+      "localPriceId": "tarCoinBundles.500.localPrice"
+    },
+    {
+      "tarCoins": 1100,
+      "bonusTarCoins": 100,
+      "localPriceId": "tarCoinBundles.1100.localPrice"
+    },
+    {
+      "tarCoins": 2300,
+      "bonusTarCoins": 300,
+      "localPriceId": "tarCoinBundles.2300.localPrice"
+    },
+    {
+      "tarCoins": 6000,
+      "bonusTarCoins": 1000,
+      "localPriceId": "tarCoinBundles.6000.localPrice"
+    },
+    {
+      "tarCoins": 12500,
+      "bonusTarCoins": 2500,
+      "localPriceId": "tarCoinBundles.12500.localPrice"
+    },
+    {
+      "tarCoins": 20250,
+      "bonusTarCoins": 5250,
+      "localPriceId": "tarCoinBundles.20250.localPrice"
+    }
+  ],
+  "classifiedDocuments": {
+    "backfillOnly": true,
+    "purchaseSource": "Expansion Hub",
+    "bundles": [
+      {
+        "classifiedDocuments": 500,
+        "tarCoins": 8750,
+        "bonusTarCoins": 3750
+      },
+      {
+        "classifiedDocuments": 250,
+        "tarCoins": 5000,
+        "bonusTarCoins": 1250
+      },
+      {
+        "classifiedDocuments": 75,
+        "tarCoins": 1680,
+        "bonusTarCoins": 195
+      },
+      {
+        "classifiedDocuments": 40,
+        "tarCoins": 950,
+        "bonusTarCoins": 50
+      },
+      {
+        "classifiedDocuments": 20,
+        "tarCoins": 500,
+        "bonusTarCoins": 0
+      }
+    ],
+    "purchasePolicy": "When enabled, evaluate purchases only after matching regular inventory, maximizing legally usable owned Classified Document consumption across all unclaimed rewards, and applying useful regular-document exchanges. Use available TarCoins immediately and choose the bundle combination that minimizes remaining uncovered backfill, then TarCoins spent, then bundle count. Never purchase Classified Documents to replace a matching regular document already owned."
+  },
+  "routeProfiles": {
+    "fastest": {
+      "factorField": "maxRaidTimeMin",
+      "tieBreakOrder": [
+        "profileCost",
+        "distinctLocations",
+        "rawDocumentQuantity",
+        "locationId"
+      ]
+    },
+    "safest": {
+      "factorField": "difficultyRating",
+      "tieBreakOrder": [
+        "profileCost",
+        "distinctLocations",
+        "rawDocumentQuantity",
+        "locationId"
+      ]
+    },
+    "combinedDisplayRule": "Present Fastest and Safest side by side. If they return the same assignment, keep both comparison cards and identify that the assignments coincide.",
+    "unavailableRule": "If any required regular document has no eligible source location, show the profile as unavailable with an explanation; do not return a partial route.",
+    "classifiedAllocationRule": "Across the legal redemption sequence for all unclaimed rewards, consume the maximum legally usable owned Classified Documents after matching regular inventory, targeting zero remaining when eligible deficits allow. Hold that consumption quantity fixed while allocating it independently per profile. If no redeemable deficit accepts backfill, consume none.",
+    "regularExchangeRule": "After matching regular inventory and fixing maximum owned Classified Document consumption, treat only regular inventory left beyond all remaining matching requirements as exchangeable surplus. Exchange any mixture of five surplus regular documents for one needed regular document when it improves the profile result; duplicate source types are allowed and Classified Documents are excluded.",
+    "blackDivisionCrateFallback": "If every ordinary reward is redeemed, recommend the eligible location with the lowest maxRaidTimeMin for Black Division Gear Crates and exclude Classified Documents and TarCoins from that fallback."
+  },
+  "dailySchedule": {
+    "enabled": true,
+    "scheduleOrder": "unlock-next-page-first-then-clear-remaining-rewards",
+    "futureDaysCollapsedByDefault": true,
+    "showOverflowAsNextDay": true
+  }
+}

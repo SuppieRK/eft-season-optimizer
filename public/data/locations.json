@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "difficultyRatingScale": {
+    "min": 1,
+    "max": 4
+  },
+  "locations": [
+    {
+      "id": "locations.lab.name",
+      "difficultyId": "difficulty.insane",
+      "maxRaidTimeMin": 30,
+      "difficultyRating": 4
+    },
+    {
+      "id": "locations.icebreaker.name",
+      "difficultyId": "difficulty.insane",
+      "maxRaidTimeMin": 50,
+      "difficultyRating": 4
+    },
+    {
+      "id": "locations.groundZero.name",
+      "difficultyId": "difficulty.hard",
+      "maxRaidTimeMin": 35,
+      "difficultyRating": 3
+    },
+    {
+      "id": "locations.woods.name",
+      "difficultyId": "difficulty.normal",
+      "maxRaidTimeMin": 25,
+      "difficultyRating": 2
+    },
+    {
+      "id": "locations.streets.name",
+      "difficultyId": "difficulty.insane",
+      "maxRaidTimeMin": 50,
+      "difficultyRating": 4
+    },
+    {
+      "id": "locations.factory.name",
+      "difficultyId": "difficulty.easy",
+      "maxRaidTimeMin": 15,
+      "difficultyRating": 1
+    },
+    {
+      "id": "locations.customs.name",
+      "difficultyId": "difficulty.hard",
+      "maxRaidTimeMin": 25,
+      "difficultyRating": 3
+    },
+    {
+      "id": "locations.interchange.name",
+      "difficultyId": "difficulty.hard",
+      "maxRaidTimeMin": 35,
+      "difficultyRating": 3
+    },
+    {
+      "id": "locations.reserve.name",
+      "difficultyId": "difficulty.insane",
+      "maxRaidTimeMin": 27,
+      "difficultyRating": 4
+    },
+    {
+      "id": "locations.lighthouse.name",
+      "difficultyId": "difficulty.insane",
+      "maxRaidTimeMin": 30,
+      "difficultyRating": 4
+    },
+    {
+      "id": "locations.shoreline.name",
+      "difficultyId": "difficulty.hard",
+      "maxRaidTimeMin": 35,
+      "difficultyRating": 3
+    },
+    {
+      "id": "locations.terminal.name",
+      "difficultyId": "difficulty.insane",
+      "maxRaidTimeMin": 45,
+      "difficultyRating": 4
+    }
+  ]
+}

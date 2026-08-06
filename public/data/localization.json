@@ -1,0 +1,1284 @@
+{
+  "schemaVersion": 1,
+  "defaultLocale": "en",
+  "supportedLocales": [
+    "en"
+  ],
+  "releaseStatus": "development-only; additional localizations and human-reviewed descriptions are a release blocker",
+  "entries": [
+    {
+      "id": "app.title",
+      "localizations": {
+        "en": "KORD Breach Optimizer"
+      }
+    },
+    {
+      "id": "app.subtitle",
+      "localizations": {
+        "en": "Battle Pass farming route planner"
+      }
+    },
+    {
+      "id": "season.one",
+      "localizations": {
+        "en": "Season One"
+      }
+    },
+    {
+      "id": "battlePass.title",
+      "localizations": {
+        "en": "Battle Pass"
+      }
+    },
+    {
+      "id": "battlePass.rewardList",
+      "localizations": {
+        "en": "Reward list"
+      }
+    },
+    {
+      "id": "battlePass.page",
+      "localizations": {
+        "en": "Page"
+      }
+    },
+    {
+      "id": "battlePass.requiresPage",
+      "localizations": {
+        "en": "Claim rewards from page {page}"
+      }
+    },
+    {
+      "id": "battlePass.collectDocuments",
+      "localizations": {
+        "en": "Collect and submit documents"
+      }
+    },
+    {
+      "id": "battlePass.claimReward",
+      "localizations": {
+        "en": "Claim reward"
+      }
+    },
+    {
+      "id": "battlePass.claimAll",
+      "localizations": {
+        "en": "Claim all"
+      }
+    },
+    {
+      "id": "battlePass.clearAll",
+      "localizations": {
+        "en": "Clear all"
+      }
+    },
+    {
+      "id": "battlePass.documents",
+      "localizations": {
+        "en": "Documents"
+      }
+    },
+    {
+      "id": "battlePass.tarCoins",
+      "localizations": {
+        "en": "TarCoins"
+      }
+    },
+    {
+      "id": "battlePass.classifiedDocuments",
+      "localizations": {
+        "en": "Classified Documents"
+      }
+    },
+    {
+      "id": "battlePass.blackDivisionCrate",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "mode.pve",
+      "localizations": {
+        "en": "PvE"
+      }
+    },
+    {
+      "id": "mode.pvp",
+      "localizations": {
+        "en": "PvP"
+      }
+    },
+    {
+      "id": "mode.pvpSeasonal",
+      "localizations": {
+        "en": "PvP Seasonal"
+      }
+    },
+    {
+      "id": "difficulty.easy",
+      "localizations": {
+        "en": "Easy"
+      }
+    },
+    {
+      "id": "difficulty.normal",
+      "localizations": {
+        "en": "Normal"
+      }
+    },
+    {
+      "id": "difficulty.hard",
+      "localizations": {
+        "en": "Hard"
+      }
+    },
+    {
+      "id": "difficulty.insane",
+      "localizations": {
+        "en": "Insane"
+      }
+    },
+    {
+      "id": "locations.lab.name",
+      "localizations": {
+        "en": "The Lab"
+      }
+    },
+    {
+      "id": "locations.icebreaker.name",
+      "localizations": {
+        "en": "Ice Breaker"
+      }
+    },
+    {
+      "id": "locations.groundZero.name",
+      "localizations": {
+        "en": "Ground Zero"
+      }
+    },
+    {
+      "id": "locations.woods.name",
+      "localizations": {
+        "en": "Woods"
+      }
+    },
+    {
+      "id": "locations.streets.name",
+      "localizations": {
+        "en": "Streets of Tarkov"
+      }
+    },
+    {
+      "id": "locations.factory.name",
+      "localizations": {
+        "en": "Factory"
+      }
+    },
+    {
+      "id": "locations.customs.name",
+      "localizations": {
+        "en": "Customs"
+      }
+    },
+    {
+      "id": "locations.interchange.name",
+      "localizations": {
+        "en": "Interchange"
+      }
+    },
+    {
+      "id": "locations.reserve.name",
+      "localizations": {
+        "en": "Reserve"
+      }
+    },
+    {
+      "id": "locations.lighthouse.name",
+      "localizations": {
+        "en": "Lighthouse"
+      }
+    },
+    {
+      "id": "locations.shoreline.name",
+      "localizations": {
+        "en": "Shoreline"
+      }
+    },
+    {
+      "id": "locations.terminal.name",
+      "localizations": {
+        "en": "Terminal"
+      }
+    },
+    {
+      "id": "documents.medical.name",
+      "localizations": {
+        "en": "Medical documents"
+      }
+    },
+    {
+      "id": "documents.medical.description",
+      "localizations": {
+        "en": "Medical records containing research findings. Many of them are ethically questionable, yet remarkably successful in every other regard."
+      }
+    },
+    {
+      "id": "documents.medical.alt",
+      "localizations": {
+        "en": "Medical documents thumbnail"
+      }
+    },
+    {
+      "id": "documents.financial.name",
+      "localizations": {
+        "en": "Financial documents"
+      }
+    },
+    {
+      "id": "documents.financial.description",
+      "localizations": {
+        "en": "Financial reports from TerraGroup and its affiliated companies."
+      }
+    },
+    {
+      "id": "documents.financial.alt",
+      "localizations": {
+        "en": "Financial documents thumbnail"
+      }
+    },
+    {
+      "id": "documents.user.name",
+      "localizations": {
+        "en": "User documentation"
+      }
+    },
+    {
+      "id": "documents.user.description",
+      "localizations": {
+        "en": "Documentation issued to every new TerraGroup employee upon signing."
+      }
+    },
+    {
+      "id": "documents.user.alt",
+      "localizations": {
+        "en": "User documentation thumbnail"
+      }
+    },
+    {
+      "id": "documents.test.name",
+      "localizations": {
+        "en": "Test documentation"
+      }
+    },
+    {
+      "id": "documents.test.description",
+      "localizations": {
+        "en": "Documents detailing tests of various experimental compounds from TerraGroup-controlled laboratories."
+      }
+    },
+    {
+      "id": "documents.test.alt",
+      "localizations": {
+        "en": "Test documentation thumbnail"
+      }
+    },
+    {
+      "id": "documents.technical.name",
+      "localizations": {
+        "en": "Technical documentation"
+      }
+    },
+    {
+      "id": "documents.technical.description",
+      "localizations": {
+        "en": "Operating manuals for TerraGroup equipment."
+      }
+    },
+    {
+      "id": "documents.technical.alt",
+      "localizations": {
+        "en": "Technical documentation thumbnail"
+      }
+    },
+    {
+      "id": "documents.project.name",
+      "localizations": {
+        "en": "Project documentation"
+      }
+    },
+    {
+      "id": "documents.project.description",
+      "localizations": {
+        "en": "Documentation from Tarkov InfraLine. The company officially specialized in road construction, but these blueprints clearly have nothing to do with transportation infrastructure."
+      }
+    },
+    {
+      "id": "documents.project.alt",
+      "localizations": {
+        "en": "Project documentation thumbnail"
+      }
+    },
+    {
+      "id": "documents.pmc.name",
+      "localizations": {
+        "en": "PMC personnel files"
+      }
+    },
+    {
+      "id": "documents.pmc.description",
+      "localizations": {
+        "en": "Rumor has it that TerraGroup keeps a personnel file on nearly every PMC operator."
+      }
+    },
+    {
+      "id": "documents.pmc.alt",
+      "localizations": {
+        "en": "PMC personnel files thumbnail"
+      }
+    },
+    {
+      "id": "documents.blueprints.name",
+      "localizations": {
+        "en": "Blueprints and technical documentation"
+      }
+    },
+    {
+      "id": "documents.blueprints.description",
+      "localizations": {
+        "en": "Blueprints and technical documentation belonging to TerraGroup. For convenience, all of the data has also been backed up onto a disk."
+      }
+    },
+    {
+      "id": "documents.blueprints.alt",
+      "localizations": {
+        "en": "Blueprints and technical documentation thumbnail"
+      }
+    },
+    {
+      "id": "documents.classified.name",
+      "localizations": {
+        "en": "Classified documents"
+      }
+    },
+    {
+      "id": "documents.classified.description",
+      "localizations": {
+        "en": "Classified information that somehow survived against all odds. A unique document that can be used to backfill any missing document required for the Battle Pass."
+      }
+    },
+    {
+      "id": "documents.classified.alt",
+      "localizations": {
+        "en": "Classified documents thumbnail"
+      }
+    },
+    {
+      "id": "optimizer.fastest",
+      "localizations": {
+        "en": "Fastest"
+      }
+    },
+    {
+      "id": "optimizer.safest",
+      "localizations": {
+        "en": "Safest"
+      }
+    },
+    {
+      "id": "optimizer.combined",
+      "localizations": {
+        "en": "Fastest and safest"
+      }
+    },
+    {
+      "id": "optimizer.noRoute",
+      "localizations": {
+        "en": "No route is available for this profile."
+      }
+    },
+    {
+      "id": "optimizer.classifiedBackfill",
+      "localizations": {
+        "en": "Classified Documents backfill missing regular documents during redemption; they are not substituted for regular documents in the farming plan."
+      }
+    },
+    {
+      "id": "optimizer.blackDivisionFallback",
+      "localizations": {
+        "en": "All ordinary rewards are complete. Farm the fastest eligible location for Black Division Gear Crates."
+      }
+    },
+    {
+      "id": "optimizer.locationCount",
+      "localizations": {
+        "en": "{count} locations"
+      }
+    },
+    {
+      "id": "optimizer.documentCount",
+      "localizations": {
+        "en": "{count} documents"
+      }
+    },
+    {
+      "id": "optimizer.raidCount",
+      "localizations": {
+        "en": "{count} raids"
+      }
+    },
+    {
+      "id": "optimizer.dailyLimit",
+      "localizations": {
+        "en": "Daily raid limit"
+      }
+    },
+    {
+      "id": "optimizer.mode",
+      "localizations": {
+        "en": "Game mode"
+      }
+    },
+    {
+      "id": "optimizer.includeTarCoins",
+      "localizations": {
+        "en": "Spend Battle Pass TarCoins on Classified Documents"
+      }
+    },
+    {
+      "id": "optimizer.classifiedOwned",
+      "localizations": {
+        "en": "Classified Documents owned"
+      }
+    },
+    {
+      "id": "optimizer.tarCoinsOwned",
+      "localizations": {
+        "en": "TarCoins owned"
+      }
+    },
+    {
+      "id": "season.countdown",
+      "localizations": {
+        "en": "Season ends in {time}"
+      }
+    },
+    {
+      "id": "season.ended",
+      "localizations": {
+        "en": "Season ended"
+      }
+    },
+    {
+      "id": "footer.disclaimer",
+      "localizations": {
+        "en": "Escape from Tarkov and all game image assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool."
+      }
+    },
+    {
+      "id": "footer.sourceNote",
+      "localizations": {
+        "en": "Battle Pass data reconstructed from the supplied screenshot collection."
+      }
+    },
+    {
+      "id": "asset.quantityRemoved",
+      "localizations": {
+        "en": "Document artwork with quantity overlays removed."
+      }
+    },
+    {
+      "id": "rewards.dogtag01.name",
+      "localizations": {
+        "en": "Dogtag"
+      }
+    },
+    {
+      "id": "rewards.tarcoins50-01.name",
+      "localizations": {
+        "en": "TarCoins (50)"
+      }
+    },
+    {
+      "id": "rewards.burn-poster.name",
+      "localizations": {
+        "en": "Burn Poster"
+      }
+    },
+    {
+      "id": "rewards.bd-crate01.name",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "rewards.black-wood-ceiling.name",
+      "localizations": {
+        "en": "Black Wood Ceiling"
+      }
+    },
+    {
+      "id": "rewards.genetex-respirator.name",
+      "localizations": {
+        "en": "Gentex Ops-Core SOTR Respirator"
+      }
+    },
+    {
+      "id": "rewards.red-hawaii.name",
+      "localizations": {
+        "en": "Red Hawaii"
+      }
+    },
+    {
+      "id": "rewards.bd-crate02.name",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "rewards.scorpion-target.name",
+      "localizations": {
+        "en": "Scorpion Target"
+      }
+    },
+    {
+      "id": "rewards.tarcoins50-02.name",
+      "localizations": {
+        "en": "TarCoins (50)"
+      }
+    },
+    {
+      "id": "rewards.mystery-ranch-sling.name",
+      "localizations": {
+        "en": "Mystery Ranch Nice Frame Load Sling"
+      }
+    },
+    {
+      "id": "rewards.bd-crate03.name",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "rewards.black-herringbone.name",
+      "localizations": {
+        "en": "Black Herringbone"
+      }
+    },
+    {
+      "id": "rewards.tarcoins50-03.name",
+      "localizations": {
+        "en": "TarCoins (50)"
+      }
+    },
+    {
+      "id": "rewards.heart.name",
+      "localizations": {
+        "en": "Heart"
+      }
+    },
+    {
+      "id": "rewards.dogtag02.name",
+      "localizations": {
+        "en": "Dogtag"
+      }
+    },
+    {
+      "id": "rewards.jagdkommando.name",
+      "localizations": {
+        "en": "Microtech Jagdkommando Knife"
+      }
+    },
+    {
+      "id": "rewards.tarcoins50-04.name",
+      "localizations": {
+        "en": "TarCoins (50)"
+      }
+    },
+    {
+      "id": "rewards.beware-bear-poster.name",
+      "localizations": {
+        "en": "Beware the Bear Poster"
+      }
+    },
+    {
+      "id": "rewards.bd-crate04.name",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "rewards.orange-hawaii.name",
+      "localizations": {
+        "en": "Orange Hawaii"
+      }
+    },
+    {
+      "id": "rewards.tarcoins50-05.name",
+      "localizations": {
+        "en": "TarCoins (50)"
+      }
+    },
+    {
+      "id": "rewards.black-division-target.name",
+      "localizations": {
+        "en": "Black Division Target"
+      }
+    },
+    {
+      "id": "rewards.bd-crate05.name",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "rewards.ferro-fcpc.name",
+      "localizations": {
+        "en": "Ferro Concepts FCPC V5 Plate Carrier (Black Division)"
+      }
+    },
+    {
+      "id": "rewards.knyazev.name",
+      "localizations": {
+        "en": "Knyazev"
+      }
+    },
+    {
+      "id": "rewards.oconnor.name",
+      "localizations": {
+        "en": "O'Connor"
+      }
+    },
+    {
+      "id": "rewards.howa-type20.name",
+      "localizations": {
+        "en": "Howa Type 20 5.56x45 Assault Rifle"
+      }
+    },
+    {
+      "id": "rewards.dogtag03.name",
+      "localizations": {
+        "en": "Dogtag"
+      }
+    },
+    {
+      "id": "rewards.tarcoins50-06.name",
+      "localizations": {
+        "en": "TarCoins (50)"
+      }
+    },
+    {
+      "id": "rewards.scorpion-upper.name",
+      "localizations": {
+        "en": "Scorpion Upper"
+      }
+    },
+    {
+      "id": "rewards.scorpion-lower.name",
+      "localizations": {
+        "en": "Scorpion Lower"
+      }
+    },
+    {
+      "id": "rewards.bd-crate06.name",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "rewards.tarcoins50-07.name",
+      "localizations": {
+        "en": "TarCoins (50)"
+      }
+    },
+    {
+      "id": "rewards.white-accent-walls.name",
+      "localizations": {
+        "en": "White Accent Walls"
+      }
+    },
+    {
+      "id": "rewards.arch.name",
+      "localizations": {
+        "en": "Arch"
+      }
+    },
+    {
+      "id": "rewards.dome.name",
+      "localizations": {
+        "en": "Dome"
+      }
+    },
+    {
+      "id": "rewards.spiritus-lv119.name",
+      "localizations": {
+        "en": "Spiritus Systems LV-119 Plate Carrier (Black Division V2)"
+      }
+    },
+    {
+      "id": "rewards.tarcoins50-08.name",
+      "localizations": {
+        "en": "TarCoins (50)"
+      }
+    },
+    {
+      "id": "rewards.tasmanian-tiger-pack.name",
+      "localizations": {
+        "en": "Tasmanian Tiger Modular Pack 45 Plus (Multicam Black)"
+      }
+    },
+    {
+      "id": "rewards.bd-crate07.name",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "rewards.silver.name",
+      "localizations": {
+        "en": "Серебряная"
+      }
+    },
+    {
+      "id": "rewards.anton.name",
+      "localizations": {
+        "en": "Anton"
+      }
+    },
+    {
+      "id": "rewards.garrett.name",
+      "localizations": {
+        "en": "Garrett"
+      }
+    },
+    {
+      "id": "rewards.bd-crate08.name",
+      "localizations": {
+        "en": "Black Division Gear Crate"
+      }
+    },
+    {
+      "id": "rewards.tarcoins100.name",
+      "localizations": {
+        "en": "TarCoins (100)"
+      }
+    },
+    {
+      "id": "rewards.dogtag04.name",
+      "localizations": {
+        "en": "Dogtag"
+      }
+    },
+    {
+      "id": "rewards.tarcoins150.name",
+      "localizations": {
+        "en": "TarCoins (150)"
+      }
+    },
+    {
+      "id": "rewards.knyazev-after-battle.name",
+      "localizations": {
+        "en": "Knyazev (After Battle)"
+      }
+    },
+    {
+      "id": "rewards.oconnor-after-battle.name",
+      "localizations": {
+        "en": "O'Connor (After Battle)"
+      }
+    },
+    {
+      "id": "rewards.norinco-cq-a1.name",
+      "localizations": {
+        "en": "Norinco CQ-A1 5.56x45 Assault Rifle"
+      }
+    },
+    {
+      "id": "rewards.nocturnal-upper.name",
+      "localizations": {
+        "en": "Nocturnal Upper"
+      }
+    },
+    {
+      "id": "rewards.nocturnal-lower.name",
+      "localizations": {
+        "en": "Nocturnal Lower"
+      }
+    },
+    {
+      "id": "season.endsAt",
+      "localizations": {
+        "en": "Season deadline: {time}"
+      }
+    },
+    {
+      "id": "ui.locale",
+      "localizations": {
+        "en": "Language"
+      }
+    },
+    {
+      "id": "ui.modeSummary",
+      "localizations": {
+        "en": "{mode} · {count}/{day}"
+      }
+    },
+    {
+      "id": "ui.previousPage",
+      "localizations": {
+        "en": "Previous Battle Pass page"
+      }
+    },
+    {
+      "id": "ui.nextPage",
+      "localizations": {
+        "en": "Next Battle Pass page"
+      }
+    },
+    {
+      "id": "ui.routeStop",
+      "localizations": {
+        "en": "Selected route stop"
+      }
+    },
+    {
+      "id": "ui.routeStopLabel",
+      "localizations": {
+        "en": "Stop {current} of {total}: {location}"
+      }
+    },
+    {
+      "id": "ui.controls",
+      "localizations": {
+        "en": "Planner controls"
+      }
+    },
+    {
+      "id": "ui.results",
+      "localizations": {
+        "en": "Optimization results"
+      }
+    },
+    {
+      "id": "ui.progress",
+      "localizations": {
+        "en": "Progress"
+      }
+    },
+    {
+      "id": "ui.reset",
+      "localizations": {
+        "en": "Reset planner"
+      }
+    },
+    {
+      "id": "ui.resetConfirm",
+      "localizations": {
+        "en": "Reset all planner selections?"
+      }
+    },
+    {
+      "id": "ui.cancel",
+      "localizations": {
+        "en": "Cancel"
+      }
+    },
+    {
+      "id": "ui.confirm",
+      "localizations": {
+        "en": "Confirm"
+      }
+    },
+    {
+      "id": "ui.documentsOwned",
+      "localizations": {
+        "en": "Documents owned"
+      }
+    },
+    {
+      "id": "ui.quantity",
+      "localizations": {
+        "en": "Quantity"
+      }
+    },
+    {
+      "id": "ui.invalidQuantity",
+      "localizations": {
+        "en": "Enter a non-negative whole number."
+      }
+    },
+    {
+      "id": "ui.claimed",
+      "localizations": {
+        "en": "Claimed"
+      }
+    },
+    {
+      "id": "ui.unclaimedRewards",
+      "localizations": {
+        "en": "{count} rewards remain"
+      }
+    },
+    {
+      "id": "ui.estimatedDays",
+      "localizations": {
+        "en": "Estimated days: {count}"
+      }
+    },
+    {
+      "id": "ui.planEstimate",
+      "localizations": {
+        "en": "Planning estimate; not a guaranteed raid or spawn schedule."
+      }
+    },
+    {
+      "id": "ui.day",
+      "localizations": {
+        "en": "day"
+      }
+    },
+    {
+      "id": "ui.claimMoreFromPage",
+      "localizations": {
+        "en": "Claim {count} more from Page {page}"
+      }
+    },
+    {
+      "id": "ui.routePreference",
+      "localizations": {
+        "en": "Route preference"
+      }
+    },
+    {
+      "id": "ui.fastestReason",
+      "localizations": {
+        "en": "Lower raid time"
+      }
+    },
+    {
+      "id": "ui.safestReason",
+      "localizations": {
+        "en": "Lower difficulty"
+      }
+    },
+    {
+      "id": "ui.nextAction",
+      "localizations": {
+        "en": "Next action"
+      }
+    },
+    {
+      "id": "ui.farmNext",
+      "localizations": {
+        "en": "Farm next"
+      }
+    },
+    {
+      "id": "ui.viewFullSchedule",
+      "localizations": {
+        "en": "View full schedule"
+      }
+    },
+    {
+      "id": "ui.fullSchedule",
+      "localizations": {
+        "en": "Full farming schedule"
+      }
+    },
+    {
+      "id": "ui.close",
+      "localizations": {
+        "en": "Close"
+      }
+    },
+    {
+      "id": "ui.planDetails",
+      "localizations": {
+        "en": "Plan details"
+      }
+    },
+    {
+      "id": "ui.stillNeed",
+      "localizations": {
+        "en": "Still need {count}"
+      }
+    },
+    {
+      "id": "ui.modeLimitFixed",
+      "localizations": {
+        "en": "Fixed by the selected game mode"
+      }
+    },
+    {
+      "id": "ui.nextClaims",
+      "localizations": {
+        "en": "Next Battle Pass progress"
+      }
+    },
+    {
+      "id": "ui.remainingDocuments",
+      "localizations": {
+        "en": "Documents still needed"
+      }
+    },
+    {
+      "id": "ui.document",
+      "localizations": {
+        "en": "Document"
+      }
+    },
+    {
+      "id": "ui.toFarm",
+      "localizations": {
+        "en": "To farm"
+      }
+    },
+    {
+      "id": "ui.readyNow",
+      "localizations": {
+        "en": "Claim now"
+      }
+    },
+    {
+      "id": "ui.sameRoute",
+      "localizations": {
+        "en": "Same locations; ordered by this profile"
+      }
+    },
+    {
+      "id": "ui.farmLocations",
+      "localizations": {
+        "en": "Farm locations"
+      }
+    },
+    {
+      "id": "ui.dailyProgression",
+      "localizations": {
+        "en": "Daily reward progression"
+      }
+    },
+    {
+      "id": "ui.claimOnDay",
+      "localizations": {
+        "en": "Claim after farming"
+      }
+    },
+    {
+      "id": "ui.pageUnlocked",
+      "localizations": {
+        "en": "Page {page} unlocked"
+      }
+    },
+    {
+      "id": "ui.locationFactor",
+      "localizations": {
+        "en": "{difficulty}; {minutes} min maximum raid time"
+      }
+    },
+    {
+      "id": "ui.scheduleDay",
+      "localizations": {
+        "en": "Day {day}: {count} documents"
+      }
+    },
+    {
+      "id": "ui.buyout",
+      "localizations": {
+        "en": "Informational remaining-pass buyout"
+      }
+    },
+    {
+      "id": "ui.additionalTarCoins",
+      "localizations": {
+        "en": "Minimum additional TarCoins: {count}"
+      }
+    },
+    {
+      "id": "ui.fromEstimate",
+      "localizations": {
+        "en": "FROM estimate: {price}"
+      }
+    },
+    {
+      "id": "ui.crateCount",
+      "localizations": {
+        "en": "Black Division crates"
+      }
+    },
+    {
+      "id": "ui.crateShortage",
+      "localizations": {
+        "en": "Regular documents to farm: {count}"
+      }
+    },
+    {
+      "id": "ui.classifiedUse",
+      "localizations": {
+        "en": "Owned Classified Documents consumed: {used}; remaining: {remaining}"
+      }
+    },
+    {
+      "id": "ui.exchange",
+      "localizations": {
+        "en": "Regular-document exchanges: {count}"
+      }
+    },
+    {
+      "id": "ui.purchaseSummary",
+      "localizations": {
+        "en": "Purchased Classified Documents: {count}; TarCoins spent: {tarCoins}"
+      }
+    },
+    {
+      "id": "ui.warning",
+      "localizations": {
+        "en": "Warning: {text}"
+      }
+    },
+    {
+      "id": "feedback.button",
+      "localizations": {
+        "en": "Feedback"
+      }
+    },
+    {
+      "id": "feedback.heading",
+      "localizations": {
+        "en": "Send feedback"
+      }
+    },
+    {
+      "id": "feedback.message",
+      "localizations": {
+        "en": "Message"
+      }
+    },
+    {
+      "id": "feedback.includeContext",
+      "localizations": {
+        "en": "Include compact optimizer context"
+      }
+    },
+    {
+      "id": "feedback.preview",
+      "localizations": {
+        "en": "Issue preview"
+      }
+    },
+    {
+      "id": "feedback.openGitHub",
+      "localizations": {
+        "en": "Open GitHub issue composer"
+      }
+    },
+    {
+      "id": "feedback.unconfigured",
+      "localizations": {
+        "en": "GitHub submission will be enabled after publication configuration."
+      }
+    },
+    {
+      "id": "feedback.invalid",
+      "localizations": {
+        "en": "Enter a message within the allowed length."
+      }
+    },
+    {
+      "id": "feedback.title",
+      "localizations": {
+        "en": "KORD BREACH Optimizer feedback"
+      }
+    },
+    {
+      "id": "feedback.body",
+      "localizations": {
+        "en": "Feedback:\n{message}"
+      }
+    },
+    {
+      "id": "feedback.context",
+      "localizations": {
+        "en": "Context:\nGame data: {version}\nMode: {mode}\nDaily limit: {limit}"
+      }
+    },
+    {
+      "id": "cookieNotice.message",
+      "localizations": {
+        "en": "Cookies store your planner selections on this device."
+      }
+    },
+    {
+      "id": "cookieNotice.dismiss",
+      "localizations": {
+        "en": "Dismiss"
+      }
+    },
+    {
+      "id": "rewards.short.pending",
+      "localizations": {
+        "en": "Reward description pending."
+      }
+    }
+  ],
+  "priceEntries": [
+    {
+      "id": "tarCoinBundles.500.localPrice",
+      "localizations": {
+        "en": {
+          "amountMinor": 499,
+          "currency": "USD",
+          "display": "FROM $ 4.99"
+        }
+      }
+    },
+    {
+      "id": "tarCoinBundles.1100.localPrice",
+      "localizations": {
+        "en": {
+          "amountMinor": 999,
+          "currency": "USD",
+          "display": "FROM $ 9.99"
+        }
+      }
+    },
+    {
+      "id": "tarCoinBundles.2300.localPrice",
+      "localizations": {
+        "en": {
+          "amountMinor": 1999,
+          "currency": "USD",
+          "display": "FROM $ 19.99"
+        }
+      }
+    },
+    {
+      "id": "tarCoinBundles.6000.localPrice",
+      "localizations": {
+        "en": {
+          "amountMinor": 4999,
+          "currency": "USD",
+          "display": "FROM $ 49.99"
+        }
+      }
+    },
+    {
+      "id": "tarCoinBundles.12500.localPrice",
+      "localizations": {
+        "en": {
+          "amountMinor": 9999,
+          "currency": "USD",
+          "display": "FROM $ 99.99"
+        }
+      }
+    },
+    {
+      "id": "tarCoinBundles.20250.localPrice",
+      "localizations": {
+        "en": {
+          "amountMinor": 14999,
+          "currency": "USD",
+          "display": "FROM $ 149.99"
+        }
+      }
+    }
+  ]
+}

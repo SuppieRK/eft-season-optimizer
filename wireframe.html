@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KORD BREACH — Layout Wireframe</title>
+    <style>
+      :root {
+        --canvas-width: 94vw;
+        --canvas-height: 94vh;
+        --canvas-min-width: 1180px;
+        --canvas-min-height: 720px;
+        --header-height: clamp(96px, 10vh, 160px);
+        --lower-band-height: clamp(136px, 13vh, 200px);
+        --reward-column: 24.4fr;
+        --focus-column: 50.3fr;
+        --detail-column: 25.3fr;
+        --section-heading-height: clamp(54px, 5.2vh, 84px);
+        --detail-content-height: clamp(132px, 16vh, 244px);
+        --primary-action-height: clamp(54px, 6vh, 90px);
+        --line: #697078;
+        --line-muted: #41464d;
+        --surface: #17191c;
+        --surface-alt: #1d2024;
+        --label: #d7d9dc;
+        --label-muted: #a8adb3;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-width: var(--canvas-min-width);
+        min-height: var(--canvas-min-height);
+        margin: 0;
+      }
+
+      body {
+        min-block-size: 100vh;
+        overflow: auto;
+        background: #0f1012;
+        color: var(--label);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+      }
+
+      .wireframe-shell {
+        display: grid;
+        grid-template-rows: var(--header-height) minmax(0, 1fr);
+        inline-size: var(--canvas-width);
+        min-inline-size: calc(var(--canvas-min-width) - 6vw);
+        block-size: var(--canvas-height);
+        min-block-size: calc(var(--canvas-min-height) - 6vh);
+        margin: 3vh auto;
+        border: 1px solid var(--line);
+        background: var(--surface);
+      }
+
+      .wireframe-header,
+      .wireframe-workspace {
+        display: grid;
+        grid-template-columns:
+          var(--reward-column)
+          var(--focus-column)
+          var(--detail-column);
+        min-block-size: 0;
+      }
+
+      .wireframe-header {
+        position: relative;
+        border-block-end: 1px solid var(--line);
+      }
+
+      .wireframe-workspace {
+        grid-template-areas:
+          "reward focus detail"
+          "pagination documents actions";
+        grid-template-rows: minmax(0, 1fr) var(--lower-band-height);
+      }
+
+      .region,
+      .slot {
+        position: relative;
+        min-inline-size: 0;
+        min-block-size: 0;
+      }
+
+      .region {
+        background:
+          linear-gradient(135deg, transparent 0 49.8%, #22262a 50% 50.2%, transparent 50.4%)
+            0 0 / 28px 28px,
+          var(--surface);
+      }
+
+      .slot {
+        background: color-mix(in srgb, var(--surface-alt) 82%, transparent);
+      }
+
+      .region-label,
+      .slot-label {
+        position: absolute;
+        z-index: 1;
+        inset-block-start: 12px;
+        inset-inline-start: 14px;
+        max-inline-size: calc(100% - 28px);
+        padding: 4px 7px;
+        background: var(--surface);
+        color: var(--label);
+        font-size: clamp(12px, 0.72vw, 16px);
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .slot-label {
+        color: var(--label-muted);
+        font-size: clamp(11px, 0.64vw, 14px);
+        font-weight: 600;
+      }
+
+      .region > .region-label {
+        inset-inline-start: auto;
+        inset-inline-end: 14px;
+      }
+
+      .header-label {
+        inset-block-start: auto;
+        inset-block-end: 12px;
+      }
+
+      .header-slot + .header-slot,
+      .focus-stage,
+      .detail-rail,
+      .document-strip,
+      .secondary-actions {
+        border-inline-start: 1px solid var(--line);
+      }
+
+      .header-slot {
+        background: var(--surface-alt);
+      }
+
+      .reward-rail {
+        grid-area: reward;
+        display: grid;
+        grid-template-rows: var(--section-heading-height) minmax(0, 1fr);
+      }
+
+      .focus-stage {
+        grid-area: focus;
+        display: grid;
+        grid-template-rows: var(--section-heading-height) minmax(0, 1fr);
+      }
+
+      .detail-rail {
+        grid-area: detail;
+        display: grid;
+        grid-template-rows:
+          var(--section-heading-height)
+          var(--detail-content-height)
+          var(--primary-action-height)
+          minmax(0, 1fr);
+      }
+
+      .section-heading,
+      .primary-content,
+      .detail-content,
+      .primary-action {
+        border-block-end: 1px dashed var(--line-muted);
+      }
+
+      .page-navigation {
+        grid-area: pagination;
+      }
+
+      .document-strip {
+        grid-area: documents;
+      }
+
+      .secondary-actions {
+        grid-area: actions;
+      }
+
+      .page-navigation,
+      .document-strip,
+      .secondary-actions {
+        border-block-start: 1px solid var(--line);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wireframe-shell">
+      <header class="wireframe-header" aria-label="Header">
+        <span class="region-label header-label">Header</span>
+        <section class="slot header-slot" aria-label="Season identity">
+          <span class="slot-label">Season / identity slot</span>
+        </section>
+        <section class="slot header-slot" aria-label="Primary navigation">
+          <span class="slot-label">Primary navigation slot</span>
+        </section>
+        <section class="slot header-slot" aria-label="Back and account utilities">
+          <span class="slot-label">Back / account slot</span>
+        </section>
+      </header>
+
+      <main class="wireframe-workspace" aria-label="Battle Pass workspace">
+        <section class="region reward-rail" aria-label="Reward rail">
+          <span class="region-label">Reward rail</span>
+          <div class="slot section-heading" aria-label="Reward heading">
+            <span class="slot-label">Reward heading slot</span>
+          </div>
+          <div class="slot primary-content" aria-label="Reward list">
+            <span class="slot-label">Reward list slot</span>
+          </div>
+        </section>
+
+        <section class="region focus-stage" aria-label="Focus stage">
+          <span class="region-label">Focus stage</span>
+          <div class="slot section-heading" aria-label="Focus heading">
+            <span class="slot-label">Focus heading slot</span>
+          </div>
+          <div class="slot primary-content" aria-label="Primary content">
+            <span class="slot-label">Primary content slot</span>
+          </div>
+        </section>
+
+        <aside class="region detail-rail" aria-label="Detail rail">
+          <span class="region-label">Detail rail</span>
+          <div class="slot section-heading" aria-label="Detail heading">
+            <span class="slot-label">Detail heading slot</span>
+          </div>
+          <div class="slot detail-content" aria-label="Detail content">
+            <span class="slot-label">Detail content slot</span>
+          </div>
+          <div class="slot primary-action" aria-label="Primary action">
+            <span class="slot-label">Primary action slot</span>
+          </div>
+        </aside>
+
+        <nav class="region page-navigation" aria-label="Page navigation">
+          <span class="region-label">Page navigation slot</span>
+        </nav>
+
+        <section class="region document-strip" aria-label="Document strip">
+          <span class="region-label">Document strip slot</span>
+        </section>
+
+        <section class="region secondary-actions" aria-label="Secondary actions">
+          <span class="region-label">Secondary actions slot</span>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

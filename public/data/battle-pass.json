@@ -1,0 +1,1108 @@
+{
+  "schemaVersion": 1,
+  "gameDataVersion": "1.1.0.0.46657.8.6.2026",
+  "id": "season.one",
+  "endsAt": 1796637600,
+  "pages": [
+    {
+      "page": 1,
+      "rewards": [
+        {
+          "id": "rewards.dogtag01.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins50-01.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 50,
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.burn-poster.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.bd-crate01.name",
+          "kind": "crate",
+          "requirements": [
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.black-wood-ceiling.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.user.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "rewards": [
+        {
+          "id": "rewards.genetex-respirator.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.red-hawaii.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.bd-crate02.name",
+          "kind": "crate",
+          "requirements": [
+            {
+              "documentId": "documents.test.name",
+              "quantity": 3
+            }
+          ]
+        },
+        {
+          "id": "rewards.scorpion-target.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.user.name",
+              "quantity": 1
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 1
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins50-02.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 50,
+          "requirements": [
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "rewards": [
+        {
+          "id": "rewards.mystery-ranch-sling.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.user.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 1
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.bd-crate03.name",
+          "kind": "crate",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.black-herringbone.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins50-03.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 50,
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.heart.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 1
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "rewards": [
+        {
+          "id": "rewards.dogtag02.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.jagdkommando.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.user.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins50-04.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 50,
+          "requirements": [
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.beware-bear-poster.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.bd-crate04.name",
+          "kind": "crate",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 5,
+      "rewards": [
+        {
+          "id": "rewards.orange-hawaii.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins50-05.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 50,
+          "requirements": [
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 1
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 1
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.black-division-target.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.bd-crate05.name",
+          "kind": "crate",
+          "requirements": [
+            {
+              "documentId": "documents.test.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.ferro-fcpc.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 6,
+      "rewards": [
+        {
+          "id": "rewards.knyazev.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.user.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.oconnor.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.howa-type20.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 7,
+      "rewards": [
+        {
+          "id": "rewards.dogtag03.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins50-06.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 50,
+          "requirements": [
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.scorpion-upper.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.scorpion-lower.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 8,
+      "rewards": [
+        {
+          "id": "rewards.bd-crate06.name",
+          "kind": "crate",
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins50-07.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 50,
+          "requirements": [
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.white-accent-walls.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.arch.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.dome.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 1
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 9,
+      "rewards": [
+        {
+          "id": "rewards.spiritus-lv119.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins50-08.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 50,
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.tasmanian-tiger-pack.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.bd-crate07.name",
+          "kind": "crate",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.silver.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "rewards": [
+        {
+          "id": "rewards.anton.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.garrett.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.bd-crate08.name",
+          "kind": "crate",
+          "requirements": [
+            {
+              "documentId": "documents.test.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins100.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 100,
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 11,
+      "rewards": [
+        {
+          "id": "rewards.dogtag04.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.project.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.tarcoins150.name",
+          "kind": "tarcoins",
+          "tarCoinsAwarded": 150,
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 3
+            }
+          ]
+        },
+        {
+          "id": "rewards.knyazev-after-battle.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 3
+            }
+          ]
+        },
+        {
+          "id": "rewards.oconnor-after-battle.name",
+          "kind": "cosmetic",
+          "requirements": [
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "rewards": [
+        {
+          "id": "rewards.norinco-cq-a1.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 29
+            }
+          ]
+        },
+        {
+          "id": "rewards.nocturnal-upper.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 2
+            }
+          ]
+        },
+        {
+          "id": "rewards.nocturnal-lower.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 3
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

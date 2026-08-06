@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "documents": [
+    {
+      "id": "documents.medical.name",
+      "kind": "regular",
+      "descriptionId": "documents.medical.description",
+      "imageAltId": "documents.medical.alt",
+      "imagePath": "/assets/documents/medical.png",
+      "sourceLocationIds": [
+        "locations.lab.name",
+        "locations.groundZero.name"
+      ]
+    },
+    {
+      "id": "documents.financial.name",
+      "kind": "regular",
+      "descriptionId": "documents.financial.description",
+      "imageAltId": "documents.financial.alt",
+      "imagePath": "/assets/documents/financial.png",
+      "sourceLocationIds": [
+        "locations.customs.name",
+        "locations.streets.name",
+        "locations.interchange.name"
+      ]
+    },
+    {
+      "id": "documents.user.name",
+      "kind": "regular",
+      "descriptionId": "documents.user.description",
+      "imageAltId": "documents.user.alt",
+      "imagePath": "/assets/documents/user.png",
+      "sourceLocationIds": [
+        "locations.groundZero.name",
+        "locations.streets.name",
+        "locations.lab.name"
+      ]
+    },
+    {
+      "id": "documents.test.name",
+      "kind": "regular",
+      "descriptionId": "documents.test.description",
+      "imageAltId": "documents.test.alt",
+      "imagePath": "/assets/documents/test.png",
+      "sourceLocationIds": [
+        "locations.shoreline.name",
+        "locations.woods.name",
+        "locations.icebreaker.name"
+      ]
+    },
+    {
+      "id": "documents.technical.name",
+      "kind": "regular",
+      "descriptionId": "documents.technical.description",
+      "imageAltId": "documents.technical.alt",
+      "imagePath": "/assets/documents/technical.png",
+      "sourceLocationIds": [
+        "locations.shoreline.name",
+        "locations.woods.name",
+        "locations.lighthouse.name"
+      ]
+    },
+    {
+      "id": "documents.project.name",
+      "kind": "regular",
+      "descriptionId": "documents.project.description",
+      "imageAltId": "documents.project.alt",
+      "imagePath": "/assets/documents/project.png",
+      "sourceLocationIds": [
+        "locations.factory.name",
+        "locations.reserve.name",
+        "locations.customs.name"
+      ]
+    },
+    {
+      "id": "documents.pmc.name",
+      "kind": "regular",
+      "descriptionId": "documents.pmc.description",
+      "imageAltId": "documents.pmc.alt",
+      "imagePath": "/assets/documents/pmc.png",
+      "sourceLocationIds": [
+        "locations.reserve.name",
+        "locations.lighthouse.name",
+        "locations.icebreaker.name"
+      ]
+    },
+    {
+      "id": "documents.blueprints.name",
+      "kind": "regular",
+      "descriptionId": "documents.blueprints.description",
+      "imageAltId": "documents.blueprints.alt",
+      "imagePath": "/assets/documents/blueprints.png",
+      "sourceLocationIds": [
+        "locations.interchange.name",
+        "locations.factory.name"
+      ]
+    },
+    {
+      "id": "documents.classified.name",
+      "kind": "classified",
+      "descriptionId": "documents.classified.description",
+      "imageAltId": "documents.classified.alt",
+      "imagePath": "/assets/documents/classified.png",
+      "sourceLocationIds": [],
+      "sourceDescriptionId": "battlePass.classifiedDocuments",
+      "redemptionRule": "backfill-missing-only"
+    }
+  ]
+}

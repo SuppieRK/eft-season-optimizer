@@ -1,0 +1,144 @@
+## 1. Create the JSON Catalogs First
+
+- [x] 1.1 Create `public/data/documents.json` with every regular and Classified Document using its name localization ID as the single canonical ID, plus descriptions, image references, source locations, and `kind`; derive farmability, crate-exchange eligibility, and Classified-backfill eligibility from `kind` without storing redundant flags.
+- [x] 1.2 Create `public/data/locations.json` with every location using its name localization ID as the single canonical ID, plus `difficultyId`, matching `difficultyRating`, and `maxRaidTimeMin` shared across game modes.
+- [x] 1.3 Create `public/data/battle-pass.json` with game-data version `1.1.0.0.46657.8.6.2026`, top-level season `id` and `endsAt: 1796637600`, pages, rewards, prerequisites, document requirements, and TarCoin grants.
+- [x] 1.4 Create `public/data/optimizer-rules.json` with `dailyDocumentLimits` of `10`/`15`/`25` for PvE/PvP/PvP Seasonal, the regular-document `5:1` and Black Division `10:1` exchanges, the complete Classified Document bundles, the six screenshot-priced purchasable TarCoin packages and their local-price IDs, and deterministic tie-break ordering; exclude the unpriced `2,000` TarCoin “RECEIVED” offer from purchase calculations.
+- [x] 1.5 Create `public/data/localization.json` with locale metadata and ID-centered `{ id, localizations }` text and structured local-price entries for the default development locale, including every ID referenced by the other four catalogs and exact screenshot-backed English `FROM` prices for the six TarCoin packages.
+- [x] 1.6 Use the supplied Battle Pass page, reward, exchange, main/guide, and dedicated definition screenshots as authoring evidence for each document icon; keep screenshot evidence outside the runtime catalogs.
+- [x] 1.7 Select or combine the clearest, largest, least-obscured occurrences for each document, preferring quantity-free sources and treating dedicated document screenshots primarily as definition evidence rather than preferred artwork sources.
+- [x] 1.8 Crop consistent icon frames to `public/assets/documents/<document-id>.png`; remove `x0`, `x1`, and other quantity counters by using clean matching pixels from another occurrence first and targeted reconstruction only where no clean source pixels exist.
+- [x] 1.9 Review every cleaned PNG side by side with the contributing screenshot evidence, reject quantity remnants or unrelated visual changes, and keep only the final image path in the runtime document catalog.
+- [x] 1.10 Review the five JSON files and cleaned document images against the complete screenshot collection, record unresolved human-authored descriptions as explicit development placeholders, and confirm that no optimizer fact is hidden in TypeScript or UI markup.
+
+## 2. Scaffold the Static TypeScript Application
+
+- [x] 2.1 Scaffold a framework-free Vite `vanilla-ts` application around the existing `public/data` catalogs without replacing or regenerating them.
+- [x] 2.2 Configure strict TypeScript, semantic HTML entry markup, CSS entry points, and modules for catalogs, localization, optimizer, state, persistence, and rendering.
+- [x] 2.3 Add Vitest, jsdom, and Testing Library DOM with unit, DOM, and production-build test commands.
+- [x] 2.4 Configure Vite's GitHub Pages base path as `/kord-breach-optimizer/` and add an Actions workflow that builds and deploys `dist`.
+- [x] 2.5 Add a production-build check proving HTML, scripts, styles, images, and JSON resolve under the repository base path.
+
+## 3. Validate and Load Catalog Data
+
+- [x] 3.1 Define TypeScript types and runtime parsers for all five JSON catalogs, including localization-backed canonical entity IDs, rejection of parallel `nameId` fields, kind-derived document behavior without redundant boolean flags, and location `difficultyId`, `difficultyRating`, and `maxRaidTimeMin` records.
+- [x] 3.2 Implement catalog loading that returns normalized immutable domain data and actionable validation failures before optimizer startup.
+- [x] 3.3 Validate duplicate IDs, numeric ranges, text and structured-price localization references, document/location references, kind-derived document behavior and source invariants, absence of redundant behavior flags, ordered pages and the implicit previous-page-minus-one unlock rule, reward prerequisites, dependency cycles, redeemability, exchange ratios, bundle and TarCoin package values, asset paths, and season metadata.
+- [x] 3.4 Add catalog tests for game version `1.1.0.0.46657.8.6.2026`, timestamp `1796637600`, difficulty ID/rating mappings, maximum raid times, mode limits, `5:1` regular-document and `10:1` Black Division exchange ratios, six purchasable TarCoin packages, and their exact English local prices.
+- [x] 3.5 Add screenshot-ground-truth tests for every reconstructed page, reward, prerequisite, document total, and TarCoin grant without requiring screenshot paths in runtime JSON; use the manually verified `tests/documents.csv` as the authoritative document-requirement fixture and treat blank cells as zero.
+
+## 4. Build the Localization Foundation
+
+- [x] 4.1 Implement an ID-based localization resolver over `localization.json` with default-locale fallback and conspicuous development missing-ID markers.
+- [x] 4.2 Validate unique and referenced IDs across text and price collections, declared-language keys, non-empty default values, locale metadata, single-purpose string entries, and structured prices with integer minor units, currency, and display values.
+- [x] 4.3 Implement locale-aware number, TarCoin amount, local real-money price, date, time, plural, countdown-unit, validation-message, and compact document-requirement formatting with `Intl` APIs and dedicated message templates.
+- [x] 4.4 Persist and restore the selected complete locale through the UI-state model, falling back to the configured default when unsupported.
+- [x] 4.5 Add localization unit tests for text and structured-price ID resolution, incomplete-locale exclusion without real-money price fallback or conversion, unsupported-locale fallback for text, localized TarCoin amounts and local currency prices, compact accessible requirements, and right-to-left direction metadata.
+
+## 5. Implement Reward and Resource Planning
+
+- [x] 5.1 Define immutable optimizer inputs with exactly one global game mode and structured profile result types without browser, cookie, DOM, or network dependencies.
+- [x] 5.2 Implement the fixed all-unclaimed-rewards objective, legal redemption ordering from reward prerequisites and implicit page unlocks, deterministic recommended next rewards, and exclusion of already claimed rewards without a selected-reward goal.
+- [x] 5.3 Aggregate regular-document requirements and consume matching owned regular inventory before any Classified allocation.
+- [x] 5.4 Implement maximum legal owned Classified Document consumption across the all-unclaimed-rewards sequence after matching regular inventory, target zero remaining whenever deficits allow, preserve canonical ordinary requirements, and leave Classified Documents unchanged when no redeemable deficit accepts backfill.
+- [x] 5.5 Implement mixed-input `5:1` regular-document exchange planning after maximum owned Classified consumption is fixed: reserve all matching requirements, allow duplicate regular donor types, exclude Classified donors, and optimize useful donor/recipient allocations independently per profile.
+- [x] 5.6 Implement opt-in staged Classified bundle selection only after maximum legal owned Classified consumption and useful regular exchanges, with reward-immediate TarCoin availability, no credit for unredeemed rewards, and deterministic route tie-breaking by profile improvement, fewer TarCoins, fewer excess Classified Documents, and fewer bundles.
+- [x] 5.7 Implement the independent remaining-pass buyout estimator over every configured Classified bundle and legal reward sequence, reporting gross TarCoin spend, starting and earned TarCoins used, minimum additional TarCoins required, purchased and excess Classified Documents, and bundle breakdown.
+- [x] 5.8 Implement minimum local real-money TarCoin-package estimation using active-locale integer minor-unit prices, then excess TarCoins and package count; label it as `FROM`, reject incomplete or mixed-currency calculations, and keep it independent of the spending selector.
+- [x] 5.9 Add unit tests for global reward sequencing, prerequisites and page unlocks, claimed rewards, sufficient inventory, mixed and duplicate `5:1` regular exchanges, protected matching inventory, Classified exclusion from exchanges, partial and whole-reward Classified backfill, forced maximum Classified consumption before exchanges, zero remaining when possible, unavoidable surplus, no redeemable deficit, immediate TarCoin use, buyout with staged reward earnings, early-purchase top-up, selector independence, bundle tie-breaking, circular-credit prevention, minimum local package cost, excess and package-count ties, and unavailable local prices.
+
+## 6. Implement Fastest and Safest Routing
+
+- [x] 6.1 Enumerate feasible location subsets and document assignments so documents sharing a location can be farmed together without requiring an external solver.
+- [x] 6.2 Implement the Fastest profile using `maxRaidTimeMin`, then tie-break by fewer locations, lower raw quantity, and stable location ID.
+- [x] 6.3 Implement the Safest profile using `difficultyRating`, then tie-break by fewer locations, lower raw quantity, and stable location ID.
+- [x] 6.4 Hold maximum legal owned Classified consumption fixed while optimizing its deficit allocation, subsequent regular-document exchanges, and optional later TarCoin purchases independently for the Fastest and Safest profile objectives.
+- [x] 6.5 Detect identical profile assignments and return one coincident result marker; return an explicit unavailable profile instead of a partial route when coverage is impossible.
+- [x] 6.6 Return each profile's locations, document assignments, routing factor values, objective values, resource use, and warnings in deterministic order.
+- [x] 6.7 Add exhaustive small-fixture tests for shared locations, distinct Fastest/Safest outcomes, coincident outcomes, profile unavailability, profile-specific Classified allocation, game-mode invariance, and complete ties.
+
+## 7. Add Scheduling and Black Division Planning
+
+- [x] 7.1 Resolve the one global game mode to its fixed `10`/`15`/`25` daily document limit and generate a daily estimate for every available route profile without exceeding that limit while retaining location grouping where possible.
+- [x] 7.2 Return summary-first progression data with reward claims and page unlocks, the first/current day expanded by default, and future days collapsed, without assigning real calendar dates or guaranteed raid counts.
+- [x] 7.3 Implement the all-rewards-claimed Black Division crate goal with a default count of one, regular-document inventory as identified by `kind`, and the eligible location with the lowest `maxRaidTimeMin` for any shortage.
+- [x] 7.4 Leave owned Classified Documents unchanged and exclude Classified backfill and TarCoin bundle purchases from Black Division crate planning.
+- [x] 7.5 Add tests proving the global PvE/PvP/PvP Seasonal selector produces fixed `10`/`15`/`25` daily limits, affects all profile schedules and estimated days, leaves route selection unchanged, advances the page-unlock frontier, covers every reward exactly once, and handles immediate crate exchange, shortages, and scaled crate counts.
+
+## 8. Implement State, Cookies, and Core Controls
+
+- [x] 8.1 Implement the typed application store/reducer for one global mode, daily limit, claimed rewards, owned documents, Classified Documents, TarCoins, spending choice, crate count after pass completion, locale, and collapse state; do not store a reward-goal selection.
+- [x] 8.2 Implement versioned bounded first-party cookies for progress, settings, locale, and collapse state with game-data version and independent schema version metadata.
+- [x] 8.3 Restore valid cookie state, safely default malformed or unsupported state, and enforce serialized size limits without storing derived optimizer results.
+- [x] 8.4 Implement deliberate reset confirmation that clears every optimizer cookie and restores catalog defaults; reserve cookie-notice dismissal integration for the final task group.
+- [x] 8.5 Add state and persistence tests for reducer transitions, cookie round trips, version mismatch, malformed data, size limits, reset confirmation, and reset cancellation.
+
+## 9. Build the Five-Region Battle Pass Interface
+
+- [x] 9.1 Implement the semantic header, left rewards column, center results column, right controls column, and footer document/disclaimer regions in stable source order.
+- [x] 9.2 Implement the green-toned Battle Pass-inspired CSS system, dense panels, restrained texture, visible focus, readable contrast, touch targets, and unofficial-tool presentation.
+- [x] 9.3 Implement the header's localized locale selector and countdown to `2026-12-07 10:00:00 UTC`, including visibility-aware ticking, zero clamping, stable assistive text, and `Season ended` state.
+- [x] 9.4 Implement independently collapsible reward pages whose visible rows contain only item name, compact accessible document requirements, and claimed controls, without target selection.
+- [x] 9.5 Implement per-reward, per-page, and global Claim all/Clear all behavior, including transition to Black Division crate controls when all rewards are claimed.
+- [x] 9.6 Implement right-column one global PvE/PvP/PvP Seasonal selector, effective daily-limit, TarCoin, and reset controls, with no reward-goal selector.
+- [x] 9.7 Implement the footer document tray with images, localized names, decrement, direct non-negative integer entry, increment, validation, internal scrolling, and persistent Battlestate Games disclaimer.
+- [x] 9.8 Implement center-column recommended reward order, Fastest and Safest result cards, combined coincident result, unavailable state, deficits, regular exchanges, resource allocation, routing factors, localized summary-first remaining-pass buyout and local `FROM` package-cost estimates and breakdowns, warnings, and collapsible daily estimates.
+- [x] 9.9 Add responsive grid areas and logical CSS properties that stack header, rewards, controls, results, and footer without viewport horizontal scrolling and support right-to-left locales.
+- [x] 9.10 Add DOM and accessibility tests for keyboard operation, region order, reward-row content limits, inventory entry, claims, controls, countdown, route cards, localized buyout pricing and selector independence, schedule disclosure, disclaimer, responsive states, and focus visibility.
+
+## 10. Add Feedback and Publication Configuration
+
+- [x] 10.1 Implement the in-page feedback form with exact title/body preview and optimizer context disabled by default.
+- [x] 10.2 Add explicit compact-context opt-in for game-data version, mode, and the mode-derived effective daily limit while excluding detailed inventory and reward state by default.
+- [x] 10.3 Build the prefilled `/issues/new` URL with `URLSearchParams`, safe length enforcement, and new-tab `noopener`/`noreferrer` behavior without tokens or issue-submission API calls.
+- [x] 10.4 Keep GitHub opening disabled with a localized publication explanation until owner/repository configuration is supplied, while leaving composition and preview testable.
+- [x] 10.5 Add feedback tests for encoding, preview fidelity, context privacy, length rejection, unconfigured target behavior, and absence of automatic submission.
+
+## 11. Complete Additional Localizations and Cookie Notice Last
+
+- [ ] 11.1 Add the user-supplied additional language values to each existing `localization.json` entry and expose only languages with complete coverage in the selector.
+- [ ] 11.2 Replace every development placeholder with reviewed human-authored item names and descriptions, image alternatives, screenshot descriptions, UI text, TarCoin price and buyout messages, requirement abbreviations, route factor labels, and feedback text for every release locale.
+- [x] 11.3 Add production release-gate validation that rejects missing language values, missing or orphaned IDs, placeholders, absent descriptions, incomplete selectable locales, and untranslated assistive text.
+- [x] 11.4 Implement the non-blocking dismissible cookie-storage toast as the final UI feature, persist its dismissal, clear that dismissal during complete reset, and test first-use, dismissal, return-visit, and reset behavior.
+- [x] 11.5 After the toast is complete, run strict OpenSpec validation, all unit and DOM tests, accessibility checks, catalog validation, and the GitHub Pages production build; document any publication blockers without bypassing localization or UI/UX approval gates.
+
+## 12. Correct Interactive UI and Development Tooling
+
+- [x] 12.1 Replace native disclosure event feedback with one explicit delegated action path, keep one handler per render, route Classified Document card changes to the dedicated inventory field, and add a stateful rerender regression test.
+- [x] 12.2 Remove the combinatorial Classified allocation path that blocks controls while preserving deterministic Fastest and Safest allocation by profile factor.
+- [x] 12.3 Rework the five-region layout against the in-game screenshots; show Fastest and Safest side by side, move deficits to a shared comparison, hide internal profile cost, and verify desktop and narrow responsive presentations in Chromium.
+- [x] 12.4 Add current flat-config ESLint and Stylelint checks, integrate them into the repository check command, and pass lint, tests, catalog validation, and the production build.
+- [x] 12.5 Remove the editable daily-limit override and implement fixed mode-derived limits plus a daily reward progression that prioritizes page unlocks and accounts for every unclaimed reward.
+
+## 13. Focus the Route Planner UI
+
+- [x] 13.1 Replace the superseded side-by-side dashboard requirements with a persisted Fastest/Safest toggle, focused next action, native full-schedule dialog, dynamic page hints, and selected-profile footer deficits.
+- [x] 13.2 Add selected-profile state and cookie persistence, preserve owned quantities during tracking-only reward claims, and remove obsolete schedule-collapse state.
+- [x] 13.3 Render one selected route, its next action, an optional full schedule, dynamic page-threshold guidance, and nonzero deficits on matching document cards; remove duplicated daily limits and page-unlocked labels.
+- [x] 13.4 Compact the five-region Tarkov-inspired layout with readable LiftKit-ratio type and spacing, accessible controls, responsive workflow ordering, and no fake game branding.
+- [x] 13.5 Add localization entries and focused DOM/state/persistence tests for the redesigned interactions.
+- [x] 13.6 Pass lint, tests, catalog validation, production build, strict OpenSpec validation, and desktop/mobile Chromium review.
+
+## 14. Flatten the Screenshot-Driven Visual Hierarchy
+
+- [x] 14.1 Update the proposal, design, and player-state specification to require one continuous Battle Pass stage, one flat route manifest, sibling secondary disclosures, and a contiguous document ribbon without repeated nested framing.
+- [x] 14.2 Flatten center rendering for farming, immediate claims, unavailable routes, crate mode, and the full schedule; show routing factors directly and remove obsolete focused-route, next-action-card, location-card, and nested Farm Locations structures.
+- [x] 14.3 Replace the panel-heavy CSS with the screenshot-derived flat shell, reward and control rails, manifest rows, pale selected tabs, integrated document ribbon, and elevation limited to the dialog and toast.
+- [x] 14.4 Update DOM regressions for flat structure, visible routing factors, sibling disclosures, preserved interactions, and every result state.
+- [x] 14.5 Pass lint, all tests, catalog and build checks, strict OpenSpec validation, and Chromium review at `2560×1440`, `1440×900`, and `390×844` without clipped primary labels or viewport horizontal overflow.
+
+## 15. Expose a Simple Editable Layout Contract
+
+- [x] 15.1 Update the proposal, design, and player-state specification to isolate placement and type sizing in one editable CSS layout map, use named route cells, and place document copy below images while preserving all behavior.
+- [x] 15.2 Normalize renderer markup into stable summary, action, location, and document-tile cells without changing event attributes, state, optimizer output, disclosures, or accessibility labels.
+- [x] 15.3 Move normal-content geometry, spacing, overflow, responsive behavior, and type sizing into `src/layout.css`; reduce `src/styles.css` to screenshot-derived palette and visual states with no shared placement rules, negative margins, or normal-content overlays.
+- [x] 15.4 Update DOM regressions for the named route cells and fixed document bands while preserving every interaction and optimizer result state.
+- [x] 15.5 Pass lint, all tests, catalog and build checks, strict OpenSpec validation, and Chromium review at `2560×1440`, `1440×900`, and `390×844` without text overlap, clipped primary labels, or viewport horizontal overflow.
+
+## 16. Build the Selected-Item Battle Pass Workspace
+
+- [x] 16.1 Replace superseded OpenSpec layout requirements with one selected reward page, header profile/locale/setup controls, a current-route-day center, selected-stop right context, and compact image-first inventory tiles.
+- [ ] 16.2 Replace collapsed-page state with backward-compatible selected-page persistence and add header setup-dialog behavior without changing optimizer or public data schemas.
+- [ ] 16.3 Render the current day as ordered selectable route stops, selected-stop document artwork in the center, and location/day outcome plus plan, buyout, and schedule actions in the right context rail.
+- [ ] 16.4 Restyle the editable five-region layout against the screenshot selection/detail hierarchy with readable typography, thin separators, compact controls, and responsive stacking without nested dashboard panels.
+- [ ] 16.5 Update state, persistence, DOM, and accessibility regressions; pass lint, tests, build, strict OpenSpec validation, and Chromium review at `2560×1440`, `1440×900`, and `390×844`.

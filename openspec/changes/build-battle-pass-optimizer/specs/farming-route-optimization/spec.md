@@ -1,0 +1,225 @@
+## ADDED Requirements
+
+### Requirement: Pure deterministic optimizer
+The optimizer SHALL accept normalized immutable data and player inputs and SHALL return a structured result without reading cookies, browser globals, DOM state, or network services.
+
+#### Scenario: Repeat identical optimization
+- **WHEN** the optimizer receives the same catalog and player input twice
+- **THEN** both results are structurally identical and use the same deterministic ordering
+
+### Requirement: Global all-rewards objective
+While any Battle Pass reward remains unclaimed, the optimizer SHALL include every unclaimed reward, exclude already claimed rewards, and return a recommended legal redemption sequence satisfying reward prerequisites and implicit page-unlock thresholds. The player SHALL NOT need to select an individual reward or partial-pass goal. Black Division crate planning SHALL become available only after every reward is claimed.
+
+#### Scenario: Rewards remain unclaimed
+- **WHEN** one or more Battle Pass rewards are unclaimed
+- **THEN** the plan includes all of them and recommends a deterministic legal order in which to redeem them
+
+#### Scenario: Prerequisites constrain the recommendation
+- **WHEN** an unclaimed reward cannot yet be redeemed because of reward prerequisites or the previous-page unlock threshold
+- **THEN** the recommended sequence places enough legal prerequisite rewards before it
+
+### Requirement: Ordinary document consumption
+The optimizer SHALL aggregate required regular documents and consume matching owned regular documents before allocating Classified Documents or recommending farming.
+
+#### Scenario: Matching regular inventory exists
+- **WHEN** the player owns part of a required regular document quantity
+- **THEN** that inventory reduces the matching deficit before any Classified Document is applied
+
+#### Scenario: Regular inventory satisfies requirements
+- **WHEN** owned matching regular documents satisfy every requirement across all unclaimed rewards
+- **THEN** the result recommends no farming and consumes no Classified Document for those satisfied requirements
+
+### Requirement: Regular document exchange
+The optimizer SHALL read `exchange.regularDocumentsPerOtherDocuments` from `optimizer-rules.json` and SHALL support exchanging any mixture of that many surplus regular documents for one needed regular document. Duplicate source types SHALL be allowed, documents with `kind: "classified"` SHALL be excluded, and inventory needed to satisfy its own matching requirements across all unclaimed rewards SHALL be reserved rather than treated as surplus. The optimizer SHALL apply profile-beneficial exchanges only after matching regular inventory and the maximum consumable owned Classified quantity are fixed, and before farming or optional TarCoin-funded purchases.
+
+#### Scenario: Mixed surplus inventory covers a deficit
+- **WHEN** the player owns five surplus regular documents in any mixture and lacks one regular document required by an unclaimed reward
+- **THEN** the optimizer may recommend exchanging those five documents for the needed document
+
+#### Scenario: Duplicate source types are allowed
+- **WHEN** all five exchange inputs are surplus documents of the same regular type
+- **THEN** they form a valid exchange input group
+
+#### Scenario: Matching requirements are protected
+- **WHEN** an owned regular document is still required by an unclaimed reward of the same type
+- **THEN** the optimizer reserves it for that requirement before calculating exchangeable surplus
+
+#### Scenario: Classified Documents are not exchangeable
+- **WHEN** the player owns Classified Documents
+- **THEN** none of them count toward the regular-document exchange ratio
+
+### Requirement: Classified Document backfill
+The optimizer SHALL use owned Classified Documents only to fill eligible deficits remaining after ordinary-document requirements and matching inventory are calculated for the legal sequence of all unclaimed rewards. It SHALL maximize owned Classified consumption before optimizing route cost or regular-document exchange, fixing the consumed quantity at the smaller of owned Classified Documents and total eligible deficit. The optimizer SHALL target zero remaining owned Classified Documents whenever the eligible deficit is at least the owned quantity.
+
+#### Scenario: Eligible deficits exhaust owned Classified Documents
+- **WHEN** the all-unclaimed-rewards legal redemption sequence has eligible deficits at least as large as the owned Classified quantity
+- **THEN** the optimizer consumes every owned Classified Document and reports zero remaining
+
+#### Scenario: Classified supply exceeds eligible deficits
+- **WHEN** eligible deficits are smaller than the owned Classified quantity
+- **THEN** the optimizer fills every eligible deficit and reports only the unavoidable surplus as remaining
+
+#### Scenario: Classified Documents cover an entire reward
+- **WHEN** the player owns none of a reward's required regular documents and owns enough Classified Documents for every missing unit
+- **THEN** the reward may be completed entirely through Classified backfill without removing its canonical ordinary-document requirements
+
+#### Scenario: Matching regular inventory takes priority
+- **WHEN** the player owns a required regular document and also owns Classified Documents
+- **THEN** the matching regular document is consumed before any Classified Document is allocated to that requirement
+
+#### Scenario: No redeemable deficit accepts backfill
+- **WHEN** the all-unclaimed-rewards legal sequence contains no reward with an eligible missing-document deficit
+- **THEN** the optimizer consumes no Classified Documents, reports the full owned quantity unchanged, and performs no Classified purchase
+
+### Requirement: Cost-aware Classified allocation
+After fixing the maximum legally consumable owned Classified quantity, the optimizer SHALL allocate that quantity independently for Fastest and Safest route selection to remove the highest-cost farming work under each profile's objective. Profile cost SHALL determine which deficits receive backfill but SHALL NOT reduce the fixed consumption quantity.
+
+#### Scenario: Classified supply is insufficient
+- **WHEN** two document deficits have different best farming costs and Classified Documents can fill only one
+- **THEN** each profile selects the allocation that yields its better complete deterministic route result
+
+#### Scenario: Route cost cannot preserve usable Classified Documents
+- **WHEN** multiple allocations differ in route cost but all owned Classified Documents can legally be consumed
+- **THEN** every candidate considered for selection consumes the full owned quantity
+
+### Requirement: Optional TarCoin purchases
+The optimizer SHALL exclude TarCoin purchases unless the player enables spending and SHALL evaluate only the Classified Document bundles defined in optimizer rules independently for each route profile after matching regular inventory, maximum legal owned Classified consumption, and useful regular-document exchanges are applied.
+
+#### Scenario: TarCoin spending disabled
+- **WHEN** the spending option is off
+- **THEN** no bundle is purchased regardless of available TarCoins
+
+#### Scenario: TarCoin spending enabled
+- **WHEN** the spending option is on and an affordable configured bundle improves the route
+- **THEN** each route profile reports its purchased bundles, TarCoins spent, purchased Classified Documents used, and any excess
+
+### Requirement: Remaining-pass Classified buyout estimate
+The optimizer SHALL calculate an informational estimate for purchasing enough Classified Documents to complete every unclaimed Battle Pass reward after applying owned matching regular documents, the maximum usable owned Classified Documents, and useful regular-document exchanges. The estimate SHALL be available regardless of the TarCoin spending selector, SHALL evaluate every Classified Document bundle configured in optimizer rules, and SHALL NOT alter route optimization or player state. It SHALL simulate a legal redemption sequence in which starting TarCoins are immediately available and Battle Pass TarCoins become available only after their reward is redeemed. Classified bundle selection SHALL minimize additional TarCoins required, then gross TarCoins spent, excess Classified Documents, and bundle count. The result SHALL report bundle counts, Classified Documents purchased and used, excess purchased documents, gross TarCoin spend, starting TarCoins used, earned Battle Pass TarCoins used, and minimum additional TarCoins required.
+
+#### Scenario: Existing inventory already covers the remaining pass
+- **WHEN** owned regular and Classified Documents cover every unclaimed reward
+- **THEN** the buyout estimate reports zero bundles, zero gross spend, and zero additional TarCoins required
+
+#### Scenario: Redeemed reward funds a later purchase
+- **WHEN** a legally redeemable reward grants TarCoins before a later bundle purchase is needed
+- **THEN** the estimate credits those TarCoins after redemption and reports the amount of earned TarCoins used
+
+#### Scenario: Future reward cannot fund an earlier purchase
+- **WHEN** completing an earlier reward requires a purchase before a later TarCoin reward can be redeemed
+- **THEN** the later grant is excluded from the earlier balance and the estimate reports the minimum additional TarCoins needed to keep the sequence feasible
+
+#### Scenario: Spending selector is disabled
+- **WHEN** the player disables TarCoin spending
+- **THEN** the buyout estimate remains visible as informational output while no purchase affects the Fastest or Safest farming plan
+
+### Requirement: Local TarCoin purchase estimate
+The optimizer SHALL use the TarCoin purchase packages configured in `optimizer-rules.json` and their locale-dependent structured prices from `localization.json` to estimate the minimum local real-money package cost of acquiring the additional TarCoins reported by the remaining-pass buyout. It SHALL minimize integer minor-unit cost, then excess purchased TarCoins, then package count. It SHALL calculate a local estimate only when every selected package has a price for the active locale and all selected prices use one currency. The unpriced `2,000` TarCoin “RECEIVED” offer SHALL NOT be included as a purchasable package.
+
+#### Scenario: Complete local prices exist
+- **WHEN** the buyout requires additional TarCoins and the active locale has complete same-currency prices
+- **THEN** the result reports the minimum package combination, total TarCoins purchased, excess TarCoins, integer minor-unit cost, currency, and localized `FROM` presentation
+
+#### Scenario: Local prices are incomplete
+- **WHEN** one or more packages needed by every valid minimum-cost combination lacks a price for the active locale or introduces a different currency
+- **THEN** the optimizer leaves the local real-money estimate unavailable and does not infer a conversion
+
+#### Scenario: No additional TarCoins are required
+- **WHEN** starting and immediately earned TarCoins fund the complete buyout sequence
+- **THEN** the local purchase estimate reports zero packages and zero additional local cost
+
+### Requirement: Immediate reward TarCoin availability
+TarCoins granted by a Battle Pass reward SHALL become available immediately after that reward is redeemed, without waiting for completion of its Battle Pass page, and SHALL never be credited before redemption.
+
+#### Scenario: Same-page subsequent purchase
+- **WHEN** a redeemed reward grants enough TarCoins for a configured bundle needed by a later reward on the same page
+- **THEN** the optimizer may purchase the bundle before planning the later reward
+
+#### Scenario: Future TarCoins are unavailable
+- **WHEN** a TarCoin reward has not yet been redeemed in the legal sequence
+- **THEN** its TarCoins are excluded from the available balance
+
+### Requirement: TarCoin route-purchase tie-breaking
+Opt-in route bundle selection SHALL first improve the route objective and SHALL break equal route outcomes by fewer TarCoins spent, fewer excess Classified Documents, and fewer bundles in that order.
+
+#### Scenario: Equal route reduction
+- **WHEN** multiple bundle combinations produce the same optimized route outcome
+- **THEN** the optimizer selects the combination using the stated deterministic tie-breaking order
+
+### Requirement: Fastest and Safest route objectives
+For remaining document deficits, the optimizer SHALL produce a Fastest profile that minimizes `sum(assigned documents × maxRaidTimeMin)` and a Safest profile that minimizes `sum(assigned documents × difficultyRating)`. Each profile SHALL break ties by fewer distinct locations, lower raw farming quantity, and stable location identifier order. Location factors SHALL remain identical across PvE, PvP, and PvP Seasonal; the selected mode affects scheduling through its daily limit only.
+
+#### Scenario: Fastest and Safest differ
+- **WHEN** one complete route has lower maximum-raid-time cost and another has lower difficulty-rating cost
+- **THEN** the optimizer returns the first as Fastest and the second as Safest
+
+#### Scenario: Shared location wins a profile tie
+- **WHEN** candidate routes tie on a profile's route cost but one uses fewer distinct locations because multiple documents share that location
+- **THEN** that profile selects the route with fewer locations
+
+#### Scenario: Complete tie
+- **WHEN** candidates tie on profile cost, location count, and raw quantity
+- **THEN** stable location identifier order determines the result
+
+#### Scenario: Both profiles produce the same assignment
+- **WHEN** the optimal Fastest and Safest location and document assignments are identical
+- **THEN** the result marks the profiles as coincident so the selected profile view can identify the shared assignment
+
+#### Scenario: Profile has no complete route
+- **WHEN** eligible locations cannot cover every remaining document for a profile
+- **THEN** that profile is marked unavailable with a reason and no partial assignment
+
+### Requirement: Location routing factors
+The optimizer SHALL read each recommended location's `maxRaidTimeMin`, `difficultyId`, and `difficultyRating` from `locations.json` and SHALL return the applicable factor values with every route result. It SHALL NOT derive different location factors from the selected game mode.
+
+#### Scenario: Factory routing factors
+- **WHEN** Factory is evaluated in PvE, PvP, or PvP Seasonal
+- **THEN** Fastest uses `maxRaidTimeMin: 15` and Safest uses `difficultyRating: 1` with `difficultyId: "difficulty.easy"`
+
+### Requirement: Global game-mode scheduling input
+The optimizer SHALL accept exactly one selected game mode for the complete calculation. It SHALL resolve PvE, PvP, and PvP Seasonal to fixed daily document limits `10`, `15`, and `25` respectively from `optimizer-rules.json`. The selected mode SHALL affect optimizer results only through the effective daily document limit and resulting schedules and estimated day counts. It SHALL NOT alter reward expansion, document deficits, inventory consumption, Classified Document allocation, TarCoin calculations, location eligibility, route assignments, or Fastest and Safest objective values. The optimizer SHALL NOT accept a user-defined daily-limit override.
+
+#### Scenario: Global mode changes estimated days
+- **WHEN** the same route requires `50` farmed documents
+- **THEN** PvE produces `5` estimated plan days, PvP produces `4`, and PvP Seasonal produces `2`
+- **AND** all three calculations retain identical document deficits, location assignments, and route objective values
+
+### Requirement: Daily planning estimate
+The optimizer SHALL partition remaining farming quantities into ordered plan days that do not exceed the effective daily document limit. It SHALL prioritize rewards that advance the current page-unlock frontier, claim rewards as soon as their requirements are available, record rewards claimed and pages unlocked on each day, then clear every remaining reward after the final page unlocks. It SHALL preserve location grouping where possible after the route is selected.
+
+#### Scenario: Quantity exceeds daily limit
+- **WHEN** a route requires more documents than the effective daily limit
+- **THEN** the result contains multiple days and no day exceeds that limit
+
+#### Scenario: First day advances the Battle Pass
+- **WHEN** the initial Page 1 state is planned under the PvE limit
+- **THEN** Day 1 claims four Page 1 rewards and records Page 2 as unlocked instead of farming an aggregate location backlog without reward progress
+
+#### Scenario: Schedule covers the fixed objective
+- **WHEN** all Battle Pass rewards begin unclaimed
+- **THEN** the immediate claims and daily claims together contain every unclaimed reward exactly once
+
+#### Scenario: Route comparison is independent of scheduling
+- **WHEN** profile routes require the same farming quantities under different daily limits
+- **THEN** changing the daily limit changes each profile schedule but not its route objective values
+
+### Requirement: Black Division crate fallback
+When every Battle Pass reward is claimed, the optimizer SHALL switch to a Black Division crate-count goal, default to one crate, apply inventory whose document has `kind: "regular"` at `10` documents per crate, and exclude documents with `kind: "classified"` and Classified purchases.
+
+#### Scenario: All rewards claimed with insufficient regular inventory
+- **WHEN** the player requests one crate and owns fewer than ten documents whose kind is `regular`
+- **THEN** the result recommends farming the shortage at the eligible location with the lowest `maxRaidTimeMin`
+
+#### Scenario: Enough documents for immediate exchange
+- **WHEN** the player owns enough documents whose kind is `regular` for the requested crate count
+- **THEN** the result recommends immediate exchange and no farming
+
+#### Scenario: Classified Documents owned in crate mode
+- **WHEN** the player owns Classified Documents while planning Black Division crates
+- **THEN** those documents remain unchanged, do not reduce the crate shortage, and no TarCoin bundle is purchased
+
+### Requirement: Structured optimizer result
+The optimizer result SHALL report all included unclaimed rewards and their recommended legal sequence, ordinary consumption, profile-specific regular-document exchanges, Classified allocation and TarCoin purchases, the independent remaining-pass buyout and local TarCoin-package estimates, deficits, location assignments and routing factors, Fastest or Safest objective values, daily estimates, unused resources, coincidence or unavailability state, and applicable warnings.
+
+#### Scenario: Result is rendered
+- **WHEN** optimization completes successfully
+- **THEN** the UI can render every summary and detail from the returned result without recomputing domain decisions

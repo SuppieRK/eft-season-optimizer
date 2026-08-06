@@ -1,0 +1,34 @@
+{
+  "name": "kord-breach-optimizer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "preview": "vite preview",
+    "build": "tsc --noEmit && vite build",
+    "lint": "npm run lint:ts && npm run lint:css",
+    "lint:ts": "eslint .",
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "test": "vitest run && npm run test:catalog",
+    "test:catalog": "node --test tests/*.test.cjs",
+    "test:watch": "vitest",
+    "test:build": "npm run build && node scripts/check-build.cjs",
+    "validate:release": "node scripts/validate-release.cjs",
+    "check": "npm run lint && npm run test:build && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/dom": "^10.4.0",
+    "@types/node": "^22.15.0",
+    "eslint": "^10.8.0",
+    "globals": "^17.9.0",
+    "jsdom": "^26.0.0",
+    "stylelint": "^17.14.1",
+    "stylelint-config-standard": "^40.0.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.66.0",
+    "vite": "^6.3.0",
+    "vitest": "^3.1.0"
+  }
+}
