@@ -643,21 +643,13 @@
       }
 
       .focus-document figcaption {
-        display: grid;
-        gap: var(--space-xxs);
-        min-block-size: 2.618em;
+        min-block-size: 1lh;
         text-align: center;
       }
 
       .focus-document figcaption strong {
         overflow-wrap: anywhere;
         font-size: var(--font-size-label);
-        line-height: var(--line-height-ui);
-      }
-
-      .focus-document figcaption span {
-        color: var(--label-muted);
-        font-size: var(--font-size-caption);
         line-height: var(--line-height-ui);
       }
 
@@ -2418,9 +2410,6 @@
           imageFrame.append(image);
           const caption = document.createElement('figcaption');
           caption.append(createElement('strong', '', documentAbbreviations[documentRecord.id]));
-          caption.append(createElement('span', '', recommendation.role === 'priority'
-            ? localizer.text('ui.targetQuantity', { count: formatNumber(recommendation.targetQuantity, localizer.locale) })
-            : localizer.text(recommendation.role === 'stockpile' ? 'ui.stockpileDocument' : 'ui.optionalDocument')));
           const stepper = createElement('div', 'raid-result-stepper');
           const decrement = createElement('button', '', '−');
           const input = document.createElement('input');
