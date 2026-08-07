@@ -56,6 +56,56 @@ test('offers a raid beside the starting Classified Document redemption option', 
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
 });
 
+test('dims and preserves the current Focus result during optimizer recalculation', async ({ page }) => {
+  await page.addInitScript(() => {
+    const NativeWorker = window.Worker;
+    window.Worker = class extends NativeWorker {
+      constructor(scriptURL: string | URL, options?: WorkerOptions) {
+        super(scriptURL, options);
+        let releasing = false;
+        this.addEventListener('message', (event) => {
+          if (releasing) {
+            releasing = false;
+            return;
+          }
+          event.stopImmediatePropagation();
+          window.setTimeout(() => {
+            releasing = true;
+            this.dispatchEvent(new MessageEvent('message', { data: event.data }));
+          }, 350);
+        });
+      }
+    } as typeof Worker;
+  });
+  await openWireframe(page);
+  const focusStage = page.locator('.focus-stage');
+  const focusContent = page.locator('[data-focus-content]');
+  const focusHeading = page.locator('[data-focus-heading]');
+  await expect(page.locator('[data-focus-document]')).toHaveCount(2, { timeout: 10_000 });
+  const headingBefore = await focusHeading.textContent();
+  const contentBefore = await focusContent.innerHTML();
+
+  await documentQuantity(page, 'documents.financial.name').evaluate((input) => {
+    (input as HTMLInputElement).value = '1';
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
+  await expect(focusStage).toHaveAttribute('aria-busy', 'true');
+  await expect(focusStage).toHaveClass(/focus-stage--loading/u);
+  await expect(focusHeading).toHaveText(headingBefore ?? '');
+  expect(await focusContent.innerHTML()).toBe(contentBefore);
+  await expect(focusContent).toHaveCSS('opacity', '0.48');
+  await expect(page.locator('[data-view-route-schedule]')).toBeDisabled();
+  await expect(page.locator('[data-commit-raid]')).toBeDisabled();
+
+  await expect(focusStage).toHaveAttribute('aria-busy', 'false', { timeout: 10_000 });
+  await expect(focusStage).not.toHaveClass(/focus-stage--loading/u);
+  await expect(focusContent).toHaveCSS('opacity', '1');
+
+  await page.locator('#reward-page-trigger-2').click();
+  await expect(focusStage).toHaveAttribute('aria-busy', 'false');
+});
+
 test('shows both location documents with one clear farming priority', async ({ page }) => {
   await openWireframe(page);
   await expect(page.locator('[data-raid-result]')).toHaveCount(2, { timeout: 10_000 });

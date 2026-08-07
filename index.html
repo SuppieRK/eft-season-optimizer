@@ -481,6 +481,19 @@
         border-block-end-style: solid;
       }
 
+      .focus-heading,
+      .focus-content {
+        transition:
+          filter 120ms ease-out,
+          opacity 120ms ease-out;
+      }
+
+      .focus-stage--loading > .focus-heading,
+      .focus-stage--loading > .focus-content {
+        filter: saturate(0.55);
+        opacity: 0.48;
+      }
+
       .focus-heading {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
@@ -1916,6 +1929,7 @@
       const resetCookieState = document.querySelector('[data-reset-cookie-state]');
       const languageSelect = document.querySelector('[data-language-select]');
       const buyoutLink = document.querySelector('[data-buyout-link]');
+      const focusStage = document.querySelector('.focus-stage');
       const focusEyebrow = document.querySelector('[data-focus-eyebrow]');
       const focusHeading = document.querySelector('[data-focus-heading]');
       const focusContent = document.querySelector('[data-focus-content]');
@@ -2014,6 +2028,25 @@
       let refreshRewardRail = () => {};
       let refreshDocumentQuantities = () => {};
       let refreshOptimization = () => {};
+      let currentNextRaid;
+      let currentProfile;
+      let currentOptimizerResult;
+      let optimizerPending = false;
+      const optimizerActionTypes = new Set([
+        'claim-all',
+        'claim-page',
+        'claim-reward',
+        'decrement-document',
+        'increment-document',
+        'redeem-reward',
+        'set-classified-documents',
+        'set-crate-count',
+        'set-locale',
+        'set-mode',
+        'set-owned-document',
+        'set-spending',
+        'set-tar-coins',
+      ]);
       const dispatch = (action) => {
         state = reduceState(state, action, catalogs);
         try {
@@ -2024,7 +2057,13 @@
         refreshProgress();
         refreshRewardRail();
         refreshDocumentQuantities();
-        refreshOptimization();
+        if (action.type === 'set-profile' && currentOptimizerResult) {
+          const profile = currentOptimizerResult.profiles[
+            currentOptimizerResult.goal === 'black-division-crates' ? 'fastest' : state.selectedProfile
+          ];
+          renderRouteDetails(profile, currentOptimizerResult);
+          if (optimizerPending) showOptimizerLoading();
+        } else if (optimizerActionTypes.has(action.type)) refreshOptimization();
       };
 
       refreshProgress();
@@ -2328,9 +2367,6 @@
 
       const optimizerWorker = new Worker(new URL('./src/optimizer-worker.ts', import.meta.url), { type: 'module' });
       let optimizerRequestId = 0;
-      let currentNextRaid;
-      let currentProfile;
-      let currentOptimizerResult;
 
       const createElement = (tagName, className, textContent) => {
         const element = document.createElement(tagName);
@@ -2574,6 +2610,7 @@
 
       const refreshBuyoutLink = (result) => {
         currentOptimizerResult = result;
+        buyoutLink.disabled = false;
         if (result.goal !== 'all-unclaimed-rewards') {
           buyoutLink.hidden = true;
           return;
@@ -2702,17 +2739,25 @@
       };
 
       const showOptimizerLoading = () => {
+        optimizerPending = true;
+        focusStage.classList.add('focus-stage--loading');
+        focusStage.setAttribute('aria-busy', 'true');
+        viewRouteScheduleButton.disabled = true;
+        commitRaidButton.disabled = true;
+        buyoutLink.disabled = true;
+        if (currentOptimizerResult) return;
         focusEyebrow.textContent = localizer.text('ui.nextRaid');
         focusHeading.textContent = localizer.text('ui.nextRaid');
         focusContent.replaceChildren(createElement('p', 'focus-loading', '…'));
         viewRouteScheduleButton.textContent = localizer.text('ui.viewFullSchedule');
-        viewRouteScheduleButton.disabled = true;
         commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
-        commitRaidButton.disabled = true;
         buyoutLink.hidden = true;
-        currentNextRaid = undefined;
-        currentProfile = undefined;
-        currentOptimizerResult = undefined;
+      };
+
+      const hideOptimizerLoading = () => {
+        optimizerPending = false;
+        focusStage.classList.remove('focus-stage--loading');
+        focusStage.setAttribute('aria-busy', 'false');
       };
 
       refreshOptimization = () => {
@@ -2737,17 +2782,22 @@
       optimizerWorker.addEventListener('message', ({ data }) => {
         if (data.requestId !== optimizerRequestId) return;
         if (data.error) {
+          currentNextRaid = undefined;
+          currentProfile = undefined;
+          currentOptimizerResult = undefined;
           focusEyebrow.textContent = localizer.text('ui.nextRaid');
           focusHeading.textContent = localizer.text('optimizer.noRoute');
           focusContent.replaceChildren(createElement('p', 'focus-message', data.error));
           viewRouteScheduleButton.disabled = true;
           commitRaidButton.disabled = true;
           buyoutLink.hidden = true;
+          hideOptimizerLoading();
           return;
         }
         const result = data.result;
         const profile = result.profiles[result.goal === 'black-division-crates' ? 'fastest' : state.selectedProfile];
         renderRouteDetails(profile, result);
+        hideOptimizerLoading();
       });
 
       commitRaidButton.addEventListener('click', () => {
