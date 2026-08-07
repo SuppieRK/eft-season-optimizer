@@ -42,7 +42,7 @@ The document catalog SHALL define every regular and Classified Document with one
 - **THEN** catalog validation fails and identifies the redundant field
 
 ### Requirement: Screenshot-derived document thumbnails
-Each document thumbnail SHALL be authored after comparing its occurrences across all supplied Battle Pass page, reward, exchange, main/guide, and document-definition screenshots. The system SHALL prefer the clearest quantity-free occurrence, then clean pixels from another occurrence of the same icon, and only then targeted reconstruction for pixels unavailable in any source. The result SHALL remove overlaid quantity numerals or counters, preserve the remaining source artwork, and be exported as a lossless PNG under `public/assets/documents/<document-id>.png`. Screenshot paths and extraction metadata are not part of the runtime JSON contract.
+Each document thumbnail SHALL be authored after comparing its occurrences across all supplied Battle Pass page, reward, exchange, main/guide, and document-definition screenshots. The system SHALL prefer the clearest quantity-free occurrence, then clean pixels from another occurrence of the same icon, and only then targeted reconstruction for pixels unavailable in any source. The result SHALL remove overlaid quantity numerals or counters, preserve the remaining source artwork, and be exported as a high-quality WebP under `public/assets/documents/<document-id>.webp`. Screenshot paths and extraction metadata are not part of the runtime JSON contract.
 
 #### Scenario: Multiple screenshot sources exist
 - **WHEN** a document icon appears in more than one supplied screenshot

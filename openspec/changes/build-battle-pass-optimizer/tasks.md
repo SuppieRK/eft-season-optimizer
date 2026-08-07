@@ -7,8 +7,8 @@
 - [x] 1.5 Create `public/data/localization.json` with locale metadata and ID-centered `{ id, localizations }` text and structured local-price entries for the default development locale, including every ID referenced by the other four catalogs and screenshot-backed English numeric prices plus ISO currency codes for the six TarCoin packages.
 - [x] 1.6 Use the supplied Battle Pass page, reward, exchange, main/guide, and dedicated definition screenshots as authoring evidence for each document icon; keep screenshot evidence outside the runtime catalogs.
 - [x] 1.7 Select or combine the clearest, largest, least-obscured occurrences for each document, preferring quantity-free sources and treating dedicated document screenshots primarily as definition evidence rather than preferred artwork sources.
-- [x] 1.8 Crop consistent icon frames to `public/assets/documents/<document-id>.png`; remove `x0`, `x1`, and other quantity counters by using clean matching pixels from another occurrence first and targeted reconstruction only where no clean source pixels exist.
-- [x] 1.9 Review every cleaned PNG side by side with the contributing screenshot evidence, reject quantity remnants or unrelated visual changes, and keep only the final image path in the runtime document catalog.
+- [x] 1.8 Crop consistent icon frames to `public/assets/documents/<document-id>.webp`; remove `x0`, `x1`, and other quantity counters by using clean matching pixels from another occurrence first and targeted reconstruction only where no clean source pixels exist.
+- [x] 1.9 Review every cleaned WebP side by side with the contributing screenshot evidence, reject quantity remnants or unrelated visual changes, and keep only the final image path in the runtime document catalog.
 - [x] 1.10 Review the five JSON files and cleaned document images against the complete screenshot collection, record unresolved human-authored descriptions as explicit development placeholders, and confirm that no optimizer fact is hidden in TypeScript or UI markup.
 
 ## 2. Scaffold the Static TypeScript Application
