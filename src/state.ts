@@ -40,7 +40,7 @@ const MODES: readonly GameMode[] = ['pve', 'pvp', 'pvp-seasonal'];
 
 export function createDefaultState(catalogs: Catalogs): AppState {
   return {
-    mode: 'pve',
+    mode: 'pvp-seasonal',
     claimedRewardIds: [],
     ownedDocuments: Object.fromEntries(catalogs.documents.documents.map((document) => [document.id, 0])),
     classifiedDocuments: 0,

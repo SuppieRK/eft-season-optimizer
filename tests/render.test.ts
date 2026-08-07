@@ -47,6 +47,8 @@ describe('Battle Pass interface', () => {
     expect(document.querySelector('[data-field="daily-limit"]')).toBeNull();
     expect(document.querySelector('.limit-readout')).toBeNull();
     expect(document.querySelectorAll('.mode-selector small')).toHaveLength(3);
+    expect([...document.querySelectorAll<HTMLInputElement>('[data-field="mode"]')].map((input) => input.value)).toEqual(['pvp-seasonal', 'pvp', 'pve']);
+    expect(document.querySelector<HTMLInputElement>('[data-field="mode"]:checked')?.value).toBe('pvp-seasonal');
     expect(document.querySelectorAll('[data-route-workspace]')).toHaveLength(1);
     expect(document.querySelectorAll('[data-action="select-stop"]').length).toBeGreaterThan(0);
     expect(document.querySelectorAll('.route-document').length).toBeGreaterThan(0);

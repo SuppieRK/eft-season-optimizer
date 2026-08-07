@@ -21,6 +21,7 @@
         --section-heading-height: clamp(54px, 5.2vh, 84px);
         --detail-content-height: clamp(132px, 16vh, 244px);
         --primary-action-height: clamp(54px, 6vh, 90px);
+        --document-strip-image-size: clamp(64px, 5vw, 96px);
         --header-control-padding-block: var(--space-s);
         --header-control-padding-inline: calc(var(--space-s) + var(--space-xxs));
         --header-control-chevron-gap: var(--header-control-padding-inline);
@@ -31,6 +32,10 @@
         --surface-alt: #1d2024;
         --label: #d7d9dc;
         --label-muted: #a8adb3;
+        --document-frame: #4f8175;
+        --classified-frame: #8d5155;
+        --tooltip-surface: #050607;
+        --tooltip-line: #777e84;
       }
 
       * {
@@ -451,6 +456,167 @@
 
       .document-strip {
         grid-area: documents;
+        display: grid;
+        place-items: center;
+      }
+
+      .document-strip__images {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-m);
+      }
+
+      .document-strip__item {
+        position: relative;
+        display: grid;
+        grid-template-rows: auto auto auto;
+        gap: var(--space-xs);
+        inline-size: var(--document-strip-image-size);
+        margin: 0;
+      }
+
+      .document-strip__title {
+        display: grid;
+        place-items: center;
+        min-block-size: calc(var(--font-size-label) * var(--line-height-ui));
+        color: var(--label);
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+
+      .document-strip__image-frame {
+        border: 1px solid var(--document-frame);
+        background: color-mix(in srgb, var(--document-frame) 10%, var(--surface));
+      }
+
+      .document-strip__item--classified .document-strip__image-frame {
+        border-color: var(--classified-frame);
+        background: color-mix(in srgb, var(--classified-frame) 18%, var(--surface));
+      }
+
+      .document-strip__image-frame img {
+        display: block;
+        inline-size: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+      }
+
+      .document-strip__item:hover .document-strip__image-frame,
+      .document-strip__item:focus-within .document-strip__image-frame {
+        border-color: color-mix(in srgb, var(--document-frame) 55%, var(--label));
+      }
+
+      .document-strip__item--classified:hover .document-strip__image-frame,
+      .document-strip__item--classified:focus-within .document-strip__image-frame {
+        border-color: color-mix(in srgb, var(--classified-frame) 60%, var(--label));
+      }
+
+      .document-strip__quantity {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 0;
+        inline-size: 100%;
+        border: 1px solid var(--line-muted);
+        background: var(--surface-alt);
+      }
+
+      .document-strip__quantity button,
+      .document-strip__quantity input {
+        min-inline-size: 0;
+        block-size: 1.618em;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        text-align: center;
+      }
+
+      .document-strip__quantity button {
+        inline-size: 1.618em;
+        cursor: pointer;
+      }
+
+      .document-strip__quantity button:hover {
+        border-color: var(--label-muted);
+        background: var(--line-muted);
+      }
+
+      .document-strip__quantity button:focus-visible,
+      .document-strip__quantity input:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: 2px;
+      }
+
+      .document-strip__quantity input {
+        inline-size: 100%;
+        border-inline: 1px solid var(--line-muted);
+        appearance: textfield;
+      }
+
+      .document-strip__quantity input::-webkit-inner-spin-button,
+      .document-strip__quantity input::-webkit-outer-spin-button {
+        margin: 0;
+        appearance: none;
+      }
+
+      .document-strip__tooltip {
+        position: absolute;
+        z-index: 10;
+        inset-block-end: calc(100% + var(--space-s));
+        inset-inline-start: 50%;
+        inline-size: clamp(220px, 18vw, 300px);
+        padding: var(--space-s);
+        border: 1px solid var(--tooltip-line);
+        background: var(--tooltip-surface);
+        color: var(--label-muted);
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, var(--space-xs));
+        transition:
+          opacity 120ms ease-out,
+          transform 120ms ease-out;
+      }
+
+      .document-strip__tooltip strong {
+        display: block;
+        margin-block-end: var(--space-xs);
+        color: var(--label);
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-ui);
+      }
+
+      .document-strip__tooltip p {
+        margin: 0;
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-body);
+      }
+
+      .document-strip__tooltip ul {
+        margin: var(--space-s) 0 0;
+        padding-block-start: var(--space-s);
+        padding-inline-start: var(--space-m);
+        border-block-start: 1px solid var(--line-muted);
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-ui);
+      }
+
+      .document-strip__tooltip li + li {
+        margin-block-start: var(--space-xxs);
+      }
+
+      .document-strip__item:hover .document-strip__tooltip,
+      .document-strip__item:focus-within .document-strip__tooltip {
+        opacity: 1;
+        transform: translate(-50%, 0);
       }
 
     </style>
@@ -540,7 +706,125 @@
         </aside>
 
         <section class="region document-strip" aria-label="Document strip">
-          <span class="region-label">Document strip slot</span>
+          <div class="document-strip__images">
+            <figure class="document-strip__item" data-document-id="documents.financial.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/financial.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.pmc.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/pmc.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.project.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/project.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.blueprints.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/blueprints.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.test.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/test.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.user.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/user.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.medical.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/medical.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.technical.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/technical.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item document-strip__item--classified" data-document-id="documents.classified.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/classified.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+          </div>
         </section>
       </main>
     </div>
@@ -550,8 +834,11 @@
       import englishFlagUrl from 'flag-icons/flags/4x3/gb.svg?no-inline';
       import { loadCatalogs } from './src/catalogs.ts';
       import { createLocalizer, formatCountdownUnit, formatNumber } from './src/localization.ts';
+      import { browserCookieAdapter, restoreState, saveState } from './src/persistence.ts';
+      import { reduceState } from './src/state.ts';
 
       const catalogs = await loadCatalogs();
+      let state = restoreState(browserCookieAdapter, catalogs);
       const localizer = createLocalizer(catalogs.localization);
       const name = document.querySelector('[data-season-name]');
       const timer = document.querySelector('[data-season-timer]');
@@ -571,15 +858,19 @@
       const configureProgress = ({ labelId, labelSelector, currentSelector, totalSelector, progressSelector, total }) => {
         const label = localizer.text(labelId);
         const progress = document.querySelector(progressSelector);
+        const current = document.querySelector(currentSelector);
         document.querySelector(labelSelector).textContent = label;
-        document.querySelector(currentSelector).textContent = formatNumber(0, localizer.locale);
         document.querySelector(totalSelector).textContent = formatNumber(total, localizer.locale);
         progress.max = total;
-        progress.value = 0;
         progress.setAttribute('aria-label', label);
+        return (value) => {
+          const boundedValue = Math.min(total, Math.max(0, value));
+          current.textContent = formatNumber(boundedValue, localizer.locale);
+          progress.value = boundedValue;
+        };
       };
 
-      configureProgress({
+      const updateDocumentProgress = configureProgress({
         labelId: 'battlePass.documents',
         labelSelector: '[data-document-progress-label]',
         currentSelector: '[data-document-progress-current]',
@@ -587,7 +878,7 @@
         progressSelector: '[data-document-progress]',
         total: documentTotal,
       });
-      configureProgress({
+      const updateRewardProgress = configureProgress({
         labelId: 'battlePass.rewards',
         labelSelector: '[data-reward-progress-label]',
         currentSelector: '[data-reward-progress-current]',
@@ -596,9 +887,91 @@
         total: rewardTotal,
       });
 
+      const refreshProgress = () => {
+        const ownedDocumentTotal = catalogs.documents.documents.reduce((total, documentRecord) => {
+          const quantity = documentRecord.kind === 'classified'
+            ? state.classifiedDocuments
+            : state.ownedDocuments[documentRecord.id] ?? 0;
+          return total + quantity;
+        }, 0);
+        updateDocumentProgress(ownedDocumentTotal);
+        updateRewardProgress(state.claimedRewardIds.length);
+      };
+
+      const dispatch = (action) => {
+        state = reduceState(state, action, catalogs);
+        try {
+          saveState(state, browserCookieAdapter);
+        } catch (error) {
+          console.error(error);
+        }
+        refreshProgress();
+      };
+
+      refreshProgress();
+
       document.querySelector('[data-route-profile-label]').textContent = localizer.text('ui.routePreference');
       document.querySelector('[data-fastest-label]').textContent = localizer.text('optimizer.fastest');
       document.querySelector('[data-safest-label]').textContent = localizer.text('optimizer.safest');
+      document.querySelectorAll('input[name="route-profile"]').forEach((input) => {
+        input.checked = input.value === state.selectedProfile;
+        input.addEventListener('change', () => {
+          if (input.checked) dispatch({ type: 'set-profile', profile: input.value });
+        });
+      });
+
+      const documentsById = new Map(catalogs.documents.documents.map((document) => [document.id, document]));
+      document.querySelectorAll('[data-document-id]').forEach((tile, index) => {
+        const documentId = tile.dataset.documentId;
+        const documentRecord = documentsById.get(documentId);
+        if (!documentRecord) throw new Error(`Unknown wireframe document: ${documentId}`);
+
+        const fullName = localizer.text(documentRecord.id);
+        const tooltip = tile.querySelector('.document-strip__tooltip');
+        const quantityInput = tile.querySelector('[data-document-quantity]');
+        const decrementButton = tile.querySelector('[data-document-decrement]');
+        const incrementButton = tile.querySelector('[data-document-increment]');
+        const tooltipId = `document-strip-tooltip-${index}`;
+        tooltip.id = tooltipId;
+        tile.querySelector('[data-document-title]').textContent = fullName.trim().split(/\s+/u)[0];
+        tile.querySelector('img').alt = localizer.text(documentRecord.imageAltId);
+        tile.querySelector('[data-document-tooltip-name]').textContent = fullName;
+        tile.querySelector('[data-document-tooltip-description]').textContent = localizer.text(documentRecord.descriptionId);
+
+        if (documentRecord.sourceLocationIds.length > 0) {
+          const locationList = document.createElement('ul');
+          documentRecord.sourceLocationIds.forEach((locationId) => {
+            const location = document.createElement('li');
+            location.textContent = localizer.text(locationId);
+            locationList.append(location);
+          });
+          tooltip.append(locationList);
+        }
+
+        const quantityLabel = localizer.text('ui.quantity');
+        quantityInput.setAttribute('aria-label', `${quantityLabel} ${fullName}`);
+        decrementButton.setAttribute('aria-label', `${quantityLabel} − ${fullName}`);
+        incrementButton.setAttribute('aria-label', `${quantityLabel} + ${fullName}`);
+        [quantityInput, decrementButton, incrementButton].forEach((control) => control.setAttribute('aria-describedby', tooltipId));
+
+        const readQuantity = () => documentRecord.kind === 'classified'
+          ? state.classifiedDocuments
+          : state.ownedDocuments[documentId] ?? 0;
+        const setQuantity = (quantity) => {
+          const normalizedQuantity = Math.max(0, Math.trunc(quantity));
+          dispatch(documentRecord.kind === 'classified'
+            ? { type: 'set-classified-documents', quantity: normalizedQuantity }
+            : { type: 'set-owned-document', documentId, quantity: normalizedQuantity });
+          quantityInput.value = String(readQuantity());
+        };
+        quantityInput.value = String(readQuantity());
+        decrementButton.addEventListener('click', () => setQuantity(Number(quantityInput.value) - 1));
+        incrementButton.addEventListener('click', () => setQuantity(Number(quantityInput.value) + 1));
+        quantityInput.addEventListener('change', () => {
+          const quantity = Number(quantityInput.value);
+          setQuantity(Number.isFinite(quantity) ? quantity : 0);
+        });
+      });
 
       const modeData = [
         ['pvp-seasonal', 'mode.pvpSeasonal'],
@@ -609,7 +982,7 @@
         return {
           text: `${localizer.text(labelId)} · ${limit} / ${localizer.text('ui.day')}`,
           value: mode,
-          selected: mode === 'pvp-seasonal',
+          selected: mode === state.mode,
         };
       });
 
@@ -620,6 +993,12 @@
           ariaLabel: localizer.text('optimizer.mode'),
           modal: 'off',
           showSearch: false,
+        },
+        events: {
+          afterChange: (selection) => {
+            const mode = selection[0]?.value;
+            if (mode && mode !== state.mode) dispatch({ type: 'set-mode', mode });
+          },
         },
       });
 

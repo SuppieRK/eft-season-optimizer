@@ -41,6 +41,7 @@ describe('state and cookie persistence', () => {
     const mode = reduceState(claimed, { type: 'set-mode', mode: 'pvp-seasonal' }, catalog);
     const selected = reduceState(mode, { type: 'set-page', page: 2 }, catalog);
 
+    expect(initial.mode).toBe('pvp-seasonal');
     expect(initial.ownedDocuments[documentId]).toBe(0);
     expect(selected.ownedDocuments[documentId]).toBe(1);
     expect(selected.claimedRewardIds).toEqual([rewardId]);
@@ -56,11 +57,12 @@ describe('state and cookie persistence', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
     const initial = createDefaultState(catalog);
-    const state = reduceState(reduceState(reduceState(reduceState(reduceState(initial, { type: 'set-mode', mode: 'pvp' }, catalog), { type: 'set-classified-documents', quantity: 12 }, catalog), { type: 'set-profile', profile: 'safest' }, catalog), { type: 'set-page', page: 3 }, catalog), { type: 'dismiss-cookie-notice' }, catalog);
+    const state = reduceState(reduceState(reduceState(reduceState(reduceState(reduceState(initial, { type: 'set-mode', mode: 'pvp' }, catalog), { type: 'set-owned-document', documentId: 'documents.financial.name', quantity: 3 }, catalog), { type: 'set-classified-documents', quantity: 12 }, catalog), { type: 'set-profile', profile: 'safest' }, catalog), { type: 'set-page', page: 3 }, catalog), { type: 'dismiss-cookie-notice' }, catalog);
 
     saveState(state, cookies);
     const restored = restoreState(cookies, catalog);
     expect(restored.mode).toBe('pvp');
+    expect(restored.ownedDocuments['documents.financial.name']).toBe(3);
     expect(restored.classifiedDocuments).toBe(12);
     expect(restored.cookieNoticeDismissed).toBe(true);
     expect(restored.selectedProfile).toBe('safest');
@@ -91,7 +93,7 @@ describe('state and cookie persistence', () => {
     saveState({ ...defaults, mode: 'pvp', tarCoins: 3 }, cookies);
     cookies.values['kord-breach-settings'] = encodeURIComponent(JSON.stringify({ gameDataVersion: 'old', schemaVersion: 1, payload: { mode: 'pvp-seasonal' } }));
     const restored = restoreState(cookies, catalog);
-    expect(restored.mode).toBe('pve');
+    expect(restored.mode).toBe('pvp-seasonal');
     expect(restored.tarCoins).toBe(3);
 
     expect(() => saveState({ ...defaults, claimedRewardIds: Array.from({ length: 1000 }, (_, index) => `unknown-${index}`) }, cookies)).toThrow(/cookie size limit/);

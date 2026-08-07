@@ -151,6 +151,12 @@
       }
     },
     {
+      "id": "locations.labyrinth.name",
+      "localizations": {
+        "en": "The Labyrinth"
+      }
+    },
+    {
       "id": "locations.icebreaker.name",
       "localizations": {
         "en": "Ice Breaker"

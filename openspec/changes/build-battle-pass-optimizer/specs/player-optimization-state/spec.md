@@ -99,7 +99,7 @@ The center column SHALL render one flat current-route-day workspace focused on t
 - **THEN** the right context column reports that the Classified quantity remains unchanged and shows no Classified redemption or purchase action
 
 ### Requirement: Header setup and right-column route context
-The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector, optional TarCoin spending, TarCoin balance, conditional crate count, and reset controls. The right column SHALL instead show the selected route stop's location, assigned documents, official difficulty, maximum raid time, complete-day claim outcome, full-schedule access, and flat plan and buyout disclosures. The optimizer objective SHALL always be all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, or a separate daily-limit readout.
+The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal, optional TarCoin spending, TarCoin balance, conditional crate count, and reset controls. The right column SHALL instead show the selected route stop's location, assigned documents, official difficulty, maximum raid time, complete-day claim outcome, full-schedule access, and flat plan and buyout disclosures. The optimizer objective SHALL always be all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, or a separate daily-limit readout.
 
 #### Scenario: Mode selection applies its default
 - **WHEN** the player selects PvE, PvP, or PvP Seasonal
@@ -120,6 +120,11 @@ The header's primary navigation area SHALL present total-based document progress
 #### Scenario: Initial progress uses catalog totals
 - **WHEN** no documents are recorded and no rewards are claimed
 - **THEN** the header shows zero against the complete catalog-derived document and reward totals
+
+#### Scenario: Persisted progress is restored
+- **WHEN** valid cookies contain owned document quantities and claimed rewards
+- **THEN** the document and reward progress bars initialize from that restored state
+- **AND** changing an inventory counter updates the persisted quantity and document progress together
 
 #### Scenario: Profile routes differ
 - **WHEN** Fastest and Safest optimization produce different location assignments

@@ -97,7 +97,7 @@ function renderRewards(localizer: ReturnType<typeof createLocalizer>, catalogs: 
 }
 
 function renderSetupDialog(localizer: ReturnType<typeof createLocalizer>, catalogs: Catalogs, state: AppState, result: OptimizerResult): string {
-  const modes = (['pve', 'pvp', 'pvp-seasonal'] as const).map((mode) => {
+  const modes = (['pvp-seasonal', 'pvp', 'pve'] as const).map((mode) => {
     const label = localizer.text(`mode.${mode === 'pvp-seasonal' ? 'pvpSeasonal' : mode}`);
     return `<label><input type="radio" name="mode" value="${mode}" data-field="mode" ${state.mode === mode ? 'checked' : ''} /><span>${escapeHtml(label)}</span><small>${formatNumber(catalogs.optimizerRules.dailyDocumentLimits[mode], localizer.locale)} / ${escapeHtml(localizer.text('ui.day'))}</small></label>`;
   }).join('');

@@ -39,6 +39,7 @@ describe('catalogs', () => {
 
     expect(Object.fromEntries(catalogs.locations.locations.map((location) => [location.id, [location.difficultyId, location.difficultyRating, location.maxRaidTimeMin]]))).toEqual({
       'locations.lab.name': ['difficulty.insane', 4, 30],
+      'locations.labyrinth.name': ['difficulty.insane', 4, 30],
       'locations.icebreaker.name': ['difficulty.insane', 4, 50],
       'locations.groundZero.name': ['difficulty.hard', 3, 35],
       'locations.woods.name': ['difficulty.normal', 2, 25],
@@ -51,6 +52,9 @@ describe('catalogs', () => {
       'locations.shoreline.name': ['difficulty.hard', 3, 35],
       'locations.terminal.name': ['difficulty.insane', 4, 45],
     });
+
+    expect(catalogs.documents.documents.find((document) => document.id === 'documents.medical.name')?.sourceLocationIds).toContain('locations.labyrinth.name');
+    expect(catalogs.documents.documents.find((document) => document.id === 'documents.blueprints.name')?.sourceLocationIds).toContain('locations.labyrinth.name');
 
     expect(catalogs.optimizerRules.dailyDocumentLimits).toEqual({ pve: 10, pvp: 15, 'pvp-seasonal': 25 });
     expect(catalogs.optimizerRules.exchange).toEqual({

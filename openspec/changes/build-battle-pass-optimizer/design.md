@@ -189,6 +189,7 @@ The initial catalog is:
 | Location | Difficulty | Difficulty rating | Maximum raid time (min) |
 |---|---:|---:|---:|
 | The Lab | Insane | 4 | 30 |
+| The Labyrinth | Insane | 4 | 30 |
 | Ice Breaker | Insane | 4 | 50 |
 | Ground Zero | Hard | 3 | 35 |
 | Woods | Normal | 2 | 25 |

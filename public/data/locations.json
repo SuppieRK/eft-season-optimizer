@@ -12,6 +12,12 @@
       "difficultyRating": 4
     },
     {
+      "id": "locations.labyrinth.name",
+      "difficultyId": "difficulty.insane",
+      "maxRaidTimeMin": 30,
+      "difficultyRating": 4
+    },
+    {
       "id": "locations.icebreaker.name",
       "difficultyId": "difficulty.insane",
       "maxRaidTimeMin": 50,

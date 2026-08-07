@@ -57,14 +57,14 @@ The location catalog SHALL define each location's official in-game difficulty th
 
 #### Scenario: Official initial location values
 - **WHEN** the initial location catalog is loaded
-- **THEN** The Lab, Ice Breaker, Streets of Tarkov, Reserve, Lighthouse, and Terminal have `Insane` difficulty and difficulty rating `4`
+- **THEN** The Lab, The Labyrinth, Ice Breaker, Streets of Tarkov, Reserve, Lighthouse, and Terminal have `Insane` difficulty and difficulty rating `4`
 - **AND** Ground Zero, Customs, Interchange, and Shoreline have `Hard` difficulty and difficulty rating `3`
 - **AND** Woods has `Normal` difficulty and difficulty rating `2`
 - **AND** Factory has `Easy` difficulty and difficulty rating `1`
 
 #### Scenario: Initial maximum raid times
 - **WHEN** the initial location catalog is loaded
-- **THEN** The Lab, Ice Breaker, Ground Zero, Woods, Streets of Tarkov, Factory, Customs, Interchange, Reserve, Lighthouse, Shoreline, and Terminal have `maxRaidTimeMin` values `30, 50, 35, 25, 50, 15, 25, 35, 27, 30, 35, 45` respectively
+- **THEN** The Lab, The Labyrinth, Ice Breaker, Ground Zero, Woods, Streets of Tarkov, Factory, Customs, Interchange, Reserve, Lighthouse, Shoreline, and Terminal have `maxRaidTimeMin` values `30, 30, 50, 35, 25, 50, 15, 25, 35, 27, 30, 35, 45` respectively
 
 #### Scenario: Game mode does not alter location factors
 - **WHEN** the player changes between PvE, PvP, and PvP Seasonal

@@ -9,7 +9,8 @@
       "imagePath": "/assets/documents/medical.png",
       "sourceLocationIds": [
         "locations.lab.name",
-        "locations.groundZero.name"
+        "locations.groundZero.name",
+        "locations.labyrinth.name"
       ]
     },
     {
@@ -92,7 +93,8 @@
       "imagePath": "/assets/documents/blueprints.png",
       "sourceLocationIds": [
         "locations.interchange.name",
-        "locations.factory.name"
+        "locations.factory.name",
+        "locations.labyrinth.name"
       ]
     },
     {
