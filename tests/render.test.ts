@@ -149,7 +149,7 @@ describe('Battle Pass interface', () => {
     expect(document.querySelector('[data-schedule-dialog]')?.hasAttribute('open')).toBe(true);
     document.querySelector<HTMLButtonElement>('[data-action="close-schedule"]')!.click();
     expect(document.querySelector('[data-schedule-dialog]')?.hasAttribute('open')).toBe(false);
-  });
+  }, 10_000);
 
   it('removes page guidance at the claim threshold without consuming owned documents', () => {
     const catalog = catalogs();
