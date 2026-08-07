@@ -21,7 +21,10 @@
         --section-heading-height: clamp(54px, 5.2vh, 84px);
         --detail-content-height: clamp(132px, 16vh, 244px);
         --primary-action-height: clamp(54px, 6vh, 90px);
-        --language-select-width: clamp(70px, 4vw, 76px);
+        --header-control-padding-block: var(--space-s);
+        --header-control-padding-inline: calc(var(--space-s) + var(--space-xxs));
+        --header-control-chevron-gap: var(--header-control-padding-inline);
+        --header-control-chevron-correction: 0.125em;
         --line: #697078;
         --line-muted: #41464d;
         --surface: #17191c;
@@ -192,8 +195,9 @@
       .navigation-progress__label {
         overflow: hidden;
         color: var(--label-muted);
-        font-size: var(--font-size-caption);
+        font-size: var(--font-size-label);
         font-weight: 700;
+        line-height: var(--line-height-ui);
         letter-spacing: 0.08em;
         text-overflow: ellipsis;
         text-transform: uppercase;
@@ -202,9 +206,10 @@
 
       .navigation-progress__value {
         color: var(--label);
-        font-size: var(--font-size-body);
+        font-size: var(--font-size-label);
+        font-weight: 700;
         font-variant-numeric: tabular-nums;
-        line-height: 1;
+        line-height: var(--line-height-ui);
         white-space: nowrap;
       }
 
@@ -264,11 +269,12 @@
         display: grid;
         place-items: center;
         min-inline-size: clamp(76px, 5vw, 104px);
-        block-size: clamp(40px, 2.4vw, 46px);
-        padding-inline: var(--space-s);
+        padding-block: var(--header-control-padding-block);
+        padding-inline: var(--header-control-padding-inline);
         color: var(--label-muted);
         font-size: var(--font-size-label);
         font-weight: 700;
+        line-height: var(--line-height-ui);
         letter-spacing: 0.04em;
         text-transform: uppercase;
       }
@@ -312,8 +318,8 @@
         --ss-border-color: var(--line-muted);
         --ss-focus-color: var(--label);
         --ss-font-color: var(--label);
-        --ss-main-height: clamp(40px, 2.4vw, 46px);
-        --ss-option-height: 36px;
+        --ss-main-height: auto;
+        --ss-option-height: auto;
         --ss-primary-color: var(--line-muted);
         --ss-spacing-s: 0px;
         --ss-spacing-m: var(--space-xs);
@@ -321,8 +327,12 @@
       }
 
       .ss-main.header-select {
-        block-size: clamp(40px, 2.4vw, 46px);
-        padding: 0 var(--space-s);
+        inline-size: max-content;
+        padding-block: var(--header-control-padding-block);
+        padding-inline-start: var(--header-control-padding-inline);
+        padding-inline-end: calc(
+          var(--header-control-padding-inline) - var(--header-control-chevron-correction)
+        );
         border-radius: 0;
       }
 
@@ -331,20 +341,24 @@
       }
 
       .ss-main.header-select .ss-values {
+        flex: 0 1 auto;
         padding: 0;
       }
 
       .ss-main.header-select .ss-values .ss-single {
         display: flex;
+        flex: 0 1 auto;
         align-items: center;
+        inline-size: auto;
+        max-inline-size: none;
         padding: 0;
-        line-height: 1;
+        line-height: var(--line-height-ui);
       }
 
       .ss-main.header-select .ss-arrow {
         inline-size: 10px;
         block-size: 10px;
-        margin: 0 0 0 var(--space-xs);
+        margin: 0 0 0 var(--header-control-chevron-gap);
       }
 
       .ss-main.header-select .ss-arrow path {
@@ -357,9 +371,10 @@
 
       .ss-content.header-select .ss-list .ss-option {
         min-block-size: var(--ss-option-height);
-        padding: 0 var(--space-s);
+        padding-block: var(--header-control-padding-block);
+        padding-inline: var(--header-control-padding-inline);
         color: var(--label);
-        line-height: 1;
+        line-height: var(--line-height-ui);
       }
 
       .ss-content.header-select .ss-list .ss-option:hover:not(.ss-disabled),
@@ -370,26 +385,14 @@
         color: var(--label);
       }
 
-      .mode-select-shell {
-        inline-size: clamp(224px, 12vw, 320px);
-      }
-
+      .mode-select-shell,
       .language-select-shell {
-        inline-size: var(--language-select-width);
+        inline-size: fit-content;
       }
 
-      .ss-main.language-select .ss-single {
-        justify-content: center;
-      }
-
-      .ss-content.language-select {
-        inline-size: max-content !important;
-        min-inline-size: calc(var(--language-select-width) + var(--space-xl));
-        transform: translateX(calc(var(--language-select-width) - 100%));
-      }
-
+      .ss-main.language-select .ss-single,
       .ss-content.language-select .ss-option {
-        justify-content: flex-start;
+        justify-content: center;
       }
 
       .locale-choice {
@@ -397,6 +400,7 @@
         display: inline-flex;
         align-items: center;
         gap: var(--space-xs);
+        min-block-size: 1.272em;
       }
 
       .locale-choice__flag {
@@ -406,21 +410,12 @@
         flex: 0 0 auto;
       }
 
-      .ss-main.language-select .locale-choice__name {
+      .locale-choice__name {
         position: absolute;
         inline-size: 1px;
         block-size: 1px;
         overflow: hidden;
         clip-path: inset(50%);
-        white-space: nowrap;
-      }
-
-      .ss-content.language-select .locale-choice__name {
-        position: static;
-        inline-size: auto;
-        block-size: auto;
-        overflow: visible;
-        clip-path: none;
         white-space: nowrap;
       }
 

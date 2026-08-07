@@ -140,5 +140,5 @@
 - [x] 16.1 Replace superseded OpenSpec layout requirements with one selected reward page, header profile/locale/setup controls, a current-route-day center, selected-stop right context, and compact image-first inventory tiles.
 - [ ] 16.2 Replace collapsed-page state with backward-compatible selected-page persistence and add header setup-dialog behavior without changing optimizer or public data schemas.
 - [ ] 16.3 Render the current day as ordered selectable route stops, selected-stop document artwork in the center, and location/day outcome plus plan, buyout, and schedule actions in the right context rail.
-- [ ] 16.4 Restyle the editable five-region layout against the screenshot selection/detail hierarchy with readable typography, thin separators, compact controls, and responsive stacking without nested dashboard panels.
+- [x] 16.4 Restyle the editable five-region layout against the screenshot selection/detail hierarchy with readable typography, thin separators, compact controls, and responsive stacking without nested dashboard panels.
 - [ ] 16.5 Update state, persistence, DOM, and accessibility regressions; pass lint, tests, build, strict OpenSpec validation, and Chromium review at `2560×1440`, `1440×900`, and `390×844`.
