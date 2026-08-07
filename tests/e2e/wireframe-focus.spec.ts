@@ -124,6 +124,11 @@ test('accepts a zero-yield Commit and exposes the projected schedule on demand',
   await expect(dialog.locator('.schedule-day-column--rewards')).not.toHaveCount(0);
   await expect(dialog.getByRole('heading', { name: 'Raids' }).first()).toBeVisible();
   await expect(dialog.getByRole('heading', { name: 'Rewards to redeem' }).first()).toBeVisible();
+  const rewardPageGroups = dialog.locator('[data-schedule-reward-page]');
+  await expect(rewardPageGroups).not.toHaveCount(0);
+  await expect(rewardPageGroups.first().locator('.schedule-reward-page__heading')).toHaveText(/^Page \d{2}$/u);
+  await expect(rewardPageGroups.first().locator('li')).not.toHaveCount(0);
+  await expect(dialog.locator('.schedule-day-column--rewards > ul')).toHaveCount(0);
   await expect(dialog).not.toContainText('Plan details');
   await expect(dialog).not.toContainText('Owned Classified Documents consumed');
   await expect(dialog).not.toContainText(/Page \d+ unlocked/iu);

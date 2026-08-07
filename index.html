@@ -836,6 +836,35 @@
         margin-block-start: var(--space-xxs);
       }
 
+      .schedule-reward-pages {
+        display: grid;
+        gap: var(--space-m);
+      }
+
+      .schedule-reward-page {
+        display: grid;
+        gap: var(--space-xs);
+      }
+
+      .schedule-reward-page__heading {
+        display: flex;
+        align-items: center;
+        gap: var(--space-s);
+        margin: 0;
+        color: var(--document-frame);
+        font-size: var(--font-size-label);
+        letter-spacing: 0.06em;
+        line-height: var(--line-height-ui);
+        text-transform: uppercase;
+      }
+
+      .schedule-reward-page__heading::after {
+        flex: 1;
+        block-size: 1px;
+        background: var(--line-muted);
+        content: '';
+      }
+
       .schedule-action-group + .schedule-action-group {
         margin-block-start: var(--space-m);
       }
@@ -1802,6 +1831,8 @@
       const closeBuyoutButton = document.querySelector('[data-close-buyout]');
       const endsAt = catalogs.battlePass.endsAt;
       const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
+      const rewardPageById = new Map(catalogs.battlePass.pages.flatMap((page) =>
+        page.rewards.map((reward) => [reward.id, page.page])));
       const documentTotal = rewards.reduce(
         (total, reward) => total + reward.requirements.reduce((rewardTotal, requirement) => rewardTotal + requirement.quantity, 0),
         0,
@@ -2268,7 +2299,6 @@
           const raids = createElement('section', 'schedule-day-column schedule-day-column--raids');
           const raidList = document.createElement('ul');
           const rewardClaims = createElement('section', 'schedule-day-column schedule-day-column--rewards');
-          const rewardList = document.createElement('ul');
           daySection.append(createElement('h3', '', localizer.text('ui.scheduleDay', {
             day: formatNumber(day.day, localizer.locale),
             count: formatNumber(day.documentQuantity, localizer.locale),
@@ -2291,9 +2321,30 @@
           });
           raids.append(raidList);
           rewardClaims.append(createElement('h4', '', localizer.text('ui.rewardsToRedeem')));
-          day.rewardIdsClaimed.forEach((rewardId) => rewardList.append(createElement('li', '', localizer.text(rewardId))));
-          if (rewardList.childElementCount > 0) rewardClaims.append(rewardList);
-          else rewardClaims.append(createElement('p', '', localizer.text('ui.noRewardsToRedeem')));
+          if (day.rewardIdsClaimed.length > 0) {
+            const rewardPages = createElement('div', 'schedule-reward-pages');
+            const pageGroups = [];
+            day.rewardIdsClaimed.forEach((rewardId) => {
+              const page = rewardPageById.get(rewardId);
+              const currentGroup = pageGroups.at(-1);
+              if (currentGroup?.page === page) currentGroup.rewardIds.push(rewardId);
+              else pageGroups.push({ page, rewardIds: [rewardId] });
+            });
+            pageGroups.forEach(({ page, rewardIds }) => {
+              const pageSection = createElement('section', 'schedule-reward-page');
+              const rewardList = document.createElement('ul');
+              pageSection.dataset.scheduleRewardPage = String(page);
+              pageSection.append(createElement(
+                'h5',
+                'schedule-reward-page__heading',
+                `${localizer.text('battlePass.page')} ${String(page).padStart(2, '0')}`,
+              ));
+              rewardIds.forEach((rewardId) => rewardList.append(createElement('li', '', localizer.text(rewardId))));
+              pageSection.append(rewardList);
+              rewardPages.append(pageSection);
+            });
+            rewardClaims.append(rewardPages);
+          } else rewardClaims.append(createElement('p', '', localizer.text('ui.noRewardsToRedeem')));
           columns.append(raids, rewardClaims);
           daySection.append(columns);
           routeScheduleContent.append(daySection);
