@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Dedicated ID-centered localization catalog
-The system SHALL store all translated content in `localization.json` with default and supported locale metadata, a text `entries` collection, and a structured `priceEntries` collection. Every object SHALL have one stable `id` and a `localizations` object containing values for declared languages side by side.
+The system SHALL store all translated content in `localization.json` with default and supported locale metadata, a text `entries` collection, and a structured `priceEntries` collection. Every object SHALL have one stable `id` and a `localizations` object containing values for declared locales side by side. Locale keys SHALL be valid regional BCP 47 tags such as `en-GB`, so the same key drives `Intl` formatting, browser preference matching, and its country flag without a locale-specific mapping.
 
 #### Scenario: Localization entry is loaded
 - **WHEN** an entry with ID `documents.secured.description` is loaded
@@ -33,7 +33,7 @@ Rendering and domain code SHALL obtain every visible and assistive user-facing s
 - **THEN** all visible labels, validation messages, result explanations, disclaimer text, and assistive strings resolve from the selected localization without reloading game facts
 
 ### Requirement: Complete selectable locales
-The header locale selector SHALL expose only declared locales that have a non-empty value for every required text and structured-price localization ID, and the configured default locale SHALL always satisfy that coverage.
+The header locale selector SHALL expose only declared regional BCP 47 locales that have a non-empty value for every required text and structured-price localization ID, and the configured default locale SHALL always satisfy that coverage. It SHALL derive each image URL from the locale's region using the installed flag asset library rather than hard-coding one import per locale or loading the library's all-flags stylesheet. The build SHALL generate the asset module from `supportedLocales` so it emits only declared flag files.
 
 #### Scenario: Incomplete locale exists in development data
 - **WHEN** one declared locale is missing any required entry value
@@ -64,13 +64,17 @@ Development builds MAY render conspicuous missing-ID markers for unfinished cont
 ### Requirement: Locale selection persistence and fallback
 The application SHALL persist the selected locale in versioned UI-state cookies and SHALL fall back to the configured default when a stored or browser-preferred locale is unsupported.
 
+#### Scenario: First visit matches a supported browser locale
+- **WHEN** no valid locale cookie exists and the browser's ordered locale preferences contain an exact supported locale or an unambiguous supported variant of the same language
+- **THEN** the application uses that supported locale
+
 #### Scenario: Restore supported locale
 - **WHEN** the stored locale is complete and supported
 - **THEN** the application restores it on the next visit
 
 #### Scenario: Stored locale is no longer supported
 - **WHEN** the stored locale is absent from the supported complete locales
-- **THEN** the application uses the configured default locale
+- **THEN** the application uses a supported browser preference when available and otherwise uses the configured default locale
 
 ### Requirement: Locale-aware formatting
 The application SHALL use locale-aware number, date, time, plural, and message formatting and SHALL NOT construct translated sentences by concatenating independently translated fragments.
@@ -90,7 +94,7 @@ The application SHALL use locale-aware number, date, time, plural, and message f
 
 #### Scenario: Render a local real-money estimate
 - **WHEN** a complete same-currency TarCoin package estimate is available for the active locale
-- **THEN** its normalized numeric amount is formatted for that locale and currency in the table total
+- **THEN** its normalized numeric amount is formatted for that locale and currency in the table total using the currency's narrow symbol
 - **AND** individual package rows format the same structured numeric data without stored display text or a `FROM` prefix
 
 ### Requirement: Localized compact requirement text

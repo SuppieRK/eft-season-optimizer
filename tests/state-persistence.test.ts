@@ -71,6 +71,28 @@ describe('state and cookie persistence', () => {
     expect(restored.selectedPage).toBe(3);
   });
 
+  it('uses the browser locale only when no supported locale cookie exists', () => {
+    const catalog = catalogs();
+    const cookies = memoryCookies();
+    const localization = {
+      ...structuredClone(catalog.localization),
+      supportedLocales: ['en-GB', 'fr-FR'],
+      entries: catalog.localization.entries.map((entry) => ({
+        ...entry,
+        localizations: { ...entry.localizations, 'fr-FR': entry.localizations['en-GB'] },
+      })),
+      priceEntries: catalog.localization.priceEntries.map((entry) => ({
+        ...entry,
+        localizations: { ...entry.localizations, 'fr-FR': entry.localizations['en-GB'] },
+      })),
+    };
+    const localizedCatalog = { ...catalog, localization };
+
+    expect(restoreState(cookies, localizedCatalog, ['fr-FR']).locale).toBe('fr-FR');
+    saveState({ ...createDefaultState(localizedCatalog), locale: 'en-GB' }, cookies);
+    expect(restoreState(cookies, localizedCatalog, ['fr-FR']).locale).toBe('en-GB');
+  });
+
   it('enforces one Classified Document only while no rewards are claimed', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();

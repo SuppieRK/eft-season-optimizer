@@ -1,1557 +1,1569 @@
 {
   "schemaVersion": 2,
-  "defaultLocale": "en",
+  "defaultLocale": "en-GB",
   "supportedLocales": [
-    "en"
+    "en-GB"
   ],
   "releaseStatus": "development-only; additional localizations and human-reviewed descriptions are a release blocker",
   "entries": [
     {
       "id": "app.title",
       "localizations": {
-        "en": "KORD Breach Optimizer"
+        "en-GB": "KORD Breach Optimizer"
       }
     },
     {
       "id": "app.subtitle",
       "localizations": {
-        "en": "Battle Pass farming route planner"
+        "en-GB": "Battle Pass farming route planner"
       }
     },
     {
       "id": "season.one",
       "localizations": {
-        "en": "KORD BREACH"
+        "en-GB": "KORD BREACH"
       }
     },
     {
       "id": "battlePass.title",
       "localizations": {
-        "en": "Battle Pass"
+        "en-GB": "Battle Pass"
       }
     },
     {
       "id": "battlePass.rewardList",
       "localizations": {
-        "en": "Reward list"
+        "en-GB": "Reward list"
       }
     },
     {
       "id": "battlePass.rewards",
       "localizations": {
-        "en": "Rewards"
+        "en-GB": "Rewards"
       }
     },
     {
       "id": "battlePass.page",
       "localizations": {
-        "en": "Page"
+        "en-GB": "Page"
       }
     },
     {
       "id": "battlePass.requiresPage",
       "localizations": {
-        "en": "Claim rewards from page {page}"
+        "en-GB": "Claim rewards from page {page}"
       }
     },
     {
       "id": "battlePass.collectDocuments",
       "localizations": {
-        "en": "Collect and submit documents"
+        "en-GB": "Collect and submit documents"
       }
     },
     {
       "id": "battlePass.claimReward",
       "localizations": {
-        "en": "Claim reward"
+        "en-GB": "Claim reward"
       }
     },
     {
       "id": "battlePass.claimAll",
       "localizations": {
-        "en": "Claim all"
+        "en-GB": "Claim all"
       }
     },
     {
       "id": "battlePass.clearAll",
       "localizations": {
-        "en": "Clear all"
+        "en-GB": "Clear all"
       }
     },
     {
       "id": "battlePass.documents",
       "localizations": {
-        "en": "Documents"
+        "en-GB": "Documents"
       }
     },
     {
       "id": "battlePass.tarCoins",
       "localizations": {
-        "en": "TarCoins"
+        "en-GB": "TarCoins"
       }
     },
     {
       "id": "battlePass.classifiedDocuments",
       "localizations": {
-        "en": "Classified Documents"
+        "en-GB": "Classified Documents"
       }
     },
     {
       "id": "battlePass.blackDivisionCrate",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "battlePass.redeemableCount",
       "localizations": {
-        "en": "({count} redeemable)"
+        "en-GB": "({count} redeemable)"
       }
     },
     {
       "id": "battlePass.readyWhenUnlockedCount",
       "localizations": {
-        "en": "({count} ready when unlocked)"
+        "en-GB": "({count} ready when unlocked)"
       }
     },
     {
       "id": "battlePass.redeemRewardTitle",
       "localizations": {
-        "en": "Redeem {reward}"
+        "en-GB": "Redeem {reward}"
       }
     },
     {
       "id": "battlePass.subtractDocumentsPrompt",
       "localizations": {
-        "en": "Subtract these documents from your inventory?"
+        "en-GB": "Subtract these documents from your inventory?"
       }
     },
     {
       "id": "battlePass.redeemAndSubtract",
       "localizations": {
-        "en": "Redeem and subtract"
+        "en-GB": "Redeem and subtract"
       }
     },
     {
       "id": "battlePass.redeemOnly",
       "localizations": {
-        "en": "Redeem only"
+        "en-GB": "Redeem only"
       }
     },
     {
       "id": "mode.pve",
       "localizations": {
-        "en": "PvE"
+        "en-GB": "PvE"
       }
     },
     {
       "id": "mode.pvp",
       "localizations": {
-        "en": "PvP"
+        "en-GB": "PvP"
       }
     },
     {
       "id": "mode.pvpSeasonal",
       "localizations": {
-        "en": "PvP Seasonal"
+        "en-GB": "PvP Seasonal"
       }
     },
     {
       "id": "difficulty.easy",
       "localizations": {
-        "en": "Easy"
+        "en-GB": "Easy"
       }
     },
     {
       "id": "difficulty.normal",
       "localizations": {
-        "en": "Normal"
+        "en-GB": "Normal"
       }
     },
     {
       "id": "difficulty.hard",
       "localizations": {
-        "en": "Hard"
+        "en-GB": "Hard"
       }
     },
     {
       "id": "difficulty.insane",
       "localizations": {
-        "en": "Insane"
+        "en-GB": "Insane"
       }
     },
     {
       "id": "locations.lab.name",
       "localizations": {
-        "en": "The Lab"
+        "en-GB": "The Lab"
       }
     },
     {
       "id": "locations.labyrinth.name",
       "localizations": {
-        "en": "The Labyrinth"
+        "en-GB": "The Labyrinth"
       }
     },
     {
       "id": "locations.icebreaker.name",
       "localizations": {
-        "en": "Ice Breaker"
+        "en-GB": "Ice Breaker"
       }
     },
     {
       "id": "locations.groundZero.name",
       "localizations": {
-        "en": "Ground Zero"
+        "en-GB": "Ground Zero"
       }
     },
     {
       "id": "locations.woods.name",
       "localizations": {
-        "en": "Woods"
+        "en-GB": "Woods"
       }
     },
     {
       "id": "locations.streets.name",
       "localizations": {
-        "en": "Streets of Tarkov"
+        "en-GB": "Streets of Tarkov"
       }
     },
     {
       "id": "locations.factory.name",
       "localizations": {
-        "en": "Factory"
+        "en-GB": "Factory"
       }
     },
     {
       "id": "locations.customs.name",
       "localizations": {
-        "en": "Customs"
+        "en-GB": "Customs"
       }
     },
     {
       "id": "locations.interchange.name",
       "localizations": {
-        "en": "Interchange"
+        "en-GB": "Interchange"
       }
     },
     {
       "id": "locations.reserve.name",
       "localizations": {
-        "en": "Reserve"
+        "en-GB": "Reserve"
       }
     },
     {
       "id": "locations.lighthouse.name",
       "localizations": {
-        "en": "Lighthouse"
+        "en-GB": "Lighthouse"
       }
     },
     {
       "id": "locations.shoreline.name",
       "localizations": {
-        "en": "Shoreline"
+        "en-GB": "Shoreline"
       }
     },
     {
       "id": "locations.terminal.name",
       "localizations": {
-        "en": "Terminal"
+        "en-GB": "Terminal"
       }
     },
     {
       "id": "documents.medical.name",
       "localizations": {
-        "en": "Medical documents"
+        "en-GB": "Medical documents"
       }
     },
     {
       "id": "documents.medical.description",
       "localizations": {
-        "en": "Medical records containing research findings. Many of them are ethically questionable, yet remarkably successful in every other regard."
+        "en-GB": "Medical records containing research findings. Many of them are ethically questionable, yet remarkably successful in every other regard."
       }
     },
     {
       "id": "documents.medical.alt",
       "localizations": {
-        "en": "Medical documents thumbnail"
+        "en-GB": "Medical documents thumbnail"
       }
     },
     {
       "id": "documents.financial.name",
       "localizations": {
-        "en": "Financial documents"
+        "en-GB": "Financial documents"
       }
     },
     {
       "id": "documents.financial.description",
       "localizations": {
-        "en": "Financial reports from TerraGroup and its affiliated companies."
+        "en-GB": "Financial reports from TerraGroup and its affiliated companies."
       }
     },
     {
       "id": "documents.financial.alt",
       "localizations": {
-        "en": "Financial documents thumbnail"
+        "en-GB": "Financial documents thumbnail"
       }
     },
     {
       "id": "documents.user.name",
       "localizations": {
-        "en": "User documentation"
+        "en-GB": "User documentation"
       }
     },
     {
       "id": "documents.user.description",
       "localizations": {
-        "en": "Documentation issued to every new TerraGroup employee upon signing."
+        "en-GB": "Documentation issued to every new TerraGroup employee upon signing."
       }
     },
     {
       "id": "documents.user.alt",
       "localizations": {
-        "en": "User documentation thumbnail"
+        "en-GB": "User documentation thumbnail"
       }
     },
     {
       "id": "documents.test.name",
       "localizations": {
-        "en": "Test documentation"
+        "en-GB": "Test documentation"
       }
     },
     {
       "id": "documents.test.description",
       "localizations": {
-        "en": "Documents detailing tests of various experimental compounds from TerraGroup-controlled laboratories."
+        "en-GB": "Documents detailing tests of various experimental compounds from TerraGroup-controlled laboratories."
       }
     },
     {
       "id": "documents.test.alt",
       "localizations": {
-        "en": "Test documentation thumbnail"
+        "en-GB": "Test documentation thumbnail"
       }
     },
     {
       "id": "documents.technical.name",
       "localizations": {
-        "en": "Technical documentation"
+        "en-GB": "Technical documentation"
       }
     },
     {
       "id": "documents.technical.description",
       "localizations": {
-        "en": "Operating manuals for TerraGroup equipment."
+        "en-GB": "Operating manuals for TerraGroup equipment."
       }
     },
     {
       "id": "documents.technical.alt",
       "localizations": {
-        "en": "Technical documentation thumbnail"
+        "en-GB": "Technical documentation thumbnail"
       }
     },
     {
       "id": "documents.project.name",
       "localizations": {
-        "en": "Project documentation"
+        "en-GB": "Project documentation"
       }
     },
     {
       "id": "documents.project.description",
       "localizations": {
-        "en": "Documentation from Tarkov InfraLine. The company officially specialized in road construction, but these blueprints clearly have nothing to do with transportation infrastructure."
+        "en-GB": "Documentation from Tarkov InfraLine. The company officially specialized in road construction, but these blueprints clearly have nothing to do with transportation infrastructure."
       }
     },
     {
       "id": "documents.project.alt",
       "localizations": {
-        "en": "Project documentation thumbnail"
+        "en-GB": "Project documentation thumbnail"
       }
     },
     {
       "id": "documents.pmc.name",
       "localizations": {
-        "en": "PMC personnel files"
+        "en-GB": "PMC personnel files"
       }
     },
     {
       "id": "documents.pmc.description",
       "localizations": {
-        "en": "Rumor has it that TerraGroup keeps a personnel file on nearly every PMC operator."
+        "en-GB": "Rumor has it that TerraGroup keeps a personnel file on nearly every PMC operator."
       }
     },
     {
       "id": "documents.pmc.alt",
       "localizations": {
-        "en": "PMC personnel files thumbnail"
+        "en-GB": "PMC personnel files thumbnail"
       }
     },
     {
       "id": "documents.blueprints.name",
       "localizations": {
-        "en": "Blueprints and technical documentation"
+        "en-GB": "Blueprints and technical documentation"
       }
     },
     {
       "id": "documents.blueprints.description",
       "localizations": {
-        "en": "Blueprints and technical documentation belonging to TerraGroup. For convenience, all of the data has also been backed up onto a disk."
+        "en-GB": "Blueprints and technical documentation belonging to TerraGroup. For convenience, all of the data has also been backed up onto a disk."
       }
     },
     {
       "id": "documents.blueprints.alt",
       "localizations": {
-        "en": "Blueprints and technical documentation thumbnail"
+        "en-GB": "Blueprints and technical documentation thumbnail"
       }
     },
     {
       "id": "documents.classified.name",
       "localizations": {
-        "en": "Classified documents"
+        "en-GB": "Classified documents"
       }
     },
     {
       "id": "documents.classified.description",
       "localizations": {
-        "en": "Classified information that somehow survived against all odds. A unique document that can be used to backfill any missing document required for the Battle Pass."
+        "en-GB": "Classified information that somehow survived against all odds. A unique document that can be used to backfill any missing document required for the Battle Pass."
       }
     },
     {
       "id": "documents.classified.alt",
       "localizations": {
-        "en": "Classified documents thumbnail"
+        "en-GB": "Classified documents thumbnail"
       }
     },
     {
       "id": "optimizer.fastest",
       "localizations": {
-        "en": "Fastest"
+        "en-GB": "Fastest"
+      }
+    },
+    {
+      "id": "optimizer.fastestTooltip",
+      "localizations": {
+        "en-GB": "Fastest prioritizes raids with lower max time."
       }
     },
     {
       "id": "optimizer.safest",
       "localizations": {
-        "en": "Safest"
+        "en-GB": "Safest"
+      }
+    },
+    {
+      "id": "optimizer.safestTooltip",
+      "localizations": {
+        "en-GB": "Safest prioritizes raids with easier difficulty."
       }
     },
     {
       "id": "optimizer.combined",
       "localizations": {
-        "en": "Fastest and safest"
+        "en-GB": "Fastest and safest"
       }
     },
     {
       "id": "optimizer.noRoute",
       "localizations": {
-        "en": "No route is available for this profile."
+        "en-GB": "No route is available for this profile."
       }
     },
     {
       "id": "optimizer.classifiedBackfill",
       "localizations": {
-        "en": "Classified Documents backfill missing regular documents during redemption; they are not substituted for regular documents in the farming plan."
+        "en-GB": "Classified Documents backfill missing regular documents during redemption; they are not substituted for regular documents in the farming plan."
       }
     },
     {
       "id": "optimizer.blackDivisionFallback",
       "localizations": {
-        "en": "All ordinary rewards are complete. Farm the fastest eligible location for Black Division Gear Crates."
+        "en-GB": "All ordinary rewards are complete. Farm the fastest eligible location for Black Division Gear Crates."
       }
     },
     {
       "id": "optimizer.locationCount",
       "localizations": {
-        "en": "{count} locations"
+        "en-GB": "{count} locations"
       }
     },
     {
       "id": "optimizer.documentCount",
       "localizations": {
-        "en": "{count} documents"
+        "en-GB": "{count} documents"
       }
     },
     {
       "id": "optimizer.raidCount",
       "localizations": {
-        "en": "{count} raids"
+        "en-GB": "{count} raids"
       }
     },
     {
       "id": "optimizer.dailyLimit",
       "localizations": {
-        "en": "Daily raid limit"
+        "en-GB": "Daily raid limit"
       }
     },
     {
       "id": "optimizer.mode",
       "localizations": {
-        "en": "Game mode"
+        "en-GB": "Game mode"
       }
     },
     {
       "id": "optimizer.includeTarCoins",
       "localizations": {
-        "en": "Spend Battle Pass TarCoins on Classified Documents"
+        "en-GB": "Spend Battle Pass TarCoins on Classified Documents"
       }
     },
     {
       "id": "optimizer.classifiedOwned",
       "localizations": {
-        "en": "Classified Documents owned"
+        "en-GB": "Classified Documents owned"
       }
     },
     {
       "id": "optimizer.tarCoinsOwned",
       "localizations": {
-        "en": "TarCoins owned"
+        "en-GB": "TarCoins owned"
       }
     },
     {
       "id": "season.countdown",
       "localizations": {
-        "en": "Season ends in {time}"
+        "en-GB": "Season ends in {time}"
       }
     },
     {
       "id": "season.ended",
       "localizations": {
-        "en": "Season ended"
+        "en-GB": "Season ended"
       }
     },
     {
       "id": "footer.disclaimer",
       "localizations": {
-        "en": "Escape from Tarkov and all game assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool."
+        "en-GB": "Escape from Tarkov and all game assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool."
       }
     },
     {
       "id": "footer.sourceNote",
       "localizations": {
-        "en": "Battle Pass data reconstructed from the supplied screenshot collection."
+        "en-GB": "Battle Pass data reconstructed from the supplied screenshot collection."
       }
     },
     {
       "id": "asset.quantityRemoved",
       "localizations": {
-        "en": "Document artwork with quantity overlays removed."
+        "en-GB": "Document artwork with quantity overlays removed."
       }
     },
     {
       "id": "rewards.dogtag01.name",
       "localizations": {
-        "en": "Dogtag"
+        "en-GB": "Dogtag"
       }
     },
     {
       "id": "rewards.tarcoins50-01.name",
       "localizations": {
-        "en": "TarCoins (50)"
+        "en-GB": "TarCoins (50)"
       }
     },
     {
       "id": "rewards.burn-poster.name",
       "localizations": {
-        "en": "Burn Poster"
+        "en-GB": "Burn Poster"
       }
     },
     {
       "id": "rewards.bd-crate01.name",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "rewards.black-wood-ceiling.name",
       "localizations": {
-        "en": "Black Wood Ceiling"
+        "en-GB": "Black Wood Ceiling"
       }
     },
     {
       "id": "rewards.genetex-respirator.name",
       "localizations": {
-        "en": "Gentex Ops-Core SOTR Respirator"
+        "en-GB": "Gentex Ops-Core SOTR Respirator"
       }
     },
     {
       "id": "rewards.red-hawaii.name",
       "localizations": {
-        "en": "Red Hawaii"
+        "en-GB": "Red Hawaii"
       }
     },
     {
       "id": "rewards.bd-crate02.name",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "rewards.scorpion-target.name",
       "localizations": {
-        "en": "Scorpion Target"
+        "en-GB": "Scorpion Target"
       }
     },
     {
       "id": "rewards.tarcoins50-02.name",
       "localizations": {
-        "en": "TarCoins (50)"
+        "en-GB": "TarCoins (50)"
       }
     },
     {
       "id": "rewards.mystery-ranch-sling.name",
       "localizations": {
-        "en": "Mystery Ranch Nice Frame Load Sling"
+        "en-GB": "Mystery Ranch Nice Frame Load Sling"
       }
     },
     {
       "id": "rewards.bd-crate03.name",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "rewards.black-herringbone.name",
       "localizations": {
-        "en": "Black Herringbone"
+        "en-GB": "Black Herringbone"
       }
     },
     {
       "id": "rewards.tarcoins50-03.name",
       "localizations": {
-        "en": "TarCoins (50)"
+        "en-GB": "TarCoins (50)"
       }
     },
     {
       "id": "rewards.heart.name",
       "localizations": {
-        "en": "Heart"
+        "en-GB": "Heart"
       }
     },
     {
       "id": "rewards.dogtag02.name",
       "localizations": {
-        "en": "Dogtag"
+        "en-GB": "Dogtag"
       }
     },
     {
       "id": "rewards.jagdkommando.name",
       "localizations": {
-        "en": "Microtech Jagdkommando Knife"
+        "en-GB": "Microtech Jagdkommando Knife"
       }
     },
     {
       "id": "rewards.tarcoins50-04.name",
       "localizations": {
-        "en": "TarCoins (50)"
+        "en-GB": "TarCoins (50)"
       }
     },
     {
       "id": "rewards.beware-bear-poster.name",
       "localizations": {
-        "en": "Beware the Bear Poster"
+        "en-GB": "Beware the Bear Poster"
       }
     },
     {
       "id": "rewards.bd-crate04.name",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "rewards.orange-hawaii.name",
       "localizations": {
-        "en": "Orange Hawaii"
+        "en-GB": "Orange Hawaii"
       }
     },
     {
       "id": "rewards.tarcoins50-05.name",
       "localizations": {
-        "en": "TarCoins (50)"
+        "en-GB": "TarCoins (50)"
       }
     },
     {
       "id": "rewards.black-division-target.name",
       "localizations": {
-        "en": "Black Division Target"
+        "en-GB": "Black Division Target"
       }
     },
     {
       "id": "rewards.bd-crate05.name",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "rewards.ferro-fcpc.name",
       "localizations": {
-        "en": "Ferro Concepts FCPC V5 Plate Carrier (Black Division)"
+        "en-GB": "Ferro Concepts FCPC V5 Plate Carrier (Black Division)"
       }
     },
     {
       "id": "rewards.knyazev.name",
       "localizations": {
-        "en": "Knyazev"
+        "en-GB": "Knyazev"
       }
     },
     {
       "id": "rewards.oconnor.name",
       "localizations": {
-        "en": "O'Connor"
+        "en-GB": "O'Connor"
       }
     },
     {
       "id": "rewards.howa-type20.name",
       "localizations": {
-        "en": "Howa Type 20 5.56x45 Assault Rifle"
+        "en-GB": "Howa Type 20 5.56x45 Assault Rifle"
       }
     },
     {
       "id": "rewards.dogtag03.name",
       "localizations": {
-        "en": "Dogtag"
+        "en-GB": "Dogtag"
       }
     },
     {
       "id": "rewards.tarcoins50-06.name",
       "localizations": {
-        "en": "TarCoins (50)"
+        "en-GB": "TarCoins (50)"
       }
     },
     {
       "id": "rewards.scorpion-upper.name",
       "localizations": {
-        "en": "Scorpion Upper"
+        "en-GB": "Scorpion Upper"
       }
     },
     {
       "id": "rewards.scorpion-lower.name",
       "localizations": {
-        "en": "Scorpion Lower"
+        "en-GB": "Scorpion Lower"
       }
     },
     {
       "id": "rewards.bd-crate06.name",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "rewards.tarcoins50-07.name",
       "localizations": {
-        "en": "TarCoins (50)"
+        "en-GB": "TarCoins (50)"
       }
     },
     {
       "id": "rewards.white-accent-walls.name",
       "localizations": {
-        "en": "White Accent Walls"
+        "en-GB": "White Accent Walls"
       }
     },
     {
       "id": "rewards.arch.name",
       "localizations": {
-        "en": "Arch"
+        "en-GB": "Arch"
       }
     },
     {
       "id": "rewards.dome.name",
       "localizations": {
-        "en": "Dome"
+        "en-GB": "Dome"
       }
     },
     {
       "id": "rewards.spiritus-lv119.name",
       "localizations": {
-        "en": "Spiritus Systems LV-119 Plate Carrier (Black Division V2)"
+        "en-GB": "Spiritus Systems LV-119 Plate Carrier (Black Division V2)"
       }
     },
     {
       "id": "rewards.tarcoins50-08.name",
       "localizations": {
-        "en": "TarCoins (50)"
+        "en-GB": "TarCoins (50)"
       }
     },
     {
       "id": "rewards.tasmanian-tiger-pack.name",
       "localizations": {
-        "en": "Tasmanian Tiger Modular Pack 45 Plus (Multicam Black)"
+        "en-GB": "Tasmanian Tiger Modular Pack 45 Plus (Multicam Black)"
       }
     },
     {
       "id": "rewards.bd-crate07.name",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "rewards.silver.name",
       "localizations": {
-        "en": "Server Room"
+        "en-GB": "Server Room"
       }
     },
     {
       "id": "rewards.anton.name",
       "localizations": {
-        "en": "Anton"
+        "en-GB": "Anton"
       }
     },
     {
       "id": "rewards.garrett.name",
       "localizations": {
-        "en": "Garrett"
+        "en-GB": "Garrett"
       }
     },
     {
       "id": "rewards.bd-crate08.name",
       "localizations": {
-        "en": "Black Division Gear Crate"
+        "en-GB": "Black Division Gear Crate"
       }
     },
     {
       "id": "rewards.tarcoins100.name",
       "localizations": {
-        "en": "TarCoins (100)"
+        "en-GB": "TarCoins (100)"
       }
     },
     {
       "id": "rewards.dogtag04.name",
       "localizations": {
-        "en": "Dogtag"
+        "en-GB": "Dogtag"
       }
     },
     {
       "id": "rewards.tarcoins150.name",
       "localizations": {
-        "en": "TarCoins (150)"
+        "en-GB": "TarCoins (150)"
       }
     },
     {
       "id": "rewards.knyazev-after-battle.name",
       "localizations": {
-        "en": "Knyazev (After Battle)"
+        "en-GB": "Knyazev (After Battle)"
       }
     },
     {
       "id": "rewards.oconnor-after-battle.name",
       "localizations": {
-        "en": "O'Connor (After Battle)"
+        "en-GB": "O'Connor (After Battle)"
       }
     },
     {
       "id": "rewards.norinco-cq-a1.name",
       "localizations": {
-        "en": "Norinco CQ-A1 5.56x45 Assault Rifle"
+        "en-GB": "Norinco CQ-A1 5.56x45 Assault Rifle"
       }
     },
     {
       "id": "rewards.nocturnal-upper.name",
       "localizations": {
-        "en": "Nocturnal Upper"
+        "en-GB": "Nocturnal Upper"
       }
     },
     {
       "id": "rewards.nocturnal-lower.name",
       "localizations": {
-        "en": "Nocturnal Lower"
+        "en-GB": "Nocturnal Lower"
       }
     },
     {
       "id": "season.endsAt",
       "localizations": {
-        "en": "Season deadline: {time}"
+        "en-GB": "Season deadline: {time}"
       }
     },
     {
       "id": "ui.locale",
       "localizations": {
-        "en": "Language"
+        "en-GB": "Language"
       }
     },
     {
       "id": "ui.modeSummary",
       "localizations": {
-        "en": "{mode} · {count}/{day}"
+        "en-GB": "{mode} · {count}/{day}"
       }
     },
     {
       "id": "ui.previousPage",
       "localizations": {
-        "en": "Previous Battle Pass page"
+        "en-GB": "Previous Battle Pass page"
       }
     },
     {
       "id": "ui.nextPage",
       "localizations": {
-        "en": "Next Battle Pass page"
+        "en-GB": "Next Battle Pass page"
       }
     },
     {
       "id": "ui.routeStop",
       "localizations": {
-        "en": "Selected route stop"
+        "en-GB": "Selected route stop"
       }
     },
     {
       "id": "ui.routeStopLabel",
       "localizations": {
-        "en": "Stop {current} of {total}: {location}"
+        "en-GB": "Stop {current} of {total}: {location}"
       }
     },
     {
       "id": "ui.controls",
       "localizations": {
-        "en": "Planner controls"
+        "en-GB": "Planner controls"
       }
     },
     {
       "id": "ui.results",
       "localizations": {
-        "en": "Optimization results"
+        "en-GB": "Optimization results"
       }
     },
     {
       "id": "ui.progress",
       "localizations": {
-        "en": "Progress"
+        "en-GB": "Progress"
       }
     },
     {
       "id": "ui.reset",
       "localizations": {
-        "en": "Reset planner"
+        "en-GB": "Reset planner"
       }
     },
     {
       "id": "ui.resetCookieStorage",
       "localizations": {
-        "en": "Reset cookie storage"
+        "en-GB": "Reset cookie storage"
       }
     },
     {
       "id": "ui.resetConfirm",
       "localizations": {
-        "en": "Reset all planner selections?"
+        "en-GB": "Reset all planner selections?"
       }
     },
     {
       "id": "ui.cancel",
       "localizations": {
-        "en": "Cancel"
+        "en-GB": "Cancel"
       }
     },
     {
       "id": "ui.confirm",
       "localizations": {
-        "en": "Confirm"
+        "en-GB": "Confirm"
       }
     },
     {
       "id": "ui.documentsOwned",
       "localizations": {
-        "en": "Documents owned"
+        "en-GB": "Documents owned"
       }
     },
     {
       "id": "ui.documentCounterDisclaimer",
       "localizations": {
-        "en": "Document counts are independent from reward claims and must be adjusted separately."
+        "en-GB": "Document counts are independent from reward claims and must be adjusted separately."
       }
     },
     {
       "id": "ui.optimizerHelpLabel",
       "localizations": {
-        "en": "How to use the optimizer"
+        "en-GB": "How to use the optimizer"
       }
     },
     {
       "id": "ui.optimizerHelp",
       "localizations": {
-        "en": "Select the rewards you already claimed and enter the documents you own.\n\nFollow Next Raid, enter the documents you extracted, then select Commit to update the plan."
+        "en-GB": "Select the rewards you already claimed and enter the documents you own.\n\nFollow Next Raid, enter the documents you extracted, then select Commit to update the plan."
       }
     },
     {
       "id": "ui.quantity",
       "localizations": {
-        "en": "Quantity"
+        "en-GB": "Quantity"
       }
     },
     {
       "id": "ui.invalidQuantity",
       "localizations": {
-        "en": "Enter a non-negative whole number."
+        "en-GB": "Enter a non-negative whole number."
       }
     },
     {
       "id": "ui.claimed",
       "localizations": {
-        "en": "Claimed"
+        "en-GB": "Claimed"
       }
     },
     {
       "id": "ui.unclaimedRewards",
       "localizations": {
-        "en": "{count} rewards remain"
+        "en-GB": "{count} rewards remain"
       }
     },
     {
       "id": "ui.estimatedDays",
       "localizations": {
-        "en": "Estimated days: {count}"
+        "en-GB": "Estimated days: {count}"
       }
     },
     {
       "id": "ui.planEstimate",
       "localizations": {
-        "en": "Planning estimate; not a guaranteed raid or spawn schedule."
+        "en-GB": "Planning estimate; not a guaranteed raid or spawn schedule."
       }
     },
     {
       "id": "ui.day",
       "localizations": {
-        "en": "day"
+        "en-GB": "day"
       }
     },
     {
       "id": "ui.claimMoreFromPage",
       "localizations": {
-        "en": "Claim {count} more from Page {page}"
+        "en-GB": "Claim {count} more from Page {page}"
       }
     },
     {
       "id": "ui.routePreference",
       "localizations": {
-        "en": "Route preference"
+        "en-GB": "Route preference"
       }
     },
     {
       "id": "ui.fastestReason",
       "localizations": {
-        "en": "Lower raid time"
+        "en-GB": "Lower raid time"
       }
     },
     {
       "id": "ui.safestReason",
       "localizations": {
-        "en": "Lower difficulty"
+        "en-GB": "Lower difficulty"
       }
     },
     {
       "id": "ui.nextAction",
       "localizations": {
-        "en": "Next action"
+        "en-GB": "Next action"
       }
     },
     {
       "id": "ui.farmNext",
       "localizations": {
-        "en": "Farm next"
+        "en-GB": "Farm next"
       }
     },
     {
       "id": "ui.viewFullSchedule",
       "localizations": {
-        "en": "View full schedule"
+        "en-GB": "View full schedule"
       }
     },
     {
       "id": "ui.fullSchedule",
       "localizations": {
-        "en": "Full farming schedule"
+        "en-GB": "Full farming schedule"
       }
     },
     {
       "id": "ui.planActions",
       "localizations": {
-        "en": "Plan actions"
+        "en-GB": "Plan actions"
       }
     },
     {
       "id": "ui.regularExchanges",
       "localizations": {
-        "en": "Regular-document exchanges"
+        "en-GB": "Regular-document exchanges"
       }
     },
     {
       "id": "ui.classifiedPurchases",
       "localizations": {
-        "en": "Classified Document purchases"
+        "en-GB": "Classified Document purchases"
       }
     },
     {
       "id": "ui.rewardsAvailableNow",
       "localizations": {
-        "en": "Rewards available now"
+        "en-GB": "Rewards available now"
       }
     },
     {
       "id": "ui.raids",
       "localizations": {
-        "en": "Raids"
+        "en-GB": "Raids"
       }
     },
     {
       "id": "ui.rewardsToRedeem",
       "localizations": {
-        "en": "Rewards to redeem"
+        "en-GB": "Rewards to redeem"
       }
     },
     {
       "id": "ui.noRewardsToRedeem",
       "localizations": {
-        "en": "No rewards to redeem after these raids."
+        "en-GB": "No rewards to redeem after these raids."
       }
     },
     {
       "id": "ui.raidLocationSummary",
       "localizations": {
-        "en": "{location} ({difficulty}, {minutes} min)"
+        "en-GB": "{location} ({difficulty}, {minutes} min)"
       }
     },
     {
       "id": "ui.close",
       "localizations": {
-        "en": "Close"
+        "en-GB": "Close"
       }
     },
     {
       "id": "ui.planDetails",
       "localizations": {
-        "en": "Plan details"
+        "en-GB": "Plan details"
       }
     },
     {
       "id": "ui.stillNeed",
       "localizations": {
-        "en": "Still need {count}"
+        "en-GB": "Still need {count}"
       }
     },
     {
       "id": "ui.modeLimitFixed",
       "localizations": {
-        "en": "Fixed by the selected game mode"
+        "en-GB": "Fixed by the selected game mode"
       }
     },
     {
       "id": "ui.nextClaims",
       "localizations": {
-        "en": "Next Battle Pass progress"
+        "en-GB": "Next Battle Pass progress"
       }
     },
     {
       "id": "ui.remainingDocuments",
       "localizations": {
-        "en": "Documents still needed"
+        "en-GB": "Documents still needed"
       }
     },
     {
       "id": "ui.document",
       "localizations": {
-        "en": "Document"
+        "en-GB": "Document"
       }
     },
     {
       "id": "ui.toFarm",
       "localizations": {
-        "en": "To farm"
+        "en-GB": "To farm"
       }
     },
     {
       "id": "ui.readyNow",
       "localizations": {
-        "en": "Claim now"
+        "en-GB": "Claim now"
       }
     },
     {
       "id": "ui.sameRoute",
       "localizations": {
-        "en": "Same locations; ordered by this profile"
+        "en-GB": "Same locations; ordered by this profile"
       }
     },
     {
       "id": "ui.farmLocations",
       "localizations": {
-        "en": "Farm locations"
+        "en-GB": "Farm locations"
       }
     },
     {
       "id": "ui.dailyProgression",
       "localizations": {
-        "en": "Daily reward progression"
+        "en-GB": "Daily reward progression"
       }
     },
     {
       "id": "ui.claimOnDay",
       "localizations": {
-        "en": "Claim after farming"
+        "en-GB": "Claim after farming"
       }
     },
     {
       "id": "ui.pageUnlocked",
       "localizations": {
-        "en": "Page {page} unlocked"
+        "en-GB": "Page {page} unlocked"
       }
     },
     {
       "id": "ui.locationFactor",
       "localizations": {
-        "en": "{difficulty}; {minutes} min maximum raid time"
+        "en-GB": "{difficulty}; {minutes} min maximum raid time"
       }
     },
     {
       "id": "ui.scheduleDay",
       "localizations": {
-        "en": "Day {day}: {count} documents"
+        "en-GB": "Day {day}: {count} documents"
       }
     },
     {
       "id": "ui.buyout",
       "localizations": {
-        "en": "Battle Pass buyout"
+        "en-GB": "Battle Pass buyout"
       }
     },
     {
       "id": "ui.buyoutLink",
       "localizations": {
-        "en": "(BUYOUT)"
+        "en-GB": "(BUYOUT)"
       }
     },
     {
       "id": "ui.approximateBuyoutPrice",
       "localizations": {
-        "en": "(~{price})"
+        "en-GB": "(~{price})"
       }
     },
     {
       "id": "ui.zeroLocalPrice",
       "localizations": {
-        "en": "$0"
+        "en-GB": "$0"
       }
     },
     {
       "id": "ui.openBuyoutEstimate",
       "localizations": {
-        "en": "Open Battle Pass buyout: {price}"
+        "en-GB": "Open Battle Pass buyout: {price}"
       }
     },
     {
       "id": "ui.buyoutGrossTarCoins",
       "localizations": {
-        "en": "TarCoins to spend: {count}"
+        "en-GB": "TarCoins to spend: {count}"
       }
     },
     {
       "id": "ui.buyoutSpendBattlePassTarCoins",
       "localizations": {
-        "en": "Spend Battle Pass TarCoins"
+        "en-GB": "Spend Battle Pass TarCoins"
       }
     },
     {
       "id": "ui.buyoutKeepBattlePassTarCoins",
       "localizations": {
-        "en": "Keep Battle Pass TarCoins"
+        "en-GB": "Keep Battle Pass TarCoins"
       }
     },
     {
       "id": "ui.source",
       "localizations": {
-        "en": "Source"
+        "en-GB": "Source"
       }
     },
     {
       "id": "ui.tarCoins",
       "localizations": {
-        "en": "TarCoins"
+        "en-GB": "TarCoins"
       }
     },
     {
       "id": "ui.price",
       "localizations": {
-        "en": "Price"
+        "en-GB": "Price"
       }
     },
     {
       "id": "ui.bundle",
       "localizations": {
-        "en": "Bundle"
+        "en-GB": "Bundle"
       }
     },
     {
       "id": "ui.total",
       "localizations": {
-        "en": "Total"
+        "en-GB": "Total"
       }
     },
     {
       "id": "ui.battlePassTarCoins",
       "localizations": {
-        "en": "Battle Pass TarCoins"
+        "en-GB": "Battle Pass TarCoins"
       }
     },
     {
       "id": "ui.tarCoinPackageSource",
       "localizations": {
-        "en": "{tarCoins} × {count}"
+        "en-GB": "{tarCoins} × {count}"
       }
     },
     {
       "id": "ui.classifiedBundleSize",
       "localizations": {
-        "en": "{documents} documents"
+        "en-GB": "{documents} documents"
       }
     },
     {
       "id": "ui.tarCoinsToSpend",
       "localizations": {
-        "en": "TarCoins to spend"
+        "en-GB": "TarCoins to spend"
       }
     },
     {
       "id": "ui.classifiedBundles",
       "localizations": {
-        "en": "Classified Document bundles"
+        "en-GB": "Classified Document bundles"
       }
     },
     {
       "id": "ui.noBundlesRequired",
       "localizations": {
-        "en": "No Classified Document bundles are required."
+        "en-GB": "No Classified Document bundles are required."
       }
     },
     {
       "id": "ui.tarCoinPackages",
       "localizations": {
-        "en": "TarCoin packages"
+        "en-GB": "TarCoin packages"
       }
     },
     {
       "id": "ui.tarCoinPackageCost",
       "localizations": {
-        "en": "Estimated package cost: {price}"
+        "en-GB": "Estimated package cost: {price}"
       }
     },
     {
       "id": "ui.noTarCoinPackagesRequired",
       "localizations": {
-        "en": "No real-money TarCoin packages are required."
+        "en-GB": "No real-money TarCoin packages are required."
       }
     },
     {
       "id": "ui.localPriceUnavailable",
       "localizations": {
-        "en": "A localized real-money price is unavailable."
+        "en-GB": "A localized real-money price is unavailable."
       }
     },
     {
       "id": "ui.crateCount",
       "localizations": {
-        "en": "Black Division crates"
+        "en-GB": "Black Division crates"
       }
     },
     {
       "id": "ui.crateShortage",
       "localizations": {
-        "en": "Regular documents to farm: {count}"
+        "en-GB": "Regular documents to farm: {count}"
       }
     },
     {
       "id": "ui.anyRegularDocuments",
       "localizations": {
-        "en": "Any non-Classified documents ({count})"
+        "en-GB": "Any non-Classified documents ({count})"
       }
     },
     {
       "id": "ui.classifiedUse",
       "localizations": {
-        "en": "Owned Classified Documents consumed: {used}; remaining: {remaining}"
+        "en-GB": "Owned Classified Documents consumed: {used}; remaining: {remaining}"
       }
     },
     {
       "id": "ui.exchange",
       "localizations": {
-        "en": "Regular-document exchanges: {count}"
+        "en-GB": "Regular-document exchanges: {count}"
       }
     },
     {
       "id": "ui.purchaseSummary",
       "localizations": {
-        "en": "Purchased Classified Documents: {count}; TarCoins spent: {tarCoins}"
+        "en-GB": "Purchased Classified Documents: {count}; TarCoins spent: {tarCoins}"
       }
     },
     {
       "id": "ui.warning",
       "localizations": {
-        "en": "Warning: {text}"
+        "en-GB": "Warning: {text}"
       }
     },
     {
       "id": "feedback.button",
       "localizations": {
-        "en": "Feedback"
+        "en-GB": "Feedback"
       }
     },
     {
       "id": "feedback.heading",
       "localizations": {
-        "en": "Send feedback"
+        "en-GB": "Send feedback"
       }
     },
     {
       "id": "feedback.message",
       "localizations": {
-        "en": "Message"
+        "en-GB": "Message"
       }
     },
     {
       "id": "feedback.includeContext",
       "localizations": {
-        "en": "Include compact optimizer context"
+        "en-GB": "Include compact optimizer context"
       }
     },
     {
       "id": "feedback.preview",
       "localizations": {
-        "en": "Issue preview"
+        "en-GB": "Issue preview"
       }
     },
     {
       "id": "feedback.openGitHub",
       "localizations": {
-        "en": "Open GitHub issue composer"
+        "en-GB": "Open GitHub issue composer"
       }
     },
     {
       "id": "feedback.unconfigured",
       "localizations": {
-        "en": "GitHub submission will be enabled after publication configuration."
+        "en-GB": "GitHub submission will be enabled after publication configuration."
       }
     },
     {
       "id": "feedback.invalid",
       "localizations": {
-        "en": "Enter a message within the allowed length."
+        "en-GB": "Enter a message within the allowed length."
       }
     },
     {
       "id": "feedback.title",
       "localizations": {
-        "en": "KORD BREACH Optimizer feedback"
+        "en-GB": "KORD BREACH Optimizer feedback"
       }
     },
     {
       "id": "feedback.body",
       "localizations": {
-        "en": "Feedback:\n{message}"
+        "en-GB": "Feedback:\n{message}"
       }
     },
     {
       "id": "feedback.context",
       "localizations": {
-        "en": "Context:\nGame data: {version}\nMode: {mode}\nDaily limit: {limit}"
+        "en-GB": "Context:\nGame data: {version}\nMode: {mode}\nDaily limit: {limit}"
       }
     },
     {
       "id": "cookieNotice.message",
       "localizations": {
-        "en": "Cookies store your planner selections on this device."
+        "en-GB": "Cookies store your planner selections on this device."
       }
     },
     {
       "id": "cookieNotice.dismiss",
       "localizations": {
-        "en": "Dismiss"
+        "en-GB": "Dismiss"
       }
     },
     {
       "id": "ui.nextRaid",
       "localizations": {
-        "en": "Next raid"
+        "en-GB": "Next raid"
       }
     },
     {
       "id": "ui.raidResult",
       "localizations": {
-        "en": "Raid result"
+        "en-GB": "Raid result"
       }
     },
     {
       "id": "ui.commitRaidResult",
       "localizations": {
-        "en": "Commit"
+        "en-GB": "Commit"
       }
     },
     {
       "id": "ui.priorityDocument",
       "localizations": {
-        "en": "Priority"
+        "en-GB": "Priority"
       }
     },
     {
       "id": "ui.optionalDocument",
       "localizations": {
-        "en": "Optional pickup"
+        "en-GB": "Optional pickup"
       }
     },
     {
       "id": "ui.stockpileDocument",
       "localizations": {
-        "en": "Crate stockpile"
+        "en-GB": "Crate stockpile"
       }
     },
     {
       "id": "ui.stockpileDocuments",
       "localizations": {
-        "en": "Stockpile documents"
+        "en-GB": "Stockpile documents"
       }
     },
     {
       "id": "ui.crateStockpileRaid",
       "localizations": {
-        "en": "Optional crate raid"
+        "en-GB": "Optional crate raid"
       }
     },
     {
       "id": "ui.targetQuantity",
       "localizations": {
-        "en": "Plan needs {count}"
+        "en-GB": "Plan needs {count}"
       }
     },
     {
       "id": "ui.enterRaidResult",
       "localizations": {
-        "en": "Enter the documents you extracted, then {commit}."
+        "en-GB": "Enter the documents you extracted, then {commit}."
       }
     },
     {
       "id": "ui.projectedOutcome",
       "localizations": {
-        "en": "Projected outcome"
+        "en-GB": "Projected outcome"
       }
     },
     {
       "id": "ui.noFarmingNeeded",
       "localizations": {
-        "en": "No farming is needed."
+        "en-GB": "No farming is needed."
       }
     },
     {
       "id": "ui.priorityDocuments",
       "localizations": {
-        "en": "Priority documents"
+        "en-GB": "Priority documents"
       }
     },
     {
       "id": "ui.exchangeInstruction",
       "localizations": {
-        "en": "{donors} → {received}"
+        "en-GB": "{donors} → {received}"
       }
     },
     {
       "id": "ui.classifiedBundleInstruction",
       "localizations": {
-        "en": "{documents} Classified Documents × {count}"
+        "en-GB": "{documents} Classified Documents × {count}"
       }
     },
     {
       "id": "rewards.short.pending",
       "localizations": {
-        "en": "Reward description pending."
+        "en-GB": "Reward description pending."
       }
     }
   ],
@@ -1559,7 +1571,7 @@
     {
       "id": "tarCoinBundles.500.localPrice",
       "localizations": {
-        "en": {
+        "en-GB": {
           "price": 4.99,
           "currency": "USD"
         }
@@ -1568,7 +1580,7 @@
     {
       "id": "tarCoinBundles.1100.localPrice",
       "localizations": {
-        "en": {
+        "en-GB": {
           "price": 9.99,
           "currency": "USD"
         }
@@ -1577,7 +1589,7 @@
     {
       "id": "tarCoinBundles.2300.localPrice",
       "localizations": {
-        "en": {
+        "en-GB": {
           "price": 19.99,
           "currency": "USD"
         }
@@ -1586,7 +1598,7 @@
     {
       "id": "tarCoinBundles.6000.localPrice",
       "localizations": {
-        "en": {
+        "en-GB": {
           "price": 49.99,
           "currency": "USD"
         }
@@ -1595,7 +1607,7 @@
     {
       "id": "tarCoinBundles.12500.localPrice",
       "localizations": {
-        "en": {
+        "en-GB": {
           "price": 99.99,
           "currency": "USD"
         }
@@ -1604,7 +1616,7 @@
     {
       "id": "tarCoinBundles.20250.localPrice",
       "localizations": {
-        "en": {
+        "en-GB": {
           "price": 149.99,
           "currency": "USD"
         }

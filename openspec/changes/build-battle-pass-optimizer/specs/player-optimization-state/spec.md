@@ -48,7 +48,7 @@ The interface SHALL use the supplied screenshots as the source of truth for a gr
 - **AND** focusing or hovering the square Lucide CircleHelp control beside season identity shows localized instructions for setting existing progress, following Next raid, entering extracted documents, and committing the result
 
 ### Requirement: Header season countdown
-The header SHALL display the selected locale and a countdown derived from Unix timestamp `1796637600`, including days, hours, minutes, and seconds, and SHALL expose the absolute end time `2026-12-07 10:00:00 UTC`.
+The header SHALL display the selected locale as the country flag derived from its regional BCP 47 key and a countdown derived from Unix timestamp `1796637600`, including days, hours, minutes, and seconds, and SHALL expose the absolute end time `2026-12-07 10:00:00 UTC`.
 
 #### Scenario: Active countdown
 - **WHEN** the device time is before the season deadline
@@ -231,7 +231,7 @@ The header SHALL contain a compact setup button labelled with the selected game 
 - **THEN** the effective daily limit changes to that mode's default while location maximum raid times and difficulty ratings remain unchanged
 
 ### Requirement: Header progress and route alternative presentation
-The header's left summary section SHALL present total-based document progress and a link-styled approximate localized remaining-pass price beside the Documents label while rewards remain, plus claimed-reward progress. The right control section SHALL contain one Fastest/Safest toggle beside mode and locale controls. The document total SHALL be derived from every Battle Pass requirement quantity, and the reward total SHALL be derived from every Battle Pass reward. The toggle SHALL default to Safest, persist as a UI preference, and control the focused result and full schedule. The independent buyout price SHALL update with state and locale but SHALL NOT change with the selected route profile or spending selector. The interface SHALL render only the selected profile at a time and SHALL NOT display the internal abstract profile-cost value.
+The header's left summary section SHALL present total-based document progress and a link-styled approximate localized remaining-pass price beside the Documents label while rewards remain, plus claimed-reward progress. The right control section SHALL contain one Fastest/Safest toggle beside mode and locale controls. Each profile option SHALL expose a concise localized tooltip on hover and keyboard focus: Fastest prioritizes raids with lower maximum time, while Safest prioritizes raids with easier difficulty. The document total SHALL be derived from every Battle Pass requirement quantity, and the reward total SHALL be derived from every Battle Pass reward. The toggle SHALL default to Safest, persist as a UI preference, and control the focused result and full schedule. The independent buyout price SHALL update with state and locale but SHALL NOT change with the selected route profile or spending selector. The interface SHALL render only the selected profile at a time and SHALL NOT display the internal abstract profile-cost value.
 
 #### Scenario: Initial progress uses catalog totals
 - **WHEN** the player opens the planner without valid persisted progress

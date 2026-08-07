@@ -37,7 +37,7 @@ async function seedOptimizerState(
       value: envelope({
         mode: 'pvp-seasonal',
         spendTarCoinsOnClassifiedDocuments: input.spendTarCoinsOnClassifiedDocuments ?? false,
-        locale: 'en',
+        locale: 'en-GB',
       }),
       url: page.url(),
     },

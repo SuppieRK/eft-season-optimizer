@@ -6,8 +6,8 @@ test('release validation blocks known development content', () => {
   const issues = validateReleaseCatalogs(
     {
       releaseStatus: 'development-only',
-      supportedLocales: ['en'],
-      entries: [{ id: 'reward.short.pending', localizations: { en: 'Pending description placeholder' } }],
+      supportedLocales: ['en-GB'],
+      entries: [{ id: 'reward.short.pending', localizations: { 'en-GB': 'Pending description placeholder' } }],
       priceEntries: [],
     },
     { documents: [{ id: 'documents.test.name' }] },
@@ -24,8 +24,8 @@ test('release validation accepts reviewed complete catalog fragments', () => {
   assert.deepStrictEqual(validateReleaseCatalogs(
     {
       releaseStatus: 'release',
-      supportedLocales: ['en'],
-      entries: [{ id: 'documents.test.name', localizations: { en: 'Test documents' } }],
+      supportedLocales: ['en-GB'],
+      entries: [{ id: 'documents.test.name', localizations: { 'en-GB': 'Test documents' } }],
       priceEntries: [],
     },
     { documents: [{ id: 'documents.test.name', descriptionId: 'documents.test.description', imageAltId: 'documents.test.alt' }] },

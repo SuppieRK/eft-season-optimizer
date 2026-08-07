@@ -70,7 +70,8 @@ describe('catalogs', () => {
       [20250, 5250],
     ]);
     expect(catalogs.localization.schemaVersion).toBe(2);
-    expect(catalogs.localization.priceEntries.map((entry) => entry.localizations.en)).toEqual([
+    expect(catalogs.localization.defaultLocale).toBe('en-GB');
+    expect(catalogs.localization.priceEntries.map((entry) => entry.localizations['en-GB'])).toEqual([
       { price: 4.99, currency: 'USD' },
       { price: 9.99, currency: 'USD' },
       { price: 19.99, currency: 'USD' },
@@ -125,8 +126,8 @@ describe('catalogs', () => {
     battlePass.pages[0].rewards[0].requirements[0].documentId = 'documents.missing.name';
     expect(() => parseCatalogs({ ...raw, battlePass })).toThrow(/unknown document/);
 
-    const localization = structuredClone(raw.localization) as { priceEntries: Array<{ localizations: { en: Record<string, unknown> } }> };
-    localization.priceEntries[0].localizations.en.currency = 'US';
+    const localization = structuredClone(raw.localization) as { priceEntries: Array<{ localizations: { 'en-GB': Record<string, unknown> } }> };
+    localization.priceEntries[0].localizations['en-GB'].currency = 'US';
     expect(() => parseCatalogs({ ...raw, localization })).toThrow(/three-letter uppercase ISO currency code/);
   });
 });

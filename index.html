@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -394,7 +394,7 @@
         opacity: 0;
       }
 
-      .route-profile-option span {
+      .route-profile-option__label {
         display: grid;
         place-items: center;
         min-inline-size: clamp(76px, 5vw, 104px);
@@ -408,14 +408,49 @@
         text-transform: uppercase;
       }
 
-      .route-profile-option input:checked + span {
+      .route-profile-option input:checked + .route-profile-option__label {
         background: var(--action-surface);
         color: var(--label);
       }
 
-      .route-profile-option input:focus-visible + span {
+      .route-profile-option input:focus-visible + .route-profile-option__label {
         outline: 2px solid var(--label);
         outline-offset: 2px;
+      }
+
+      .route-profile-option__tooltip {
+        position: absolute;
+        z-index: 20;
+        inset-block-start: calc(100% + var(--space-xs));
+        inline-size: min(30ch, calc(100vw - (4 * var(--space-m))));
+        padding: var(--space-s);
+        border: 1px solid var(--tooltip-line);
+        background: var(--tooltip-surface);
+        box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 45%);
+        color: var(--label);
+        font-size: var(--font-size-label);
+        font-weight: 400;
+        line-height: var(--line-height-copy);
+        letter-spacing: normal;
+        opacity: 0;
+        pointer-events: none;
+        text-transform: none;
+        transform: translateY(calc(-1 * var(--space-xxs)));
+        transition: opacity 120ms ease, transform 120ms ease;
+      }
+
+      .route-profile-option:first-of-type .route-profile-option__tooltip {
+        inset-inline-start: 0;
+      }
+
+      .route-profile-option:last-child .route-profile-option__tooltip {
+        inset-inline-end: 0;
+      }
+
+      .route-profile-option:hover .route-profile-option__tooltip,
+      .route-profile-option:focus-within .route-profile-option__tooltip {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       .visually-hidden {
@@ -1858,12 +1893,14 @@
           <fieldset class="route-profile-toggle">
             <legend class="visually-hidden" data-route-profile-label>…</legend>
             <label class="route-profile-option">
-              <input type="radio" name="route-profile" value="fastest" />
-              <span data-fastest-label>…</span>
+              <input type="radio" name="route-profile" value="fastest" aria-describedby="fastest-profile-tooltip" />
+              <span class="route-profile-option__label" data-fastest-label>…</span>
+              <span class="route-profile-option__tooltip" id="fastest-profile-tooltip" role="tooltip" data-fastest-tooltip></span>
             </label>
             <label class="route-profile-option">
-              <input type="radio" name="route-profile" value="safest" checked />
-              <span data-safest-label>…</span>
+              <input type="radio" name="route-profile" value="safest" aria-describedby="safest-profile-tooltip" checked />
+              <span class="route-profile-option__label" data-safest-label>…</span>
+              <span class="route-profile-option__tooltip" id="safest-profile-tooltip" role="tooltip" data-safest-tooltip></span>
             </label>
           </fieldset>
           <div class="account-slot">
@@ -2053,10 +2090,10 @@
     <script type="module">
       import SlimSelect from 'slim-select';
       import 'slim-select/styles';
-      import englishFlagUrl from 'flag-icons/flags/4x3/gb.svg?no-inline';
       import { CircleHelp, X, createElement as createIconElement } from 'lucide';
+      import flagIconUrls from 'virtual:locale-flags';
       import { loadCatalogs } from './src/catalogs.ts';
-      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber } from './src/localization.ts';
+      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber, getCompleteLocales, getLocaleRegion } from './src/localization.ts';
       import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from './src/persistence.ts';
       import { countPageRedeemableRewards, planRewardRedemption } from './src/redeemable.ts';
       import { isBattlePassPageUnlocked } from './src/page-unlocks.ts';
@@ -2064,8 +2101,10 @@
 
       const initialize = async () => {
       const catalogs = await loadCatalogs();
-      let state = restoreState(browserCookieAdapter, catalogs);
-      const localizer = createLocalizer(catalogs.localization);
+      let state = restoreState(browserCookieAdapter, catalogs, navigator.languages);
+      const localizer = createLocalizer(catalogs.localization, state.locale);
+      document.documentElement.lang = localizer.locale;
+      document.documentElement.dir = localizer.direction;
       const name = document.querySelector('[data-season-name]');
       const timer = document.querySelector('[data-season-timer]');
       const modeSelect = document.querySelector('[data-mode-select]');
@@ -2229,6 +2268,8 @@
       document.querySelector('[data-route-profile-label]').textContent = localizer.text('ui.routePreference');
       document.querySelector('[data-fastest-label]').textContent = localizer.text('optimizer.fastest');
       document.querySelector('[data-safest-label]').textContent = localizer.text('optimizer.safest');
+      document.querySelector('[data-fastest-tooltip]').textContent = localizer.text('optimizer.fastestTooltip');
+      document.querySelector('[data-safest-tooltip]').textContent = localizer.text('optimizer.safestTooltip');
       document.querySelectorAll('input[name="route-profile"]').forEach((input) => {
         input.checked = input.value === state.selectedProfile;
         input.addEventListener('change', () => {
@@ -3043,26 +3084,48 @@
         },
       });
 
-      const languageNames = new Intl.DisplayNames([localizer.locale], { type: 'language' });
-      const englishName = languageNames.of('en') ?? 'en';
-      const localeChoice = document.createElement('span');
-      localeChoice.className = 'locale-choice';
-      const localeFlag = document.createElement('img');
-      localeFlag.className = 'locale-choice__flag';
-      localeFlag.src = englishFlagUrl;
-      localeFlag.alt = '';
-      const localeName = document.createElement('span');
-      localeName.className = 'locale-choice__name';
-      localeName.textContent = englishName;
-      localeChoice.append(localeFlag, localeName);
+      const regionNames = new Intl.DisplayNames([localizer.locale], { type: 'region' });
+      const localeData = getCompleteLocales(catalogs.localization).map((locale) => {
+        const region = getLocaleRegion(locale);
+        const localeName = region
+          ? regionNames.of(region.toUpperCase()) ?? locale
+          : locale;
+        const localeChoice = document.createElement('span');
+        localeChoice.className = 'locale-choice';
+        const flagRegion = region ?? 'xx';
+        const localeFlag = document.createElement('img');
+        localeFlag.className = 'locale-choice__flag';
+        localeFlag.src = flagIconUrls[flagRegion];
+        localeFlag.alt = '';
+        localeFlag.dataset.flagRegion = flagRegion;
+        const accessibleName = document.createElement('span');
+        accessibleName.className = 'locale-choice__name';
+        accessibleName.textContent = localeName;
+        localeChoice.append(localeFlag, accessibleName);
+        return {
+          text: localeName,
+          value: locale,
+          html: localeChoice.outerHTML,
+          selected: locale === state.locale,
+        };
+      });
 
       new SlimSelect({
         select: languageSelect,
-        data: [{ text: englishName, value: 'en', html: localeChoice.outerHTML, selected: true }],
+        data: localeData,
         settings: {
           ariaLabel: localizer.text('ui.locale'),
           modal: 'off',
           showSearch: false,
+        },
+        events: {
+          afterChange: (selection) => {
+            const locale = selection[0]?.value;
+            if (!locale || locale === state.locale) return;
+            state = reduceState(state, { type: 'set-locale', locale }, catalogs);
+            saveState(state, browserCookieAdapter);
+            window.location.reload();
+          },
         },
       });
 

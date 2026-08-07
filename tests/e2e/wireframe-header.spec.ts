@@ -21,6 +21,19 @@ test('shows the season identity, relative countdown, totals, and default route p
   await expect(page.locator('input[name="route-profile"][value="safest"]')).toBeChecked();
   await expect(page.locator('input[name="route-profile"][value="fastest"]')).not.toBeChecked();
 
+  const fastestOption = page.locator('.route-profile-option').filter({ hasText: 'Fastest' });
+  const fastestTooltip = page.locator('[data-fastest-tooltip]');
+  const safestInput = page.locator('input[name="route-profile"][value="safest"]');
+  const safestTooltip = page.locator('[data-safest-tooltip]');
+  await expect(fastestTooltip).toHaveCSS('opacity', '0');
+  await fastestOption.hover();
+  await expect(fastestTooltip).toHaveCSS('opacity', '1');
+  await expect(fastestTooltip).toHaveText('Fastest prioritizes raids with lower max time.');
+  await page.mouse.move(1000, 800);
+  await safestInput.focus();
+  await expect(safestTooltip).toHaveCSS('opacity', '1');
+  await expect(safestTooltip).toHaveText('Safest prioritizes raids with easier difficulty.');
+
   const helpTrigger = page.locator('[data-season-help-trigger]');
   const helpTooltip = page.locator('[data-season-help-tooltip]');
   await expect(helpTrigger.locator('svg.season-help__icon')).toHaveCount(1);
@@ -56,7 +69,8 @@ test('orders and persists game modes while keeping the language selector icon-on
   const modeControl = page.locator('.ss-main.mode-select');
   const languageControl = page.locator('.ss-main.language-select');
   await expect(modeControl).toContainText('PvP Seasonal · 25 / day');
-  await expect(languageControl.locator('.locale-choice__flag')).toBeVisible();
+  await expect(page.locator('[data-language-select]')).toHaveValue('en-GB');
+  await expect(languageControl.locator('.locale-choice__flag[data-flag-region="gb"]')).toBeVisible();
 
   const languageNameStyle = await languageControl.locator('.locale-choice__name').evaluate((element) => {
     const style = getComputedStyle(element);
@@ -90,7 +104,7 @@ test('orders and persists game modes while keeping the language selector icon-on
   const languageMenu = page.locator('.ss-content.language-select');
   await expect(languageMenu).toBeVisible();
   await expect(languageMenu.locator('.ss-option')).toHaveCount(1);
-  await expect(languageMenu.locator('.locale-choice__flag')).toBeVisible();
+  await expect(languageMenu.locator('.locale-choice__flag[data-flag-region="gb"]')).toBeVisible();
   const opensBelowLanguage = await Promise.all([languageControl, languageMenu].map((locator) => locator.boundingBox()));
   expect(opensBelowLanguage[1]!.y).toBeGreaterThanOrEqual(opensBelowLanguage[0]!.y + opensBelowLanguage[0]!.height - 1);
   await page.keyboard.press('Escape');

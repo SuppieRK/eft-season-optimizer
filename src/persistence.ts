@@ -1,6 +1,6 @@
 import { GAME_DATA_VERSION } from './catalogs';
 import type { Catalogs, GameMode } from './catalogs';
-import { getCompleteLocales } from './localization';
+import { getCompleteLocales, resolvePreferredLocale } from './localization';
 import type { OptimizationProfile } from './optimizer';
 import { createDefaultState, getClassifiedDocumentMinimum, getDefaultRewardPage, type AppState } from './state';
 
@@ -76,8 +76,20 @@ export function saveState(state: AppState, cookies: CookieAdapter): void {
   });
 }
 
-export function restoreState(cookies: CookieAdapter, catalogs: Catalogs): AppState {
-  const defaults = createDefaultState(catalogs);
+export function restoreState(
+  cookies: CookieAdapter,
+  catalogs: Catalogs,
+  preferredLocales: readonly string[] = [],
+): AppState {
+  const catalogDefaults = createDefaultState(catalogs);
+  const defaults = {
+    ...catalogDefaults,
+    locale: resolvePreferredLocale(
+      preferredLocales,
+      getCompleteLocales(catalogs.localization),
+      catalogDefaults.locale,
+    ),
+  };
   const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress);
   const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings);
   const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui);

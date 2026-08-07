@@ -55,6 +55,38 @@ export function resolveStoredLocale(
   return storedLocale && completeLocales.includes(storedLocale) ? storedLocale : defaultLocale;
 }
 
+export function resolvePreferredLocale(
+  preferredLocales: readonly string[],
+  completeLocales: readonly string[],
+  defaultLocale: string,
+): string {
+  const supportedByCanonicalLocale = new Map(
+    completeLocales.map((locale) => [canonicalLocale(locale), locale]),
+  );
+
+  for (const preferredLocale of preferredLocales) {
+    const canonicalPreferredLocale = canonicalLocale(preferredLocale);
+    const exactMatch = supportedByCanonicalLocale.get(canonicalPreferredLocale);
+    if (exactMatch) return exactMatch;
+
+    const preferredLanguage = canonicalPreferredLocale.split('-')[0];
+    const languageMatches = completeLocales.filter(
+      (locale) => canonicalLocale(locale).split('-')[0] === preferredLanguage,
+    );
+    if (languageMatches.length === 1) return languageMatches[0];
+  }
+
+  return defaultLocale;
+}
+
+export function getLocaleRegion(locale: string): string | undefined {
+  try {
+    return new Intl.Locale(locale).region?.toLowerCase();
+  } catch {
+    return undefined;
+  }
+}
+
 export function getTextDirection(locale: string): 'ltr' | 'rtl' {
   return RTL_LOCALES.has(locale.toLowerCase().split('-')[0]) ? 'rtl' : 'ltr';
 }
@@ -68,7 +100,11 @@ export function formatTarCoins(value: number, locale: string): string {
 }
 
 export function formatLocalPrice(price: LocalPrice, locale: string): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: price.currency }).format(price.price);
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: price.currency,
+    currencyDisplay: 'narrowSymbol',
+  }).format(price.price);
 }
 
 export function formatDateTime(timestampSeconds: number, locale: string): string {
@@ -102,4 +138,12 @@ export function formatAccessibleRequirements(
 function interpolate(template: string, values?: Readonly<Record<string, MessageValue>>): string {
   if (!values) return template;
   return template.replace(/\{([\w-]+)\}/g, (placeholder, key: string) => String(values[key] ?? placeholder));
+}
+
+function canonicalLocale(locale: string): string {
+  try {
+    return Intl.getCanonicalLocales(locale)[0]?.toLowerCase() ?? locale.toLowerCase();
+  } catch {
+    return locale.toLowerCase();
+  }
 }

@@ -243,6 +243,15 @@ function parseLocalization(raw: unknown, issues: string[]): LocalizationCatalog 
     asString(value, `localization.supportedLocales[${index}]`, issues),
   );
   requireUnique(supportedLocales, 'localization.supportedLocales', issues);
+  for (const [index, locale] of supportedLocales.entries()) {
+    try {
+      if (!new Intl.Locale(locale).region) {
+        issues.push(`localization.supportedLocales[${index}] must include a region for its flag`);
+      }
+    } catch {
+      issues.push(`localization.supportedLocales[${index}] must be a valid BCP 47 locale`);
+    }
+  }
   const defaultLocale = asString(object.defaultLocale, 'localization.defaultLocale', issues);
   if (!supportedLocales.includes(defaultLocale)) issues.push(`localization.defaultLocale ${defaultLocale} is not supported`);
 

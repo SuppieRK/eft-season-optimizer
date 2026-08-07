@@ -110,17 +110,17 @@ No user-facing or assistive string is hard-coded in render functions. Domain JSO
 {
   "id": "documents.secured.description",
   "localizations": {
-    "en": "…",
-    "ru": "…"
+    "en-GB": "…",
+    "ru-RU": "…"
   }
 }
 ```
 
 Names, descriptions, requirement abbreviations, image alternatives, screenshot descriptions, UI labels, countdown units, and validation messages use independent IDs so each entry has one semantic purpose and a consistent string value shape. Keeping all languages adjacent within the same entry makes omissions and translation differences easier to review than separate per-language dictionaries.
 
-Locale-dependent real-money TarCoin package prices use a separate `priceEntries` collection in the same file. Each price entry keeps the same ID-centered shape, but each locale value contains only numeric major-unit `price` and a three-letter uppercase ISO `currency` code. Display strings are derived with `Intl.NumberFormat`; no preformatted storefront price is stored or parsed. Calculations normalize the numeric price to the ISO currency's fraction digits before comparing package combinations. Invariant TarCoin amounts remain ordinary numeric game data rather than localized currency values.
+Locale-dependent real-money TarCoin package prices use a separate `priceEntries` collection in the same file. Each price entry keeps the same ID-centered shape, but each locale value contains only numeric major-unit `price` and a three-letter uppercase ISO `currency` code. Display strings are derived with `Intl.NumberFormat` and its narrow currency symbol; no preformatted storefront price is stored or parsed. Calculations normalize the numeric price to the ISO currency's fraction digits before comparing package combinations. Invariant TarCoin amounts remain ordinary numeric game data rather than localized currency values.
 
-The configured default locale is always available. A locale appears in the header selector only when every required entry has a non-empty value for that locale; offered locales may not silently fall back for missing release content. Development builds may show conspicuous missing-ID markers, while production builds fail on missing, empty, duplicate, or orphaned IDs, missing locale values, or values for undeclared locales. The user's selected locale is stored in the UI-state cookie and falls back to the configured default when unsupported.
+The configured default locale is always available. Catalog locale keys use regional BCP 47 tags such as `en-GB`; the region selects the corresponding 4:3 image from the installed `flag-icons` package, while the complete tag drives `Intl` formatting and browser preference matching. A Vite virtual module generated from `supportedLocales` replaces the former hard-coded `en` text-locale to `gb.svg` mapping, emits only declared 4:3 flag assets, and does not require a new icon import when another regional locale is added. A locale appears in the header selector only when every required entry has a non-empty value for that locale; offered locales may not silently fall back for missing release content. Development builds may show conspicuous missing-ID markers, while production builds fail on missing, empty, duplicate, orphaned, invalid, or regionless locale IDs, missing locale values, or values for undeclared locales. The user's selected locale is stored in the UI-state cookie. On a first visit, the application chooses an exact browser preference or one unambiguous supported variant of the same language before falling back to the configured default; a valid stored locale remains authoritative.
 
 Formatting uses `Intl.NumberFormat`, `Intl.DateTimeFormat`, and locale-aware message templates rather than string concatenation. The countdown uses localized unit labels and plural forms while retaining the canonical UTC instant. The document abbreviations in the left column are localized data, not substrings cut from translated names.
 
