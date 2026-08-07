@@ -19,6 +19,7 @@
         --section-heading-height: clamp(54px, 5.2vh, 84px);
         --detail-content-height: clamp(132px, 16vh, 244px);
         --primary-action-height: clamp(54px, 6vh, 90px);
+        --language-select-width: clamp(70px, 4vw, 76px);
         --line: #697078;
         --line-muted: #41464d;
         --surface: #17191c;
@@ -170,6 +171,108 @@
         letter-spacing: 0.05em;
       }
 
+      .account-slot {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: clamp(10px, 0.8vw, 18px);
+        padding: clamp(12px, 1vw, 22px);
+      }
+
+      .header-select-shell,
+      .ss-main.header-select,
+      .ss-content.header-select {
+        color: var(--label);
+        font-family: inherit;
+        font-size: clamp(11px, 0.72vw, 15px);
+        font-weight: 700;
+        --ss-bg-color: var(--surface);
+        --ss-border-color: var(--line-muted);
+        --ss-focus-color: var(--label);
+        --ss-font-color: var(--label);
+        --ss-main-height: clamp(40px, 2.4vw, 46px);
+        --ss-option-height: 36px;
+        --ss-primary-color: var(--line-muted);
+        --ss-spacing-s: 0px;
+        --ss-spacing-m: 8px;
+        --ss-spacing-l: 12px;
+      }
+
+      .ss-main.header-select {
+        block-size: clamp(40px, 2.4vw, 46px);
+        padding: 0 12px;
+        border-radius: 0;
+      }
+
+      .ss-main.header-select:focus {
+        box-shadow: 0 0 0 2px var(--label);
+      }
+
+      .ss-main.header-select .ss-values {
+        padding: 0;
+      }
+
+      .ss-main.header-select .ss-values .ss-single {
+        display: flex;
+        align-items: center;
+        padding: 0;
+        line-height: 1;
+      }
+
+      .ss-main.header-select .ss-arrow {
+        inline-size: 10px;
+        block-size: 10px;
+        margin: 0 0 0 8px;
+      }
+
+      .ss-main.header-select .ss-arrow path {
+        stroke: var(--label-muted);
+      }
+
+      .ss-content.header-select {
+        border-radius: 0;
+      }
+
+      .ss-content.header-select .ss-list .ss-option {
+        min-block-size: var(--ss-option-height);
+        padding: 0 12px;
+        color: var(--label);
+        line-height: 1;
+      }
+
+      .ss-content.header-select .ss-list .ss-option:hover:not(.ss-disabled),
+      .ss-content.header-select .ss-list .ss-option.ss-highlighted,
+      .ss-content.header-select .ss-list .ss-option:not(.ss-disabled).ss-selected {
+        border-inline-start: 0;
+        background: var(--line-muted);
+        color: var(--label);
+      }
+
+      .mode-select-shell {
+        inline-size: clamp(200px, 12vw, 260px);
+      }
+
+      .language-select-shell {
+        inline-size: var(--language-select-width);
+      }
+
+      .ss-main.language-select .ss-single,
+      .ss-content.language-select .ss-option {
+        justify-content: center;
+      }
+
+      .locale-choice {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .locale-choice__flag {
+        display: block;
+        inline-size: auto;
+        block-size: 1em;
+        flex: 0 0 auto;
+      }
+
       .reward-rail {
         grid-area: reward;
         display: grid;
@@ -225,8 +328,13 @@
         <section class="slot header-slot" aria-label="Primary navigation">
           <span class="slot-label">Primary navigation slot</span>
         </section>
-        <section class="slot header-slot" aria-label="Back and account utilities">
-          <span class="slot-label">Back / account slot</span>
+        <section class="slot header-slot account-slot" aria-label="Back and account utilities">
+          <div class="header-select-shell mode-select-shell">
+            <select class="header-select mode-select" data-mode-select></select>
+          </div>
+          <div class="header-select-shell language-select-shell">
+            <select class="header-select language-select" data-language-select></select>
+          </div>
         </section>
       </header>
 
@@ -278,17 +386,65 @@
       </main>
     </div>
     <script type="module">
+      import SlimSelect from 'slim-select';
+      import 'slim-select/styles';
+      import englishFlagUrl from 'flag-icons/flags/4x3/gb.svg?no-inline';
       import { loadCatalogs } from './src/catalogs.ts';
-      import { createLocalizer, formatCountdownUnit } from './src/localization.ts';
+      import { createLocalizer, formatCountdownUnit, formatNumber } from './src/localization.ts';
 
       const catalogs = await loadCatalogs();
       const localizer = createLocalizer(catalogs.localization);
       const name = document.querySelector('[data-season-name]');
       const timer = document.querySelector('[data-season-timer]');
+      const modeSelect = document.querySelector('[data-mode-select]');
+      const languageSelect = document.querySelector('[data-language-select]');
       const endsAt = catalogs.battlePass.endsAt;
 
       name.textContent = localizer.text(catalogs.battlePass.id);
       timer.dateTime = new Date(endsAt * 1000).toISOString();
+
+      const modeData = [
+        ['pvp-seasonal', 'mode.pvpSeasonal'],
+        ['pvp', 'mode.pvp'],
+        ['pve', 'mode.pve'],
+      ].map(([mode, labelId]) => {
+        const limit = formatNumber(catalogs.optimizerRules.dailyDocumentLimits[mode], localizer.locale);
+        return {
+          text: `${localizer.text(labelId)} · ${limit} / ${localizer.text('ui.day')}`,
+          value: mode,
+          selected: mode === 'pvp-seasonal',
+        };
+      });
+
+      new SlimSelect({
+        select: modeSelect,
+        data: modeData,
+        settings: {
+          ariaLabel: localizer.text('optimizer.mode'),
+          modal: 'off',
+          showSearch: false,
+        },
+      });
+
+      const languageNames = new Intl.DisplayNames([localizer.locale], { type: 'language' });
+      const englishName = languageNames.of('en') ?? 'en';
+      const localeChoice = document.createElement('span');
+      localeChoice.className = 'locale-choice';
+      const localeFlag = document.createElement('img');
+      localeFlag.className = 'locale-choice__flag';
+      localeFlag.src = englishFlagUrl;
+      localeFlag.alt = englishName;
+      localeChoice.append(localeFlag);
+
+      new SlimSelect({
+        select: languageSelect,
+        data: [{ text: englishName, value: 'en', html: localeChoice.outerHTML, selected: true }],
+        settings: {
+          ariaLabel: localizer.text('ui.locale'),
+          modal: 'off',
+          showSearch: false,
+        },
+      });
 
       const updateTimer = () => {
         const totalSeconds = Math.max(0, Math.ceil(endsAt - Date.now() / 1000));
