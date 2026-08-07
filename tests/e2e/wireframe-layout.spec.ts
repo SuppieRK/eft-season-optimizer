@@ -137,20 +137,136 @@ test('keeps season proportions and existing header controls on the shared type s
   expect(new Set(controlFontSizes).size).toBe(1);
 });
 
-test('keeps body section headings at a fixed size across viewport widths', async ({ page }) => {
+test('keeps main header type and control geometry fixed across desktop viewports', async ({ page }) => {
+  await openWireframe(page);
+
+  const headerHeights = new Set<number>();
+  const seasonNumberSizes = new Set<string>();
+  const bodySizes = new Set<string>();
+  const labelSizes = new Set<string>();
+  const controlGeometry = [new Set<string>(), new Set<string>(), new Set<string>()];
+  const verticalGeometry = new Set<string>();
+  for (const viewport of [
+    { width: 1181, height: 720 },
+    { width: 1440, height: 900 },
+    { width: 2560, height: 1440 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const header = page.locator('.wireframe-header');
+    const headerBox = await header.boundingBox();
+    expect(headerBox).not.toBeNull();
+    headerHeights.add(headerBox!.height);
+
+    seasonNumberSizes.add(await page.locator('.season-number').evaluate((element) =>
+      getComputedStyle(element).fontSize));
+    bodySizes.add(await page.locator('.season-name').evaluate((element) =>
+      getComputedStyle(element).fontSize));
+    const labelElements = [
+      page.locator('.season-timer'),
+      page.locator('.navigation-progress__label').first(),
+      page.locator('.navigation-progress__value').first(),
+      page.locator('.route-profile-option__label').first(),
+      page.locator('.ss-main.mode-select'),
+      page.locator('.ss-main.language-select'),
+    ];
+    for (const element of labelElements) {
+      labelSizes.add(await element.evaluate((node) => getComputedStyle(node).fontSize));
+    }
+
+    const controls = [
+      page.locator('.route-profile-toggle'),
+      page.locator('.ss-main.mode-select'),
+      page.locator('.ss-main.language-select'),
+    ];
+    const boxes = await Promise.all(controls.map((control) => control.boundingBox()));
+    expect(boxes.every(Boolean)).toBe(true);
+    for (const [index, box] of boxes.entries()) {
+      controlGeometry[index]!.add(JSON.stringify({ width: box!.width, height: box!.height }));
+    }
+    const routeCenter = boxes[0]!.y + boxes[0]!.height / 2;
+    const modeCenter = boxes[1]!.y + boxes[1]!.height / 2;
+    const languageCenter = boxes[2]!.y + boxes[2]!.height / 2;
+    expect(Math.max(routeCenter, modeCenter, languageCenter) - Math.min(routeCenter, modeCenter, languageCenter))
+      .toBeLessThanOrEqual(1);
+    verticalGeometry.add(JSON.stringify({
+      routeTop: boxes[0]!.y - headerBox!.y,
+      modeTop: boxes[1]!.y - headerBox!.y,
+      languageTop: boxes[2]!.y - headerBox!.y,
+    }));
+  }
+
+  expect([...headerHeights]).toEqual([96]);
+  expect(seasonNumberSizes.size).toBe(1);
+  expect([...bodySizes]).toEqual(['16px']);
+  expect([...labelSizes]).toEqual(['13px']);
+  expect(controlGeometry.every((geometry) => geometry.size === 1)).toBe(true);
+  expect(verticalGeometry.size).toBe(1);
+});
+
+test('keeps body section headings at a fixed size and desktop height', async ({ page }) => {
   await openWireframe(page);
 
   const fontSizes = new Set<string>();
-  for (const width of [390, 1180, 1440, 2560]) {
-    await page.setViewportSize({ width, height: 900 });
-    const sizes = await Promise.all([
+  const desktopHeights = new Set<number>();
+  const desktopControlGeometry = new Set<string>();
+  const actionWidths = [new Set<number>(), new Set<number>(), new Set<number>(), new Set<number>()];
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 1180, height: 900 },
+    { width: 1181, height: 720 },
+    { width: 1440, height: 900 },
+    { width: 2560, height: 1440 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const headings = [
       page.locator('#reward-rail-heading'),
       page.locator('#focus-stage-heading'),
-    ].map((locator) => locator.evaluate((element) => getComputedStyle(element).fontSize)));
+    ];
+    const sizes = await Promise.all(headings.map((locator) =>
+      locator.evaluate((element) => getComputedStyle(element).fontSize)));
     sizes.forEach((size) => fontSizes.add(size));
+    if (viewport.width > 1180) {
+      const sections = [
+        page.locator('.reward-heading'),
+        page.locator('.focus-heading'),
+      ];
+      const buttons = [
+        page.locator('[data-reward-claim-all]'),
+        page.locator('[data-reward-clear-all]'),
+        page.locator('[data-view-route-schedule]'),
+        page.locator('[data-commit-raid]'),
+      ];
+      const heights = await Promise.all(sections.map(async (locator) =>
+        (await locator.boundingBox())?.height ?? 0));
+      heights.forEach((height) => desktopHeights.add(height));
+      const buttonBoxes = await Promise.all(buttons.map((locator) => locator.boundingBox()));
+      expect(buttonBoxes.every(Boolean)).toBe(true);
+      buttonBoxes.forEach((box, index) => actionWidths[index]!.add(box!.width));
+      for (const [sectionIndex, section] of sections.entries()) {
+        const sectionBox = await section.boundingBox();
+        const buttonBox = buttonBoxes[sectionIndex * 2];
+        expect(sectionBox).not.toBeNull();
+        expect(buttonBox).not.toBeNull();
+        const buttonFontSize = await buttons[sectionIndex * 2]!.evaluate((element) =>
+          getComputedStyle(element).fontSize);
+        const topGap = buttonBox!.y - sectionBox!.y;
+        const bottomGap = sectionBox!.y + sectionBox!.height - buttonBox!.y - buttonBox!.height;
+        expect(Math.abs(topGap - bottomGap)).toBeLessThanOrEqual(1);
+        desktopControlGeometry.add(JSON.stringify({
+          sectionHeight: sectionBox!.height,
+          buttonHeight: buttonBox!.height,
+          buttonFontSize,
+          topGap,
+          bottomGap,
+        }));
+      }
+    }
   }
 
   expect([...fontSizes]).toEqual(['16px']);
+  expect([...desktopHeights]).toEqual([54]);
+  expect(desktopControlGeometry.size).toBe(1);
+  expect(actionWidths.every((widths) => widths.size === 1)).toBe(true);
 });
 
 test('reveals the initialized interface without a startup layout shift', async ({ page }) => {
