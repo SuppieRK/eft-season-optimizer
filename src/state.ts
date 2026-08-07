@@ -49,7 +49,7 @@ export function createDefaultState(catalogs: Catalogs): AppState {
     crateCount: 1,
     locale: catalogs.localization.defaultLocale,
     selectedPage: catalogs.battlePass.pages[0]?.page ?? 1,
-    selectedProfile: 'fastest',
+    selectedProfile: 'safest',
     cookieNoticeDismissed: false,
   };
 }

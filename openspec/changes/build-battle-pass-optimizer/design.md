@@ -53,7 +53,7 @@ The desktop information architecture has five explicit regions:
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│ Header: season · countdown · Fastest/Safest · locale · setup│
+│ Header: season · countdown · total progress · profile · setup│
 ├───────────────┬────────────────────────┬─────────────────────┤
 │ Left          │ Center                 │ Right               │
 │ One reward page│ Current route day      │ Selected route stop │
@@ -66,7 +66,7 @@ The left column shows exactly one Battle Pass page at a time. Previous, next, an
 
 The center column is one current-route-day workspace rather than a panel containing nested result cards. It shows immediate claims when available; otherwise it shows the first schedule day, an ordered selectable stop strip, and the selected stop's assigned document artwork and quantities on one continuous surface. Remaining rewards and estimated days remain visible without duplicating deficits or daily limits. Empty and completed states use the same workspace structure.
 
-The right column is one uninterrupted context rail for the selected route stop. It shows location, official difficulty, maximum raid time, assigned documents, the complete day's claim outcome, full-schedule access, and flat plan/buyout disclosures. Global mode, TarCoin spending, TarCoin balance, conditional crate count, and reset controls move to a native setup dialog opened by a compact header button whose label combines the selected mode and its fixed daily limit. The Fastest/Safest toggle sits beside the locale selector in the header. The all-unclaimed-rewards objective remains fixed rather than player-selectable. The footer is a contiguous document ribbon modeled on the supplied in-game inventory strip. Images dominate each tile while the localized name, nonzero selected-profile deficit, decrement, direct numeric input, and increment controls remain visible and keyboard operable.
+The right column is one uninterrupted context rail for the selected route stop. It shows location, official difficulty, maximum raid time, assigned documents, the complete day's claim outcome, full-schedule access, and flat plan/buyout disclosures. Global mode, TarCoin spending, TarCoin balance, conditional crate count, and reset controls move to a native setup dialog opened by a compact header button whose label combines the selected mode and its fixed daily limit. The header's primary navigation area shows total-based document and claimed-reward progress plus the Fastest/Safest toggle; locale and setup utilities remain in the adjacent account area. The all-unclaimed-rewards objective remains fixed rather than player-selectable. The footer is a contiguous document ribbon modeled on the supplied in-game inventory strip. Images dominate each tile while the localized name, nonzero selected-profile deficit, decrement, direct numeric input, and increment controls remain visible and keyboard operable.
 
 On narrow screens, the regions stack in workflow order: header, center route day, right stop context, left reward selection, then footer inventory and disclaimer. CSS grid areas and logical properties prepare the layout for right-to-left locales. No region relies on horizontal viewport scrolling, though the stop strip and footer document tray may scroll internally.
 
@@ -208,7 +208,7 @@ The optimizer evaluates the complete Classified allocation and farming assignmen
 
 Each profile breaks ties by fewer distinct locations, lower raw farming quantity, then stable location identifier order. Shared document availability is therefore handled directly by the assignment. The number of known locations is small enough to enumerate candidate location subsets deterministically without an external solver.
 
-The header presents one persisted Fastest/Safest toggle beside the locale selector, defaulting to Fastest, and renders only the selected profile. The selected result explains its locations through maximum raid time and official difficulty without showing abstract profile cost. If both profiles produce the same assignment, the selected view identifies the coincidence. If catalog eligibility makes a profile impossible, the result explains why that option is unavailable rather than returning a partial route. Once every reward is claimed, the toggle disappears and the single Fastest Black Division crate plan is shown.
+The header presents one persisted Fastest/Safest toggle in the primary navigation area, defaulting to Safest, and renders only the selected profile. The selected result explains its locations through maximum raid time and official difficulty without showing abstract profile cost. If both profiles produce the same assignment, the selected view identifies the coincidence. If catalog eligibility makes a profile impossible, the result explains why that option is unavailable rather than returning a partial route. Once every reward is claimed, the toggle disappears and the single Fastest Black Division crate plan is shown.
 
 ### 10. Present daily scheduling as a cautious, progressively disclosed estimate
 

@@ -114,8 +114,12 @@ The header SHALL contain a compact setup button labelled with the selected game 
 - **WHEN** the player changes between PvE, PvP, and PvP Seasonal
 - **THEN** the effective daily limit changes to that mode's default while location maximum raid times and difficulty ratings remain unchanged
 
-### Requirement: Route alternative presentation
-The header SHALL present one Fastest/Safest toggle immediately beside the language selector. It SHALL default to Fastest, persist as a UI preference, and control the focused result, footer deficits, and full schedule. The interface SHALL render only the selected profile at a time and SHALL NOT display the internal abstract profile-cost value.
+### Requirement: Header progress and route alternative presentation
+The header's primary navigation area SHALL present total-based document progress, claimed-reward progress, and one Fastest/Safest toggle. The document total SHALL be derived from every Battle Pass requirement quantity, and the reward total SHALL be derived from every Battle Pass reward. The toggle SHALL default to Safest, persist as a UI preference, and control the focused result, footer deficits, and full schedule. The interface SHALL render only the selected profile at a time and SHALL NOT display the internal abstract profile-cost value.
+
+#### Scenario: Initial progress uses catalog totals
+- **WHEN** no documents are recorded and no rewards are claimed
+- **THEN** the header shows zero against the complete catalog-derived document and reward totals
 
 #### Scenario: Profile routes differ
 - **WHEN** Fastest and Safest optimization produce different location assignments

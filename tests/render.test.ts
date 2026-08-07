@@ -60,7 +60,7 @@ describe('Battle Pass interface', () => {
     expect(document.querySelector('.context-disclosures > .buyout')).toBeTruthy();
     expect(document.querySelectorAll('[data-action="set-profile"]')).toHaveLength(2);
     expect(document.querySelector('.header-actions > .profile-toggle + .locale-control')).toBeTruthy();
-    expect(document.querySelector('[data-profile="fastest"]')?.getAttribute('aria-pressed')).toBe('true');
+    expect(document.querySelector('[data-profile="safest"]')?.getAttribute('aria-pressed')).toBe('true');
     expect(document.querySelector('.deficit-overview')).toBeNull();
     expect(document.querySelectorAll('.document-deficit').length).toBeGreaterThan(0);
     expect(document.querySelectorAll('.document-artwork')).toHaveLength(9);

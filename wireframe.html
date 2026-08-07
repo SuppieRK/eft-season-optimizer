@@ -171,6 +171,126 @@
         letter-spacing: 0.05em;
       }
 
+      .primary-navigation-slot {
+        display: grid;
+        grid-template-columns: minmax(120px, 1fr) minmax(110px, 0.85fr) auto;
+        align-items: center;
+        gap: clamp(16px, 1.8vw, 36px);
+        padding: clamp(12px, 1vw, 22px);
+      }
+
+      .navigation-progress {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+        gap: 7px 12px;
+        min-inline-size: 0;
+      }
+
+      .navigation-progress__label {
+        overflow: hidden;
+        color: var(--label-muted);
+        font-size: clamp(10px, 0.62vw, 13px);
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .navigation-progress__value {
+        color: var(--label);
+        font-size: clamp(14px, 0.95vw, 21px);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .navigation-progress__separator {
+        padding-inline: 0.18em;
+        color: var(--label-muted);
+      }
+
+      .navigation-progress progress {
+        grid-column: 1 / -1;
+        inline-size: 100%;
+        block-size: 4px;
+        overflow: hidden;
+        border: 0;
+        border-radius: 0;
+        appearance: none;
+        background: var(--line-muted);
+      }
+
+      .navigation-progress progress::-webkit-progress-bar {
+        background: var(--line-muted);
+      }
+
+      .navigation-progress progress::-webkit-progress-value {
+        background: var(--label);
+      }
+
+      .navigation-progress progress::-moz-progress-bar {
+        background: var(--label);
+      }
+
+      .route-profile-toggle {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        margin: 0;
+        padding: 0;
+        border: 1px solid var(--line-muted);
+      }
+
+      .route-profile-option {
+        position: relative;
+        cursor: pointer;
+      }
+
+      .route-profile-option + .route-profile-option {
+        border-inline-start: 1px solid var(--line-muted);
+      }
+
+      .route-profile-option input {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        opacity: 0;
+      }
+
+      .route-profile-option span {
+        display: grid;
+        place-items: center;
+        min-inline-size: clamp(76px, 5vw, 104px);
+        block-size: clamp(40px, 2.4vw, 46px);
+        padding-inline: 12px;
+        color: var(--label-muted);
+        font-size: clamp(11px, 0.72vw, 15px);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .route-profile-option input:checked + span {
+        background: var(--label);
+        color: var(--surface);
+      }
+
+      .route-profile-option input:focus-visible + span {
+        outline: 2px solid var(--label);
+        outline-offset: 2px;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
       .account-slot {
         display: flex;
         align-items: center;
@@ -325,8 +445,32 @@
             <time class="season-timer" data-season-timer>…</time>
           </div>
         </section>
-        <section class="slot header-slot" aria-label="Primary navigation">
-          <span class="slot-label">Primary navigation slot</span>
+        <section class="slot header-slot primary-navigation-slot" aria-label="Primary navigation">
+          <div class="navigation-progress">
+            <span class="navigation-progress__label" data-document-progress-label>…</span>
+            <strong class="navigation-progress__value">
+              <span data-document-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-document-progress-total>…</span>
+            </strong>
+            <progress data-document-progress value="0" max="1"></progress>
+          </div>
+          <div class="navigation-progress">
+            <span class="navigation-progress__label" data-reward-progress-label>…</span>
+            <strong class="navigation-progress__value">
+              <span data-reward-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-reward-progress-total>…</span>
+            </strong>
+            <progress data-reward-progress value="0" max="1"></progress>
+          </div>
+          <fieldset class="route-profile-toggle">
+            <legend class="visually-hidden" data-route-profile-label>…</legend>
+            <label class="route-profile-option">
+              <input type="radio" name="route-profile" value="fastest" />
+              <span data-fastest-label>…</span>
+            </label>
+            <label class="route-profile-option">
+              <input type="radio" name="route-profile" value="safest" checked />
+              <span data-safest-label>…</span>
+            </label>
+          </fieldset>
         </section>
         <section class="slot header-slot account-slot" aria-label="Back and account utilities">
           <div class="header-select-shell mode-select-shell">
@@ -399,9 +543,47 @@
       const modeSelect = document.querySelector('[data-mode-select]');
       const languageSelect = document.querySelector('[data-language-select]');
       const endsAt = catalogs.battlePass.endsAt;
+      const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
+      const documentTotal = rewards.reduce(
+        (total, reward) => total + reward.requirements.reduce((rewardTotal, requirement) => rewardTotal + requirement.quantity, 0),
+        0,
+      );
+      const rewardTotal = rewards.length;
 
       name.textContent = localizer.text(catalogs.battlePass.id);
       timer.dateTime = new Date(endsAt * 1000).toISOString();
+
+      const configureProgress = ({ labelId, labelSelector, currentSelector, totalSelector, progressSelector, total }) => {
+        const label = localizer.text(labelId);
+        const progress = document.querySelector(progressSelector);
+        document.querySelector(labelSelector).textContent = label;
+        document.querySelector(currentSelector).textContent = formatNumber(0, localizer.locale);
+        document.querySelector(totalSelector).textContent = formatNumber(total, localizer.locale);
+        progress.max = total;
+        progress.value = 0;
+        progress.setAttribute('aria-label', label);
+      };
+
+      configureProgress({
+        labelId: 'battlePass.documents',
+        labelSelector: '[data-document-progress-label]',
+        currentSelector: '[data-document-progress-current]',
+        totalSelector: '[data-document-progress-total]',
+        progressSelector: '[data-document-progress]',
+        total: documentTotal,
+      });
+      configureProgress({
+        labelId: 'battlePass.rewards',
+        labelSelector: '[data-reward-progress-label]',
+        currentSelector: '[data-reward-progress-current]',
+        totalSelector: '[data-reward-progress-total]',
+        progressSelector: '[data-reward-progress]',
+        total: rewardTotal,
+      });
+
+      document.querySelector('[data-route-profile-label]').textContent = localizer.text('ui.routePreference');
+      document.querySelector('[data-fastest-label]').textContent = localizer.text('optimizer.fastest');
+      document.querySelector('[data-safest-label]').textContent = localizer.text('optimizer.safest');
 
       const modeData = [
         ['pvp-seasonal', 'mode.pvpSeasonal'],

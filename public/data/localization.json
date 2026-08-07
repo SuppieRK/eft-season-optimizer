@@ -37,6 +37,12 @@
       }
     },
     {
+      "id": "battlePass.rewards",
+      "localizations": {
+        "en": "Rewards"
+      }
+    },
+    {
       "id": "battlePass.page",
       "localizations": {
         "en": "Page"
