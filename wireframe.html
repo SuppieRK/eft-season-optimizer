@@ -426,6 +426,8 @@
 
       .reward-rail {
         grid-area: reward;
+        display: grid;
+        grid-template-rows: var(--section-heading-height) minmax(0, 1fr);
       }
 
       .focus-stage {
@@ -434,7 +436,6 @@
         grid-template-rows: var(--section-heading-height) minmax(0, 1fr);
       }
 
-      .reward-rail,
       .detail-rail {
         display: grid;
         grid-template-rows:
@@ -452,6 +453,184 @@
       .detail-content,
       .primary-action {
         border-block-end: 1px dashed var(--line-muted);
+      }
+
+      .reward-heading {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: var(--space-s);
+        padding: var(--space-s) var(--space-m);
+        border-block-end-style: solid;
+      }
+
+      .reward-heading h2 {
+        margin: 0;
+        overflow: hidden;
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.06em;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .reward-heading__actions {
+        display: flex;
+        gap: var(--space-xs);
+      }
+
+      .reward-heading__actions button,
+      .reward-page__trigger {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .reward-heading__actions button {
+        padding: var(--space-xs) var(--space-s);
+        border: 1px solid var(--line-muted);
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .reward-heading__actions button:hover,
+      .reward-heading__actions button:focus-visible {
+        border-color: var(--label-muted);
+        background: var(--line-muted);
+      }
+
+      .reward-heading__actions button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      .reward-content {
+        overflow: auto;
+        border-block-end: 0;
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
+        scrollbar-color: var(--line) var(--surface);
+        scrollbar-width: thin;
+      }
+
+      .reward-page + .reward-page {
+        border-block-start: 1px solid var(--line-muted);
+      }
+
+      .reward-page__trigger {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: var(--space-m);
+        inline-size: 100%;
+        padding: var(--space-s) var(--space-m);
+        text-align: start;
+      }
+
+      .reward-page__chevron {
+        display: block;
+        inline-size: 0.75em;
+        block-size: 0.75em;
+        color: var(--label-muted);
+        transform: rotate(0deg);
+        transform-origin: center;
+        transition: transform 120ms ease-out;
+      }
+
+      .reward-page__trigger[aria-expanded="true"] {
+        background: var(--line-muted);
+      }
+
+      .reward-page__trigger[aria-expanded="true"] .reward-page__chevron {
+        transform: rotate(180deg);
+      }
+
+      .reward-page__label {
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .reward-page__count {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+      }
+
+      .reward-page__panel[hidden] {
+        display: none;
+      }
+
+      .reward-page__items {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .reward-item {
+        border-block-start: 1px solid color-mix(in srgb, var(--line-muted) 68%, transparent);
+      }
+
+      .reward-item label {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: var(--space-s);
+        padding: var(--space-s) var(--space-m);
+        cursor: pointer;
+      }
+
+      .reward-item input {
+        inline-size: 1em;
+        block-size: 1em;
+        margin: 0;
+        accent-color: var(--document-frame);
+      }
+
+      .reward-item__copy {
+        display: grid;
+        gap: var(--space-xxs);
+        min-inline-size: 0;
+      }
+
+      .reward-item__name,
+      .reward-item__requirements {
+        overflow-wrap: anywhere;
+      }
+
+      .reward-item__name {
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+      }
+
+      .reward-item__requirements {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-ui);
+      }
+
+      .reward-item:has(input:checked) .reward-item__name,
+      .reward-item:has(input:checked) .reward-item__requirements {
+        color: var(--label-muted);
+        text-decoration: line-through;
+      }
+
+      .reward-crate {
+        display: grid;
+        gap: var(--space-xxs);
+        padding: var(--space-m);
       }
 
       .document-strip {
@@ -669,17 +848,15 @@
       </header>
 
       <main class="wireframe-workspace" aria-label="Battle Pass workspace">
-        <section class="region reward-rail" aria-label="Reward rail">
-          <span class="region-label">Reward rail</span>
-          <div class="slot section-heading" aria-label="Reward heading">
-            <span class="slot-label">Reward heading slot</span>
+        <section class="region reward-rail" aria-labelledby="reward-rail-heading">
+          <div class="slot section-heading reward-heading">
+            <h2 id="reward-rail-heading" data-reward-heading></h2>
+            <div class="reward-heading__actions">
+              <button type="button" data-reward-claim-all></button>
+              <button type="button" data-reward-clear-all></button>
+            </div>
           </div>
-          <div class="slot detail-content" aria-label="Reward content">
-            <span class="slot-label">Reward content slot</span>
-          </div>
-          <div class="slot primary-action" aria-label="Reward primary action">
-            <span class="slot-label">Reward primary action slot</span>
-          </div>
+          <div class="slot detail-content reward-content" data-reward-pages></div>
         </section>
 
         <section class="region focus-stage" aria-label="Focus stage">
@@ -833,7 +1010,7 @@
       import 'slim-select/styles';
       import englishFlagUrl from 'flag-icons/flags/4x3/gb.svg?no-inline';
       import { loadCatalogs } from './src/catalogs.ts';
-      import { createLocalizer, formatCountdownUnit, formatNumber } from './src/localization.ts';
+      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatNumber } from './src/localization.ts';
       import { browserCookieAdapter, restoreState, saveState } from './src/persistence.ts';
       import { reduceState } from './src/state.ts';
 
@@ -851,6 +1028,17 @@
         0,
       );
       const rewardTotal = rewards.length;
+      const getClaimedDocumentQuantities = () => {
+        const claimedRewards = new Set(state.claimedRewardIds);
+        const quantities = {};
+        rewards.forEach((reward) => {
+          if (!claimedRewards.has(reward.id)) return;
+          reward.requirements.forEach(({ documentId, quantity }) => {
+            quantities[documentId] = (quantities[documentId] ?? 0) + quantity;
+          });
+        });
+        return quantities;
+      };
 
       name.textContent = localizer.text(catalogs.battlePass.id);
       timer.dateTime = new Date(endsAt * 1000).toISOString();
@@ -888,16 +1076,19 @@
       });
 
       const refreshProgress = () => {
+        const claimedDocumentTotal = Object.values(getClaimedDocumentQuantities())
+          .reduce((total, quantity) => total + quantity, 0);
         const ownedDocumentTotal = catalogs.documents.documents.reduce((total, documentRecord) => {
           const quantity = documentRecord.kind === 'classified'
             ? state.classifiedDocuments
             : state.ownedDocuments[documentRecord.id] ?? 0;
           return total + quantity;
         }, 0);
-        updateDocumentProgress(ownedDocumentTotal);
+        updateDocumentProgress(claimedDocumentTotal + ownedDocumentTotal);
         updateRewardProgress(state.claimedRewardIds.length);
       };
 
+      let refreshRewardRail = () => {};
       const dispatch = (action) => {
         state = reduceState(state, action, catalogs);
         try {
@@ -906,6 +1097,7 @@
           console.error(error);
         }
         refreshProgress();
+        refreshRewardRail();
       };
 
       refreshProgress();
@@ -919,6 +1111,121 @@
           if (input.checked) dispatch({ type: 'set-profile', profile: input.value });
         });
       });
+
+      const rewardHeading = document.querySelector('[data-reward-heading]');
+      const claimAllButton = document.querySelector('[data-reward-claim-all]');
+      const clearAllButton = document.querySelector('[data-reward-clear-all]');
+      const rewardPages = document.querySelector('[data-reward-pages]');
+      const documentNames = Object.fromEntries(catalogs.documents.documents.map((documentRecord) => [documentRecord.id, localizer.text(documentRecord.id)]));
+      const documentAbbreviations = Object.fromEntries(Object.entries(documentNames).map(([documentId, documentName]) => [documentId, documentName.trim().split(/\s+/u)[0]]));
+      const pageViews = catalogs.battlePass.pages.map((page) => {
+        const pageSection = document.createElement('section');
+        const trigger = document.createElement('button');
+        const pageLabel = document.createElement('span');
+        const claimedCount = document.createElement('span');
+        const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const chevronPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const panel = document.createElement('div');
+        const itemList = document.createElement('ul');
+        const triggerId = `reward-page-trigger-${page.page}`;
+        const panelId = `reward-page-panel-${page.page}`;
+
+        pageSection.className = 'reward-page';
+        trigger.className = 'reward-page__trigger';
+        trigger.type = 'button';
+        trigger.id = triggerId;
+        trigger.setAttribute('aria-controls', panelId);
+        pageLabel.className = 'reward-page__label';
+        pageLabel.textContent = `${localizer.text('battlePass.page')} ${String(page.page).padStart(2, '0')}`;
+        claimedCount.className = 'reward-page__count';
+        chevron.classList.add('reward-page__chevron');
+        chevron.setAttribute('viewBox', '0 0 12 8');
+        chevron.setAttribute('aria-hidden', 'true');
+        chevron.setAttribute('focusable', 'false');
+        chevronPath.setAttribute('d', 'M1 1.25 6 6.25 11 1.25');
+        chevronPath.setAttribute('fill', 'none');
+        chevronPath.setAttribute('stroke', 'currentColor');
+        chevronPath.setAttribute('stroke-width', '1.5');
+        chevronPath.setAttribute('stroke-linecap', 'square');
+        chevronPath.setAttribute('stroke-linejoin', 'miter');
+        chevron.append(chevronPath);
+        panel.className = 'reward-page__panel';
+        panel.id = panelId;
+        panel.setAttribute('role', 'region');
+        panel.setAttribute('aria-labelledby', triggerId);
+        itemList.className = 'reward-page__items';
+
+        const rewardInputs = page.rewards.map((reward) => {
+          const item = document.createElement('li');
+          const label = document.createElement('label');
+          const checkbox = document.createElement('input');
+          const copy = document.createElement('span');
+          const rewardName = document.createElement('span');
+          const requirements = document.createElement('span');
+          const fullName = localizer.text(reward.id);
+
+          item.className = 'reward-item';
+          checkbox.type = 'checkbox';
+          checkbox.dataset.rewardId = reward.id;
+          checkbox.setAttribute('aria-label', `${localizer.text('battlePass.claimReward')}: ${fullName}`);
+          copy.className = 'reward-item__copy';
+          rewardName.className = 'reward-item__name';
+          rewardName.textContent = fullName;
+          requirements.className = 'reward-item__requirements';
+          requirements.textContent = reward.requirements.map(({ documentId, quantity }) => `${documentAbbreviations[documentId]} (${formatNumber(quantity, localizer.locale)})`).join(' · ');
+          requirements.title = formatAccessibleRequirements(reward.requirements, documentNames, localizer.locale);
+          copy.append(rewardName, requirements);
+          label.append(checkbox, copy);
+          item.append(label);
+          itemList.append(item);
+
+          checkbox.addEventListener('change', () => dispatch({ type: 'claim-reward', rewardId: reward.id, claimed: checkbox.checked }));
+          return { rewardId: reward.id, checkbox };
+        });
+
+        trigger.append(pageLabel, claimedCount, chevron);
+        trigger.addEventListener('click', () => dispatch({ type: 'set-page', page: page.page }));
+        panel.append(itemList);
+        pageSection.append(trigger, panel);
+        rewardPages.append(pageSection);
+        return { page, pageSection, trigger, panel, claimedCount, rewardInputs };
+      });
+
+      const crateReward = document.createElement('article');
+      const crateRewardName = document.createElement('strong');
+      const crateRewardRequirement = document.createElement('span');
+      crateReward.className = 'reward-crate';
+      crateRewardName.className = 'reward-item__name';
+      crateRewardName.textContent = localizer.text('battlePass.blackDivisionCrate');
+      crateRewardRequirement.className = 'reward-item__requirements';
+      crateRewardRequirement.textContent = localizer.text('ui.anyRegularDocuments', {
+        count: formatNumber(catalogs.optimizerRules.exchange.regularDocumentsPerBlackDivisionGearCrate, localizer.locale),
+      });
+      crateReward.append(crateRewardName, crateRewardRequirement);
+
+      rewardHeading.textContent = localizer.text('battlePass.rewards');
+      claimAllButton.textContent = localizer.text('battlePass.claimAll');
+      clearAllButton.textContent = localizer.text('battlePass.clearAll');
+      claimAllButton.addEventListener('click', () => dispatch({ type: 'claim-all', claimed: true }));
+      clearAllButton.addEventListener('click', () => dispatch({ type: 'claim-all', claimed: false }));
+
+      refreshRewardRail = () => {
+        const claimedRewards = new Set(state.claimedRewardIds);
+        const allRewardsClaimed = rewards.every((reward) => claimedRewards.has(reward.id));
+        rewardPages.replaceChildren(...(allRewardsClaimed ? [crateReward] : pageViews.map(({ pageSection }) => pageSection)));
+        claimAllButton.disabled = allRewardsClaimed;
+        pageViews.forEach(({ page, trigger, panel, claimedCount, rewardInputs }) => {
+          const selected = page.page === state.selectedPage;
+          const claimedOnPage = rewardInputs.filter(({ rewardId }) => claimedRewards.has(rewardId)).length;
+          trigger.setAttribute('aria-expanded', String(selected));
+          panel.hidden = !selected;
+          claimedCount.textContent = `${formatNumber(claimedOnPage, localizer.locale)} / ${formatNumber(page.rewards.length, localizer.locale)}`;
+          rewardInputs.forEach(({ rewardId, checkbox }) => {
+            checkbox.checked = claimedRewards.has(rewardId);
+          });
+        });
+      };
+      refreshRewardRail();
 
       const documentsById = new Map(catalogs.documents.documents.map((document) => [document.id, document]));
       document.querySelectorAll('[data-document-id]').forEach((tile, index) => {

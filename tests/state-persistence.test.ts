@@ -70,6 +70,22 @@ describe('state and cookie persistence', () => {
     expect(restored.selectedPage).toBe(3);
   });
 
+  it('selects the first page with unclaimed rewards and resets there after clearing completion', () => {
+    const catalog = catalogs();
+    const initial = createDefaultState(catalog);
+    const afterPageOne = reduceState(initial, { type: 'claim-page', page: 1, claimed: true }, catalog);
+    const completed = reduceState(afterPageOne, { type: 'claim-all', claimed: true }, catalog);
+    const cleared = reduceState(completed, { type: 'claim-all', claimed: false }, catalog);
+
+    expect(afterPageOne.selectedPage).toBe(2);
+    expect(completed.selectedPage).toBe(1);
+    expect(cleared.selectedPage).toBe(1);
+
+    const cookies = memoryCookies();
+    saveState({ ...afterPageOne, selectedPage: 1 }, cookies);
+    expect(restoreState(cookies, catalog).selectedPage).toBe(2);
+  });
+
   it('migrates the previously expanded reward page without invalidating the UI cookie', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();

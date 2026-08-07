@@ -44,12 +44,21 @@ The header SHALL display the selected locale and a countdown derived from Unix t
 - **WHEN** the device time reaches or exceeds `1796637600`
 - **THEN** the timer stops, never displays a negative value, and shows the localized equivalent of `Season ended`
 
-### Requirement: Per-page reward navigation
-The left column SHALL display exactly one selected Battle Pass page and provide previous, next, and direct page navigation.
+### Requirement: Exclusive accordion reward navigation
+While at least one Battle Pass reward remains unclaimed, the left column SHALL display every Battle Pass page heading as an exclusive accordion and SHALL keep exactly one selected page body open. Selecting another page heading SHALL close the previous page, open the selected page, and persist that selected page.
 
-#### Scenario: Select one reward page
-- **WHEN** the player uses previous, next, or direct page navigation
-- **THEN** only the selected page's reward rows are displayed and the selected page is persisted
+#### Scenario: Select an accordion page
+- **WHEN** the player activates a page heading
+- **THEN** the previously open page closes, only the selected page's reward rows remain displayed, and the selected page is persisted
+
+#### Scenario: Select the default accordion page
+- **WHEN** the selected page has no unclaimed rewards and at least one Battle Pass reward remains unclaimed
+- **THEN** the first page containing an unclaimed reward opens
+
+#### Scenario: Replace the completed accordion with the crate reward
+- **WHEN** all Battle Pass rewards are claimed
+- **THEN** no reward-page accordion is rendered
+- **AND** the rail renders only the localized Black Division Gear Crate reward with a requirement of `10` documents of any non-Classified type
 
 ### Requirement: Compact reward rows
 A visible left-column reward row SHALL contain only the localized Battle Pass item name, a compact localized list of document requirements, and the control required to mark the reward claimed. It SHALL NOT display reward artwork, long descriptions, stats, target selection, or unrelated metadata.
@@ -59,11 +68,11 @@ A visible left-column reward row SHALL contain only the localized Battle Pass it
 - **THEN** each reward row shows the item name and unambiguous abbreviated document quantities with accessible full text
 
 ### Requirement: Reward claim controls
-The interface SHALL provide per-reward claimed controls, per-day Claim all and Clear all actions, and global Claim all and Clear all actions. These controls SHALL track already-claimed rewards only and SHALL NOT consume or mutate owned document quantities.
+The interface SHALL provide one claimed checkbox for each reward and global Claim all and Clear all buttons in the reward-rail heading. Reward page bodies SHALL contain no interactive controls other than the reward checkboxes. These controls SHALL track already-claimed rewards only and SHALL NOT consume or mutate owned document quantities.
 
-#### Scenario: Claim all rewards in one day
-- **WHEN** the player invokes Claim all for a Battle Pass day
-- **THEN** every reward in that day is marked claimed without changing rewards in other days
+#### Scenario: Toggle one reward
+- **WHEN** the player changes a reward checkbox
+- **THEN** only that reward's claimed state changes
 
 #### Scenario: Clear all rewards globally
 - **WHEN** the player invokes global Clear all
@@ -125,6 +134,11 @@ The header's primary navigation area SHALL present total-based document progress
 - **WHEN** valid cookies contain owned document quantities and claimed rewards
 - **THEN** the document and reward progress bars initialize from that restored state
 - **AND** changing an inventory counter updates the persisted quantity and document progress together
+
+#### Scenario: Claimed rewards contribute document progress
+- **WHEN** one or more rewards are checked as claimed
+- **THEN** their cumulative regular-document requirements contribute to the document progress value
+- **AND** every document quantity control retains its separately entered value and a minimum of zero
 
 #### Scenario: Profile routes differ
 - **WHEN** Fastest and Safest optimization produce different location assignments

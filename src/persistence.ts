@@ -2,7 +2,7 @@ import { GAME_DATA_VERSION } from './catalogs';
 import type { Catalogs, GameMode } from './catalogs';
 import { getCompleteLocales } from './localization';
 import type { OptimizationProfile } from './optimizer';
-import { createDefaultState, type AppState } from './state';
+import { createDefaultState, getDefaultRewardPage, type AppState } from './state';
 
 export const COOKIE_SCHEMA_VERSION = 1;
 export const MAX_COOKIE_BYTES = 3800;
@@ -81,12 +81,18 @@ export function restoreState(cookies: CookieAdapter, catalogs: Catalogs): AppSta
   const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress);
   const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings);
   const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui);
-  return {
+  const restored = {
     ...defaults,
     ...(progress ? sanitizeProgress(progress, defaults, catalogs) : {}),
     ...(settings ? sanitizeSettings(settings, defaults, catalogs) : {}),
     ...(ui ? sanitizeUi(ui, defaults, catalogs) : {}),
   };
+  const selectedPage = catalogs.battlePass.pages
+    .find((page) => page.page === restored.selectedPage)
+    ?.rewards.some((reward) => !restored.claimedRewardIds.includes(reward.id))
+    ? restored.selectedPage
+    : getDefaultRewardPage(catalogs, restored.claimedRewardIds);
+  return { ...restored, selectedPage };
 }
 
 export function resetPersistedState(cookies: CookieAdapter, catalogs: Catalogs, confirmed: boolean): AppState | undefined {

@@ -1123,6 +1123,12 @@
       }
     },
     {
+      "id": "ui.anyRegularDocuments",
+      "localizations": {
+        "en": "Any non-Classified documents ({count})"
+      }
+    },
+    {
       "id": "ui.classifiedUse",
       "localizations": {
         "en": "Owned Classified Documents consumed: {used}; remaining: {remaining}"

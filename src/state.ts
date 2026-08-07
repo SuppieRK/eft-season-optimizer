@@ -48,7 +48,7 @@ export function createDefaultState(catalogs: Catalogs): AppState {
     spendTarCoinsOnClassifiedDocuments: false,
     crateCount: 1,
     locale: catalogs.localization.defaultLocale,
-    selectedPage: catalogs.battlePass.pages[0]?.page ?? 1,
+    selectedPage: getDefaultRewardPage(catalogs, []),
     selectedProfile: 'safest',
     cookieNoticeDismissed: false,
   };
@@ -85,8 +85,12 @@ export function reduceState(state: AppState, action: StateAction, catalogs: Cata
         const page = catalogs.battlePass.pages.find((candidate) => candidate.page === action.page);
         return page?.rewards.some((reward) => reward.id === rewardId) ? action.claimed : claimed;
       });
-    case 'claim-all':
-      return updateClaimedRewards(state, catalogs, () => action.claimed);
+    case 'claim-all': {
+      const nextState = updateClaimedRewards(state, catalogs, () => action.claimed);
+      return action.claimed
+        ? nextState
+        : { ...nextState, selectedPage: getDefaultRewardPage(catalogs, nextState.claimedRewardIds) };
+    }
     case 'set-page':
       return catalogs.battlePass.pages.some((page) => page.page === action.page) ? { ...state, selectedPage: action.page } : state;
     case 'dismiss-cookie-notice':
@@ -108,7 +112,24 @@ function updateClaimedRewards(state: AppState, catalogs: Catalogs, update: (rewa
     if (next) claimed.add(reward.id);
     else claimed.delete(reward.id);
   }
-  return { ...state, claimedRewardIds: [...claimed].sort() };
+  const claimedRewardIds = [...claimed].sort();
+  const selectedPage = pageHasUnclaimedReward(catalogs, state.selectedPage, claimed)
+    ? state.selectedPage
+    : getDefaultRewardPage(catalogs, claimedRewardIds);
+  return { ...state, claimedRewardIds, selectedPage };
+}
+
+export function getDefaultRewardPage(catalogs: Catalogs, claimedRewardIds: readonly string[]): number {
+  const claimed = new Set(claimedRewardIds);
+  return catalogs.battlePass.pages.find((page) => page.rewards.some((reward) => !claimed.has(reward.id)))?.page
+    ?? catalogs.battlePass.pages[0]?.page
+    ?? 1;
+}
+
+function pageHasUnclaimedReward(catalogs: Catalogs, pageNumber: number, claimedRewardIds: ReadonlySet<string>): boolean {
+  return catalogs.battlePass.pages
+    .find((page) => page.page === pageNumber)
+    ?.rewards.some((reward) => !claimedRewardIds.has(reward.id)) === true;
 }
 
 function validQuantity(quantity: number): boolean {
