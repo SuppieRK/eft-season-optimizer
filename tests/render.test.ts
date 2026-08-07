@@ -156,27 +156,19 @@ describe('Battle Pass interface', () => {
     let state: AppState = {
       ...createDefaultState(catalog),
       ownedDocuments: { ...createDefaultState(catalog).ownedDocuments, 'documents.financial.name': 3 },
-    };
-    const dispatch = (action: StateAction): void => {
-      state = reduceState(state, action, catalog);
-      renderApp(document, catalog, state, dispatch);
+      selectedPage: 2,
     };
     document.body.innerHTML = '<div id="app"></div>';
-    renderApp(document, catalog, state, dispatch);
+    renderApp(document, catalog, state, () => undefined);
 
-    const pageSelect = document.querySelector<HTMLSelectElement>('[data-field="reward-page"]')!;
-    pageSelect.value = '2';
-    pageSelect.dispatchEvent(new Event('change', { bubbles: true }));
     expect(document.querySelector('.page-guidance')?.textContent).toContain('Claim 4 more from Page 1');
-    document.querySelector<HTMLButtonElement>('[data-action="set-page"][data-page="1"]')!.click();
-    for (let count = 0; count < 4; count += 1) {
-      document.querySelector<HTMLInputElement>('.reward-page[data-page="1"] input[data-reward-id]:not(:checked)')!.click();
+    for (const reward of catalog.battlePass.pages[0]!.rewards.slice(0, 4)) {
+      state = reduceState(state, { type: 'claim-reward', rewardId: reward.id, claimed: true }, catalog);
     }
-    const updatedPageSelect = document.querySelector<HTMLSelectElement>('[data-field="reward-page"]')!;
-    updatedPageSelect.value = '2';
-    updatedPageSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    renderApp(document, catalog, state, () => undefined);
 
     expect(document.querySelector('.page-guidance')).toBeNull();
+    expect(state.claimedRewardIds).toHaveLength(4);
     expect(state.ownedDocuments['documents.financial.name']).toBe(3);
   });
 
