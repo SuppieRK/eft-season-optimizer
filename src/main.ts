@@ -1,3 +1,5 @@
+import './typography.css';
+import './spacing.css';
 import './layout.css';
 import './styles.css';
 

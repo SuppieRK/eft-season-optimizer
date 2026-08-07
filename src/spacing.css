@@ -1,0 +1,10 @@
+:root {
+  /* Golden-ratio spacing scale: each step is approximately 1.618 times the last. */
+  --space-xxs: 0.236rem;
+  --space-xs: 0.382rem;
+  --space-s: 0.618rem;
+  --space-m: 1rem;
+  --space-l: 1.618rem;
+  --space-xl: 2.618rem;
+  --space-xxl: 4.236rem;
+}

@@ -8,7 +8,7 @@ The application SHALL render as semantic HTML and CSS with TypeScript compiled t
 - **THEN** the interface and optimizer load from generated static HTML, CSS, JavaScript, image, and JSON assets
 
 ### Requirement: Five-region Battle Pass layout
-The desktop interface SHALL use a header containing global profile, locale, and setup access; a left reward column; a center current-route-day column; a right selected-stop context column; and a footer containing document inventory and the asset disclaimer. Normal-content placement and typography sizing SHALL be isolated in one editable CSS layout map, separate from palette and visual-state styling.
+The desktop interface SHALL use a header containing global profile, locale, and setup access; a left reward column; a center current-route-day column; a right selected-stop context column; and a footer containing document inventory and the asset disclaimer. Normal-content placement SHALL be isolated in one editable CSS layout map, typography SHALL use one shared proportional caption/label/body/heading/metric/display token scale, and internal gaps, padding, and region spacing SHALL use one shared golden-ratio token scale. Layout, typography, spacing, and palette or visual-state styling SHALL remain independently editable.
 
 #### Scenario: Desktop layout
 - **WHEN** the viewport supports the desktop layout

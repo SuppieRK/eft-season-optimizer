@@ -12,23 +12,23 @@
   --context-width: clamp(18rem, 18vw, 21rem);
   --workspace-areas: "rewards results context";
   --workspace-columns: var(--rewards-width) minmax(32rem, 1fr) var(--context-width);
-  --region-padding: 1rem;
+  --region-padding: var(--space-m);
   --route-summary-columns: auto minmax(0, 1fr) auto;
   --schedule-columns: 8rem minmax(13rem, 1fr) 6rem 7rem;
   --document-width: 8rem;
   --document-image-height: 4.75rem;
   --document-copy-height: 2.75rem;
   --control-height: 2.5rem;
-  --text-size: 1rem;
-  --label-size: 0.875rem;
-  --heading-size: 1.25rem;
-  --metric-size: 1.5rem;
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.5rem;
-  --space-6: 2rem;
+  --text-size: var(--font-size-body);
+  --label-size: var(--font-size-label);
+  --heading-size: var(--font-size-heading);
+  --metric-size: var(--font-size-metric);
+  --space-1: var(--space-xxs);
+  --space-2: var(--space-xs);
+  --space-3: var(--space-s);
+  --space-4: var(--space-m);
+  --space-5: var(--space-l);
+  --space-6: var(--space-xl);
 }
 
 * {
@@ -45,7 +45,7 @@ body,
 body {
   margin: 0;
   font-size: var(--text-size);
-  line-height: 1.4;
+  line-height: var(--line-height-body);
 }
 
 body::before {
@@ -67,6 +67,7 @@ input,
 select,
 textarea {
   font: inherit;
+  line-height: var(--line-height-ui);
 }
 
 button,
@@ -183,7 +184,7 @@ small,
   display: grid;
   grid-template-areas: var(--workspace-areas);
   grid-template-columns: var(--workspace-columns);
-  width: min(calc(100% - 2rem), var(--stage-max-width));
+  width: min(calc(100% - (2 * var(--space-m))), var(--stage-max-width));
   min-height: 0;
   margin-inline: auto;
   padding-block: var(--space-3);
@@ -563,11 +564,11 @@ small,
 }
 
 .schedule-dialog {
-  width: min(60rem, calc(100vw - 2rem));
+  width: min(60rem, calc(100vw - (2 * var(--space-m))));
 }
 
 .setup-dialog {
-  width: min(34rem, calc(100vw - 2rem));
+  width: min(34rem, calc(100vw - (2 * var(--space-m))));
 }
 
 .schedule-dialog > header,
@@ -673,7 +674,7 @@ small,
 }
 
 .site-footer {
-  width: min(calc(100% - 2rem), var(--stage-max-width));
+  width: min(calc(100% - (2 * var(--space-m))), var(--stage-max-width));
   margin-inline: auto;
   padding-block-end: var(--space-1);
 }
@@ -687,9 +688,9 @@ small,
 .document-tray {
   display: grid;
   grid-template-columns: repeat(9, minmax(var(--document-width), 1fr));
-  gap: 2px;
+  gap: var(--space-xxs);
   overflow-x: auto;
-  padding: 2px;
+  padding: var(--space-xxs);
 }
 
 .document-tile {
@@ -775,7 +776,7 @@ small,
   z-index: 6;
   right: var(--space-4);
   bottom: var(--space-4);
-  width: min(32rem, calc(100vw - 2rem));
+  width: min(32rem, calc(100vw - (2 * var(--space-m))));
   padding: var(--space-3);
 }
 
@@ -807,7 +808,7 @@ small,
   align-items: center;
   gap: var(--space-4);
   justify-content: space-between;
-  width: min(32rem, calc(100vw - 2rem));
+  width: min(32rem, calc(100vw - (2 * var(--space-m))));
   padding: var(--space-3);
 }
 
@@ -870,7 +871,7 @@ small,
 
   .layout,
   .site-footer {
-    width: calc(100% - 0.75rem);
+    width: calc(100% - (2 * var(--space-xs)));
   }
 
   .workspace-region {
@@ -931,6 +932,6 @@ small,
   .cookie-toast {
     right: var(--space-2);
     bottom: var(--space-2);
-    width: calc(100vw - 1rem);
+    width: calc(100vw - (2 * var(--space-xs)));
   }
 }

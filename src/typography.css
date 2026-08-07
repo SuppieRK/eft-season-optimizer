@@ -1,0 +1,16 @@
+html {
+  /* Keep the token ratios intact while scaling the complete system from 1440px to 2560px. */
+  font-size: clamp(16px, calc(10.857px + 0.357vw), 20px);
+}
+
+:root {
+  /* LiftKit-inspired proportional type scale for the wireframe and live interface. */
+  --font-size-caption: 0.786rem;
+  --font-size-label: 0.835rem;
+  --font-size-body: 1rem;
+  --font-size-heading: 1.129rem;
+  --font-size-metric: 1.272rem;
+  --font-size-display: 2.956rem;
+  --line-height-ui: 1.272;
+  --line-height-body: 1.618;
+}

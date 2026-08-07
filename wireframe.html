@@ -4,13 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KORD BREACH — Layout Wireframe</title>
+    <link rel="stylesheet" href="./src/typography.css" />
+    <link rel="stylesheet" href="./src/spacing.css" />
     <style>
       :root {
         --canvas-width: 94vw;
         --canvas-height: 94vh;
         --canvas-min-width: 1180px;
         --canvas-min-height: 720px;
-        --grid-gap: clamp(12px, 1vw, 24px);
+        --grid-gap: var(--space-m);
         --header-height: clamp(96px, 10vh, 160px);
         --lower-band-height: clamp(136px, 13vh, 200px);
         --reward-column: 24.4fr;
@@ -101,28 +103,28 @@
       .slot-label {
         position: absolute;
         z-index: 1;
-        inset-block-start: 12px;
-        inset-inline-start: 14px;
-        max-inline-size: calc(100% - 28px);
-        padding: 4px 7px;
+        inset-block-start: var(--space-s);
+        inset-inline-start: var(--space-s);
+        max-inline-size: calc(100% - (2 * var(--space-s)));
+        padding: var(--space-xxs) var(--space-xs);
         background: var(--surface);
         color: var(--label);
-        font-size: clamp(12px, 0.72vw, 16px);
+        font-size: var(--font-size-label);
         font-weight: 700;
-        line-height: 1.2;
+        line-height: var(--line-height-ui);
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
       .slot-label {
         color: var(--label-muted);
-        font-size: clamp(11px, 0.64vw, 14px);
+        font-size: var(--font-size-caption);
         font-weight: 600;
       }
 
       .region > .region-label {
         inset-inline-start: auto;
-        inset-inline-end: 14px;
+        inset-inline-end: var(--space-s);
       }
 
       .header-slot {
@@ -133,22 +135,22 @@
       .season-slot {
         display: flex;
         align-items: center;
-        gap: clamp(14px, 1vw, 24px);
-        padding: clamp(14px, 1.2vw, 28px);
+        gap: var(--space-m);
+        padding: var(--space-m);
       }
 
       .season-number {
-        padding-inline-end: clamp(14px, 1vw, 24px);
+        padding-inline-end: var(--space-m);
         border-inline-end: 1px solid var(--line-muted);
         color: var(--label-muted);
-        font-size: clamp(49px, 3.2vw, 70px);
+        font-size: var(--font-size-display);
         font-weight: 700;
         line-height: 0.81;
       }
 
       .season-details {
         display: grid;
-        gap: 8px;
+        gap: var(--space-xs);
         min-inline-size: 0;
       }
 
@@ -159,14 +161,14 @@
 
       .season-name {
         overflow: hidden;
-        font-size: clamp(15px, 1.05vw, 24px);
+        font-size: var(--font-size-body);
         letter-spacing: 0.08em;
         text-overflow: ellipsis;
       }
 
       .season-timer {
         color: var(--label-muted);
-        font-size: clamp(12px, 0.78vw, 17px);
+        font-size: var(--font-size-label);
         font-variant-numeric: tabular-nums;
         letter-spacing: 0.05em;
       }
@@ -175,22 +177,22 @@
         display: grid;
         grid-template-columns: minmax(120px, 1fr) minmax(110px, 0.85fr) auto;
         align-items: center;
-        gap: clamp(16px, 1.8vw, 36px);
-        padding: clamp(12px, 1vw, 22px);
+        gap: var(--space-l);
+        padding: var(--space-m);
       }
 
       .navigation-progress {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: end;
-        gap: 7px 12px;
+        gap: var(--space-xs) var(--space-s);
         min-inline-size: 0;
       }
 
       .navigation-progress__label {
         overflow: hidden;
         color: var(--label-muted);
-        font-size: clamp(10px, 0.62vw, 13px);
+        font-size: var(--font-size-caption);
         font-weight: 700;
         letter-spacing: 0.08em;
         text-overflow: ellipsis;
@@ -200,14 +202,14 @@
 
       .navigation-progress__value {
         color: var(--label);
-        font-size: clamp(14px, 0.95vw, 21px);
+        font-size: var(--font-size-body);
         font-variant-numeric: tabular-nums;
         line-height: 1;
         white-space: nowrap;
       }
 
       .navigation-progress__separator {
-        padding-inline: 0.18em;
+        padding-inline: var(--space-xxs);
         color: var(--label-muted);
       }
 
@@ -263,9 +265,9 @@
         place-items: center;
         min-inline-size: clamp(76px, 5vw, 104px);
         block-size: clamp(40px, 2.4vw, 46px);
-        padding-inline: 12px;
+        padding-inline: var(--space-s);
         color: var(--label-muted);
-        font-size: clamp(11px, 0.72vw, 15px);
+        font-size: var(--font-size-label);
         font-weight: 700;
         letter-spacing: 0.04em;
         text-transform: uppercase;
@@ -295,8 +297,8 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: clamp(10px, 0.8vw, 18px);
-        padding: clamp(12px, 1vw, 22px);
+        gap: var(--space-s);
+        padding: var(--space-s);
       }
 
       .header-select-shell,
@@ -304,7 +306,7 @@
       .ss-content.header-select {
         color: var(--label);
         font-family: inherit;
-        font-size: clamp(11px, 0.72vw, 15px);
+        font-size: var(--font-size-label);
         font-weight: 700;
         --ss-bg-color: var(--surface);
         --ss-border-color: var(--line-muted);
@@ -314,13 +316,13 @@
         --ss-option-height: 36px;
         --ss-primary-color: var(--line-muted);
         --ss-spacing-s: 0px;
-        --ss-spacing-m: 8px;
-        --ss-spacing-l: 12px;
+        --ss-spacing-m: var(--space-xs);
+        --ss-spacing-l: var(--space-s);
       }
 
       .ss-main.header-select {
         block-size: clamp(40px, 2.4vw, 46px);
-        padding: 0 12px;
+        padding: 0 var(--space-s);
         border-radius: 0;
       }
 
@@ -342,7 +344,7 @@
       .ss-main.header-select .ss-arrow {
         inline-size: 10px;
         block-size: 10px;
-        margin: 0 0 0 8px;
+        margin: 0 0 0 var(--space-xs);
       }
 
       .ss-main.header-select .ss-arrow path {
@@ -355,7 +357,7 @@
 
       .ss-content.header-select .ss-list .ss-option {
         min-block-size: var(--ss-option-height);
-        padding: 0 12px;
+        padding: 0 var(--space-s);
         color: var(--label);
         line-height: 1;
       }
@@ -369,21 +371,32 @@
       }
 
       .mode-select-shell {
-        inline-size: clamp(200px, 12vw, 260px);
+        inline-size: clamp(224px, 12vw, 320px);
       }
 
       .language-select-shell {
         inline-size: var(--language-select-width);
       }
 
-      .ss-main.language-select .ss-single,
-      .ss-content.language-select .ss-option {
+      .ss-main.language-select .ss-single {
         justify-content: center;
       }
 
+      .ss-content.language-select {
+        inline-size: max-content !important;
+        min-inline-size: calc(var(--language-select-width) + var(--space-xl));
+        transform: translateX(calc(var(--language-select-width) - 100%));
+      }
+
+      .ss-content.language-select .ss-option {
+        justify-content: flex-start;
+      }
+
       .locale-choice {
+        position: relative;
         display: inline-flex;
         align-items: center;
+        gap: var(--space-xs);
       }
 
       .locale-choice__flag {
@@ -391,6 +404,24 @@
         inline-size: auto;
         block-size: 1em;
         flex: 0 0 auto;
+      }
+
+      .ss-main.language-select .locale-choice__name {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .ss-content.language-select .locale-choice__name {
+        position: static;
+        inline-size: auto;
+        block-size: auto;
+        overflow: visible;
+        clip-path: none;
+        white-space: nowrap;
       }
 
       .reward-rail {
@@ -604,8 +635,11 @@
       const localeFlag = document.createElement('img');
       localeFlag.className = 'locale-choice__flag';
       localeFlag.src = englishFlagUrl;
-      localeFlag.alt = englishName;
-      localeChoice.append(localeFlag);
+      localeFlag.alt = '';
+      const localeName = document.createElement('span');
+      localeName.className = 'locale-choice__name';
+      localeName.textContent = englishName;
+      localeChoice.append(localeFlag, localeName);
 
       new SlimSelect({
         select: languageSelect,
