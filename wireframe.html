@@ -12,15 +12,13 @@
         --canvas-height: 94vh;
         --canvas-min-width: 1180px;
         --canvas-min-height: 720px;
+        --workspace-height: clamp(500px, 62vh, 720px);
         --grid-gap: var(--space-m);
         --header-height: clamp(96px, 10vh, 160px);
-        --lower-band-height: clamp(196px, 20vh, 268px);
         --reward-column: 24.4fr;
         --focus-column: 50.3fr;
         --detail-column: 25.3fr;
         --section-heading-height: clamp(54px, 5.2vh, 84px);
-        --detail-content-height: clamp(132px, 16vh, 244px);
-        --primary-action-height: clamp(54px, 6vh, 90px);
         --document-strip-image-size: clamp(64px, 5vw, 96px);
         --header-control-padding-block: var(--space-s);
         --header-control-padding-inline: calc(var(--space-s) + var(--space-xxs));
@@ -72,11 +70,11 @@
 
       .wireframe-shell {
         display: grid;
-        grid-template-rows: var(--header-height) minmax(0, 1fr);
+        grid-template-rows: var(--header-height) var(--workspace-height) auto;
         gap: var(--grid-gap);
         inline-size: var(--canvas-width);
         min-inline-size: calc(var(--canvas-min-width) - 6vw);
-        block-size: var(--canvas-height);
+        block-size: auto;
         min-block-size: calc(var(--canvas-min-height) - 6vh);
         margin: 3vh auto;
       }
@@ -93,11 +91,8 @@
       }
 
       .wireframe-workspace {
-        grid-template-areas:
-          "reward focus detail"
-          "documents documents documents";
-        grid-template-rows: minmax(0, 1fr) var(--lower-band-height);
-        row-gap: var(--grid-gap);
+        grid-template-areas: "reward focus focus";
+        grid-template-rows: minmax(0, 1fr);
       }
 
       .region,
@@ -219,6 +214,37 @@
         text-overflow: ellipsis;
         text-transform: uppercase;
         white-space: nowrap;
+      }
+
+      .navigation-progress__label-line {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-xs);
+        min-inline-size: 0;
+      }
+
+      .navigation-progress__buyout {
+        flex: 0 0 auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--document-frame);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        cursor: pointer;
+      }
+
+      .navigation-progress__buyout:hover {
+        color: var(--label);
+      }
+
+      .navigation-progress__buyout:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: var(--space-xxs);
       }
 
       .navigation-progress__value {
@@ -445,37 +471,22 @@
       .focus-stage {
         grid-area: focus;
         display: grid;
-        grid-template-rows: var(--section-heading-height) minmax(0, 1fr);
+        grid-template-rows: var(--section-heading-height) minmax(0, 1fr) auto;
       }
 
-      .detail-rail {
-        display: grid;
-        grid-template-rows:
-          var(--section-heading-height)
-          var(--detail-content-height)
-          var(--primary-action-height)
-          minmax(0, 1fr);
-      }
-
-      .detail-rail {
-        grid-area: detail;
-      }
-
-      .focus-heading,
-      .detail-heading {
+      .focus-heading {
         padding: var(--space-s) var(--space-m);
         border-block-end-style: solid;
       }
 
       .focus-heading {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
-        justify-content: space-between;
         gap: var(--space-m);
       }
 
-      .focus-heading h2,
-      .detail-heading h2 {
+      .focus-heading h2 {
         margin: 0;
         font-size: var(--font-size-body);
         line-height: var(--line-height-ui);
@@ -483,8 +494,7 @@
         text-transform: uppercase;
       }
 
-      .focus-heading__eyebrow,
-      .detail-heading__eyebrow {
+      .focus-heading__eyebrow {
         display: block;
         margin-block-end: var(--space-xxs);
         color: var(--label-muted);
@@ -495,19 +505,59 @@
         text-transform: uppercase;
       }
 
-      .focus-heading__summary {
-        color: var(--document-frame);
-        font-size: var(--font-size-label);
-        font-variant-numeric: tabular-nums;
+      .focus-heading__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-s);
+      }
+
+      .focus-heading__actions button {
+        min-block-size: 2.618em;
+        padding: var(--space-xs) var(--space-m);
+        border: 1px solid var(--line-muted);
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-caption);
+        font-weight: 700;
         line-height: var(--line-height-ui);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
         white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .focus-heading__actions [data-commit-raid] {
+        border-color: var(--document-frame);
+        background: color-mix(in srgb, var(--document-frame) 24%, var(--surface));
+      }
+
+      .focus-heading__actions button:hover,
+      .focus-heading__actions button:focus-visible {
+        border-color: var(--label-muted);
+        background: var(--line-muted);
+        outline: 0;
+      }
+
+      .focus-heading__actions [data-commit-raid]:hover,
+      .focus-heading__actions [data-commit-raid]:focus-visible {
+        background: color-mix(in srgb, var(--document-frame) 42%, var(--surface));
+      }
+
+      .focus-heading__actions button:disabled {
+        border-color: var(--line-muted);
+        background: transparent;
+        color: var(--label-muted);
+        cursor: default;
+        opacity: 0.55;
       }
 
       .focus-content {
         display: grid;
         align-content: center;
         gap: var(--space-l);
-        padding: var(--space-l);
+        padding: var(--space-m);
         overflow: auto;
         border-block-end: 0;
         background: color-mix(in srgb, var(--surface) 94%, transparent);
@@ -540,7 +590,7 @@
 
       .focus-documents {
         display: grid;
-        grid-template-columns: repeat(2, minmax(118px, 176px));
+        grid-template-columns: repeat(2, minmax(118px, 140px));
         justify-content: center;
         gap: var(--space-xl);
       }
@@ -660,123 +710,9 @@
         outline-offset: 2px;
       }
 
-      .detail-heading {
-        display: grid;
-        align-content: center;
-      }
-
-      .route-detail-content {
-        display: grid;
-        align-content: start;
-        gap: var(--space-s);
-        padding: var(--space-m);
-        overflow: auto;
-      }
-
-      .route-facts {
-        display: grid;
-        gap: var(--space-s);
-        margin: 0;
-      }
-
-      .route-facts > div {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: var(--space-s);
-        padding-block-end: var(--space-xs);
-        border-block-end: 1px solid var(--line-muted);
-      }
-
-      .route-facts dt,
-      .route-facts dd {
-        margin: 0;
-        font-size: var(--font-size-label);
-        line-height: var(--line-height-ui);
-      }
-
-      .route-facts dt {
-        color: var(--label-muted);
-      }
-
-      .route-facts dd {
-        font-weight: 700;
-        text-align: end;
-      }
-
-      .route-primary-action {
-        display: grid;
-        padding: var(--space-s) var(--space-m);
-        border-block-end-style: solid;
-      }
-
-      .route-primary-action button {
-        border: 1px solid var(--document-frame);
-        border-radius: 0;
-        background: color-mix(in srgb, var(--document-frame) 24%, var(--surface));
-        color: var(--label);
-        font: inherit;
-        font-size: var(--font-size-label);
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        cursor: pointer;
-      }
-
-      .route-primary-action button:hover,
-      .route-primary-action button:focus-visible {
-        background: color-mix(in srgb, var(--document-frame) 42%, var(--surface));
-        outline: 0;
-      }
-
-      .route-primary-action button:disabled {
-        border-color: var(--line-muted);
-        background: transparent;
-        color: var(--label-muted);
-        cursor: default;
-        opacity: 0.55;
-      }
-
-      .detail-secondary {
-        min-block-size: 0;
-        padding: var(--space-s) var(--space-m);
-        overflow: auto;
-      }
-
-      .detail-secondary > button {
-        inline-size: 100%;
-        padding: var(--space-s);
-        border: 1px solid var(--line-muted);
-        border-radius: 0;
-        background: transparent;
-        color: var(--label);
-        font: inherit;
-        font-size: var(--font-size-label);
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .detail-secondary details {
-        border-block-end: 1px solid var(--line-muted);
-      }
-
-      .detail-secondary summary {
-        padding-block: var(--space-s);
-        color: var(--label);
-        font-size: var(--font-size-label);
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .detail-secondary details p,
-      .detail-secondary details ul {
-        margin: 0 0 var(--space-s);
-        color: var(--label-muted);
-        font-size: var(--font-size-caption);
-        line-height: var(--line-height-body);
-      }
-
-      .route-schedule-dialog {
-        inline-size: min(760px, calc(100vw - (2 * var(--space-xl))));
+      .route-schedule-dialog,
+      .buyout-dialog {
+        inline-size: min(900px, calc(100vw - (2 * var(--space-xl))));
         max-block-size: min(760px, calc(100vh - (2 * var(--space-xl))));
         padding: 0;
         overflow: hidden;
@@ -786,11 +722,13 @@
         color: var(--label);
       }
 
-      .route-schedule-dialog::backdrop {
+      .route-schedule-dialog::backdrop,
+      .buyout-dialog::backdrop {
         background: rgb(0 0 0 / 72%);
       }
 
-      .route-schedule-dialog > header {
+      .route-schedule-dialog > header,
+      .buyout-dialog > header {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -799,12 +737,21 @@
         border-block-end: 1px solid var(--line-muted);
       }
 
-      .route-schedule-dialog h2 {
+      .route-schedule-dialog h2,
+      .buyout-dialog h2 {
         margin: 0;
         font-size: var(--font-size-heading);
       }
 
-      .route-schedule-dialog header button {
+      .route-schedule-dialog header strong {
+        display: block;
+        margin-block-start: var(--space-xxs);
+        color: var(--document-frame);
+        font-size: var(--font-size-label);
+      }
+
+      .route-schedule-dialog header button,
+      .buyout-dialog header button {
         padding: var(--space-xs) var(--space-s);
         border: 1px solid var(--line-muted);
         border-radius: 0;
@@ -814,15 +761,88 @@
         cursor: pointer;
       }
 
-      [data-route-schedule-content] {
+      [data-route-schedule-content],
+      [data-buyout-content] {
         max-block-size: calc(100vh - 10rem);
         padding: 0 var(--space-m);
         overflow: auto;
       }
 
-      .schedule-projection-day {
+      .schedule-plan-actions,
+      .schedule-immediate,
+      .buyout-section {
+        padding-block: var(--space-m);
+        border-block-end: 1px solid var(--line-muted);
+      }
+
+      .schedule-estimate-note {
+        margin: 0;
+        padding-block: var(--space-m);
+        border-block-end: 1px solid var(--line-muted);
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
+      .schedule-plan-actions h3,
+      .schedule-immediate h3,
+      .buyout-section h3 {
+        margin: 0 0 var(--space-s);
+        font-size: var(--font-size-label);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .schedule-plan-actions h4,
+      .schedule-day-column h4,
+      .buyout-section h4 {
+        margin: 0 0 var(--space-xs);
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .schedule-plan-actions ul,
+      .schedule-immediate ul,
+      .schedule-day-column ul,
+      .buyout-section ul {
         display: grid;
         gap: var(--space-xs);
+        margin: 0;
+        padding-inline-start: var(--space-l);
+      }
+
+      .schedule-plan-actions li,
+      .schedule-immediate li,
+      .schedule-day-column li,
+      .buyout-section li,
+      .buyout-section p {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
+      .schedule-day-column li strong,
+      .schedule-day-column li span {
+        display: block;
+      }
+
+      .schedule-day-column li strong {
+        color: var(--label);
+      }
+
+      .schedule-day-column li span {
+        margin-block-start: var(--space-xxs);
+      }
+
+      .schedule-action-group + .schedule-action-group {
+        margin-block-start: var(--space-m);
+      }
+
+      .schedule-projection-day {
+        display: grid;
+        gap: var(--space-s);
         padding-block: var(--space-m);
         border-block-end: 1px solid var(--line-muted);
       }
@@ -837,11 +857,25 @@
         font-size: var(--font-size-label);
       }
 
-      .schedule-projection-day p,
-      .schedule-projection-day li {
-        color: var(--label-muted);
-        font-size: var(--font-size-caption);
-        line-height: var(--line-height-body);
+      .schedule-projection-day__columns {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: var(--space-l);
+      }
+
+      .schedule-day-column + .schedule-day-column {
+        padding-inline-start: var(--space-l);
+        border-inline-start: 1px solid var(--line-muted);
+      }
+
+      .buyout-section p {
+        margin: 0;
+      }
+
+      .buyout-section p + p,
+      .buyout-section p + ul,
+      .buyout-section ul + p {
+        margin-block-start: var(--space-s);
       }
 
       .section-heading,
@@ -1155,18 +1189,14 @@
         color: var(--document-frame);
       }
 
-      .lower-band {
-        grid-area: documents;
-        display: grid;
-        grid-template-rows: minmax(0, 1fr) auto;
-        row-gap: var(--space-m);
-      }
-
       .document-strip {
         display: grid;
         align-content: center;
         justify-items: center;
         padding: var(--space-s) var(--space-m);
+        overflow: visible;
+        border-block-start: 1px solid var(--line-muted);
+        background: color-mix(in srgb, var(--surface-alt) 82%, transparent);
       }
 
       .document-strip__images {
@@ -1385,7 +1415,7 @@
           --canvas-min-width: 320px;
           --canvas-min-height: 0px;
           --header-height: auto;
-          --lower-band-height: auto;
+          --workspace-height: auto;
         }
 
         html,
@@ -1395,7 +1425,7 @@
         }
 
         .wireframe-shell {
-          grid-template-rows: auto auto;
+          grid-template-rows: auto auto auto;
           inline-size: var(--canvas-width);
           min-inline-size: 0;
           block-size: auto;
@@ -1411,16 +1441,27 @@
         .wireframe-workspace {
           grid-template-areas:
             "focus"
-            "detail"
-            "reward"
-            "documents";
+            "reward";
           grid-template-columns: minmax(0, 1fr);
           grid-template-rows: auto;
           row-gap: var(--grid-gap);
         }
 
         .primary-navigation-slot {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        }
+
+        .navigation-progress {
+          grid-template-columns: minmax(0, 1fr);
+          align-items: start;
+        }
+
+        .navigation-progress__value {
+          justify-self: end;
+        }
+
+        .navigation-progress progress {
+          grid-column: 1;
         }
 
         .route-profile-toggle {
@@ -1433,25 +1474,24 @@
 
         .reward-rail,
         .focus-stage {
-          grid-template-rows: var(--section-heading-height) auto;
+          grid-template-rows: auto;
         }
 
-        .detail-rail {
-          grid-template-rows:
-            var(--section-heading-height)
-            auto
-            var(--primary-action-height)
-            auto;
+        .focus-stage {
+          grid-template-rows: auto auto auto;
         }
 
-        .route-facts > div {
+        .focus-heading {
           grid-template-columns: minmax(0, 1fr);
-          gap: var(--space-xs);
         }
 
-        .route-facts dd {
-          overflow-wrap: anywhere;
-          text-align: start;
+        .focus-heading__actions {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .focus-heading__actions button {
+          white-space: normal;
         }
 
         .focus-content {
@@ -1467,11 +1507,6 @@
           overflow: visible;
         }
 
-        .lower-band {
-          grid-template-rows: auto auto;
-          min-inline-size: 0;
-        }
-
         .document-strip {
           justify-items: start;
           max-inline-size: 100%;
@@ -1481,6 +1516,17 @@
         .document-strip__images {
           justify-content: flex-start;
           min-inline-size: max-content;
+        }
+
+        .schedule-projection-day__columns {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .schedule-day-column + .schedule-day-column {
+          padding-block-start: var(--space-m);
+          padding-inline-start: 0;
+          border-block-start: 1px solid var(--line-muted);
+          border-inline-start: 0;
         }
 
         .wireframe-footer {
@@ -1510,7 +1556,10 @@
         </section>
         <section class="slot header-slot primary-navigation-slot" aria-label="Primary navigation">
           <div class="navigation-progress">
-            <span class="navigation-progress__label" data-document-progress-label>…</span>
+            <div class="navigation-progress__label-line">
+              <span class="navigation-progress__label" data-document-progress-label>…</span>
+              <button class="navigation-progress__buyout" type="button" data-buyout-link hidden></button>
+            </div>
             <strong class="navigation-progress__value">
               <span data-document-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-document-progress-total>…</span>
             </strong>
@@ -1563,28 +1612,14 @@
               <span class="focus-heading__eyebrow" data-focus-eyebrow></span>
               <h2 id="focus-stage-heading" data-focus-heading></h2>
             </div>
-            <strong class="focus-heading__summary" data-focus-summary></strong>
+            <div class="focus-heading__actions">
+              <button type="button" data-view-route-schedule disabled></button>
+              <button type="button" data-commit-raid disabled></button>
+            </div>
           </div>
           <div class="slot primary-content focus-content" data-focus-content aria-live="polite">
             <p class="focus-loading">…</p>
           </div>
-        </section>
-
-        <aside class="region detail-rail" aria-labelledby="detail-rail-heading">
-          <div class="slot section-heading detail-heading">
-            <span class="detail-heading__eyebrow" data-detail-eyebrow></span>
-            <h2 id="detail-rail-heading" data-detail-heading></h2>
-          </div>
-          <div class="slot detail-content route-detail-content" data-detail-content>
-            <p class="focus-loading">…</p>
-          </div>
-          <div class="slot primary-action route-primary-action">
-            <button type="button" data-commit-raid disabled></button>
-          </div>
-          <div class="slot detail-secondary" data-detail-secondary></div>
-        </aside>
-
-        <div class="region lower-band">
           <section class="document-strip" aria-label="Document strip">
             <div class="document-strip__images">
             <figure class="document-strip__item" data-document-id="documents.financial.name">
@@ -1706,20 +1741,30 @@
             </figure>
             </div>
           </section>
-          <footer class="wireframe-footer">
-            <p class="wireframe-footer__disclaimer" data-asset-disclaimer></p>
-            <span class="wireframe-footer__separator" aria-hidden="true"></span>
-            <button class="wireframe-footer__reset" type="button" data-reset-cookie-state></button>
-          </footer>
-        </div>
+        </section>
       </main>
+      <footer class="wireframe-footer">
+        <p class="wireframe-footer__disclaimer" data-asset-disclaimer></p>
+        <span class="wireframe-footer__separator" aria-hidden="true"></span>
+        <button class="wireframe-footer__reset" type="button" data-reset-cookie-state></button>
+      </footer>
     </div>
     <dialog class="route-schedule-dialog" data-route-schedule-dialog aria-labelledby="route-schedule-title">
       <header>
-        <h2 id="route-schedule-title"></h2>
+        <div>
+          <h2 id="route-schedule-title"></h2>
+          <strong data-route-schedule-estimate></strong>
+        </div>
         <button type="button" data-close-route-schedule></button>
       </header>
       <div data-route-schedule-content></div>
+    </dialog>
+    <dialog class="buyout-dialog" data-buyout-dialog aria-labelledby="buyout-title">
+      <header>
+        <h2 id="buyout-title"></h2>
+        <button type="button" data-close-buyout></button>
+      </header>
+      <div data-buyout-content></div>
     </dialog>
     <script type="module">
       import SlimSelect from 'slim-select';
@@ -1739,19 +1784,21 @@
       const modeSelect = document.querySelector('[data-mode-select]');
       const resetCookieState = document.querySelector('[data-reset-cookie-state]');
       const languageSelect = document.querySelector('[data-language-select]');
+      const buyoutLink = document.querySelector('[data-buyout-link]');
       const focusEyebrow = document.querySelector('[data-focus-eyebrow]');
       const focusHeading = document.querySelector('[data-focus-heading]');
-      const focusSummary = document.querySelector('[data-focus-summary]');
       const focusContent = document.querySelector('[data-focus-content]');
-      const detailEyebrow = document.querySelector('[data-detail-eyebrow]');
-      const detailHeading = document.querySelector('[data-detail-heading]');
-      const detailContent = document.querySelector('[data-detail-content]');
-      const detailSecondary = document.querySelector('[data-detail-secondary]');
+      const viewRouteScheduleButton = document.querySelector('[data-view-route-schedule]');
       const commitRaidButton = document.querySelector('[data-commit-raid]');
       const routeScheduleDialog = document.querySelector('[data-route-schedule-dialog]');
       const routeScheduleTitle = document.querySelector('#route-schedule-title');
+      const routeScheduleEstimate = document.querySelector('[data-route-schedule-estimate]');
       const routeScheduleContent = document.querySelector('[data-route-schedule-content]');
       const closeRouteScheduleButton = document.querySelector('[data-close-route-schedule]');
+      const buyoutDialog = document.querySelector('[data-buyout-dialog]');
+      const buyoutTitle = document.querySelector('#buyout-title');
+      const buyoutContent = document.querySelector('[data-buyout-content]');
+      const closeBuyoutButton = document.querySelector('[data-close-buyout]');
       const endsAt = catalogs.battlePass.endsAt;
       const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
       const documentTotal = rewards.reduce(
@@ -2143,6 +2190,8 @@
       const optimizerWorker = new Worker(new URL('./src/optimizer-worker.ts', import.meta.url), { type: 'module' });
       let optimizerRequestId = 0;
       let currentNextRaid;
+      let currentProfile;
+      let currentOptimizerResult;
 
       const createElement = (tagName, className, textContent) => {
         const element = document.createElement(tagName);
@@ -2155,103 +2204,197 @@
 
       const renderScheduleProjection = (profile) => {
         routeScheduleTitle.textContent = localizer.text('ui.fullSchedule');
+        routeScheduleEstimate.textContent = localizer.text('ui.estimatedDays', {
+          count: formatNumber(profile.schedule.length, localizer.locale),
+        });
         closeRouteScheduleButton.textContent = localizer.text('ui.close');
         routeScheduleContent.replaceChildren();
+        routeScheduleContent.append(createElement('p', 'schedule-estimate-note', localizer.text('ui.planEstimate')));
+
+        if (profile.exchanges.length > 0 || profile.purchases.classifiedDocumentsPurchased > 0) {
+          const actions = createElement('section', 'schedule-plan-actions');
+          actions.append(createElement('h3', '', localizer.text('ui.planActions')));
+          if (profile.exchanges.length > 0) {
+            const group = createElement('div', 'schedule-action-group');
+            const list = document.createElement('ul');
+            group.append(createElement('h4', '', localizer.text('ui.regularExchanges')));
+            profile.exchanges.forEach((exchange) => {
+              const donors = Object.entries(exchange.donors)
+                .map(([documentId, quantity]) => `${localizer.text(documentId)} × ${formatNumber(quantity, localizer.locale)}`)
+                .join(' + ');
+              list.append(createElement('li', '', localizer.text('ui.exchangeInstruction', {
+                donors,
+                received: localizer.text(exchange.receivedDocumentId),
+              })));
+            });
+            group.append(list);
+            actions.append(group);
+          }
+          if (profile.purchases.classifiedDocumentsPurchased > 0) {
+            const group = createElement('div', 'schedule-action-group');
+            const summary = createElement('p', '', localizer.text('ui.purchaseSummary', {
+              count: formatNumber(profile.purchases.classifiedDocumentsPurchased, localizer.locale),
+              tarCoins: formatNumber(profile.purchases.tarCoinsSpent, localizer.locale),
+            }));
+            const list = document.createElement('ul');
+            group.append(createElement('h4', '', localizer.text('ui.classifiedPurchases')), summary);
+            profile.purchases.bundleCounts.forEach((count, index) => {
+              if (count === 0) return;
+              const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
+              list.append(createElement('li', '', localizer.text('ui.classifiedBundleInstruction', {
+                documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
+                count: formatNumber(count, localizer.locale),
+              })));
+            });
+            group.append(list);
+            actions.append(group);
+          }
+          routeScheduleContent.append(actions);
+        }
+
+        if (profile.projectedImmediateRewardIds.length > 0) {
+          const immediate = createElement('section', 'schedule-immediate');
+          const list = document.createElement('ul');
+          immediate.append(createElement('h3', '', localizer.text('ui.rewardsAvailableNow')));
+          profile.projectedImmediateRewardIds.forEach((rewardId) => list.append(createElement('li', '', localizer.text(rewardId))));
+          immediate.append(list);
+          routeScheduleContent.append(immediate);
+        }
+
         profile.schedule.forEach((day) => {
           const daySection = createElement('section', 'schedule-projection-day');
+          const columns = createElement('div', 'schedule-projection-day__columns');
+          const raids = createElement('section', 'schedule-day-column schedule-day-column--raids');
+          const raidList = document.createElement('ul');
+          const rewardClaims = createElement('section', 'schedule-day-column schedule-day-column--rewards');
+          const rewardList = document.createElement('ul');
           daySection.append(createElement('h3', '', localizer.text('ui.scheduleDay', {
             day: formatNumber(day.day, localizer.locale),
             count: formatNumber(day.documentQuantity, localizer.locale),
           })));
+          raids.append(createElement('h4', '', localizer.text('ui.raids')));
           day.locations.forEach((location) => {
             const targets = location.documents
               .map((assignment) => `${localizer.text(assignment.documentId)} × ${formatNumber(assignment.quantity, localizer.locale)}`)
               .join(' · ');
-            daySection.append(createElement('p', '', `${localizer.text(location.locationId)} — ${targets}`));
+            const item = document.createElement('li');
+            item.append(
+              createElement('strong', '', localizer.text('ui.raidLocationSummary', {
+                location: localizer.text(location.locationId),
+                difficulty: localizer.text(location.difficultyId),
+                minutes: formatNumber(location.maxRaidTimeMin, localizer.locale),
+              })),
+              createElement('span', '', targets),
+            );
+            raidList.append(item);
           });
-          if (day.rewardIdsClaimed.length > 0) {
-            const claims = createElement('ul');
-            day.rewardIdsClaimed.forEach((rewardId) => claims.append(createElement('li', '', localizer.text(rewardId))));
-            daySection.append(claims);
-          }
+          raids.append(raidList);
+          rewardClaims.append(createElement('h4', '', localizer.text('ui.rewardsToRedeem')));
+          day.rewardIdsClaimed.forEach((rewardId) => rewardList.append(createElement('li', '', localizer.text(rewardId))));
+          if (rewardList.childElementCount > 0) rewardClaims.append(rewardList);
+          else rewardClaims.append(createElement('p', '', localizer.text('ui.noRewardsToRedeem')));
+          columns.append(raids, rewardClaims);
+          daySection.append(columns);
           routeScheduleContent.append(daySection);
         });
       };
 
-      const appendPlanGuidance = (profile, result) => {
-        detailSecondary.replaceChildren();
-        if (profile.schedule.length > 0) {
-          const scheduleButton = createElement('button', '', localizer.text('ui.viewFullSchedule'));
-          scheduleButton.type = 'button';
-          scheduleButton.addEventListener('click', () => {
-            renderScheduleProjection(profile);
-            routeScheduleDialog.showModal();
-          });
-          detailSecondary.append(scheduleButton);
-        }
+      const renderBuyout = (result) => {
+        const estimate = result.buyout;
+        const localEstimate = estimate.localEstimate;
+        buyoutTitle.textContent = localizer.text('ui.buyout');
+        closeBuyoutButton.textContent = localizer.text('ui.close');
+        buyoutContent.replaceChildren();
 
-        const planDetails = createElement('details');
-        planDetails.append(createElement('summary', '', localizer.text('ui.planDetails')));
-        const classifiedUse = createElement('p', '', localizer.text('ui.classifiedUse', {
-          used: formatNumber(profile.classifiedConsumed, localizer.locale),
-          remaining: formatNumber(profile.classifiedRemaining, localizer.locale),
-        }));
-        planDetails.append(classifiedUse);
-        if (profile.exchanges.length > 0) {
-          planDetails.append(createElement('p', '', localizer.text('ui.exchange', {
-            count: formatNumber(profile.exchanges.length, localizer.locale),
+        const funding = createElement('section', 'buyout-section');
+        funding.append(
+          createElement('h3', '', localizer.text('ui.buyoutFundingHeading')),
+          createElement('p', '', localizer.text('ui.buyoutGrossTarCoins', {
+            count: formatNumber(estimate.grossTarCoinsSpent, localizer.locale),
+          })),
+          createElement('p', '', localizer.text('ui.additionalTarCoins', {
+            count: formatNumber(estimate.minimumAdditionalTarCoins, localizer.locale),
+          })),
+          createElement('p', '', localizer.text('ui.buyoutFunding', {
+            starting: formatNumber(estimate.startingTarCoinsUsed, localizer.locale),
+            earned: formatNumber(estimate.earnedTarCoinsUsed, localizer.locale),
+          })),
+        );
+        if (localEstimate) {
+          funding.append(createElement('p', '', localizer.text('ui.fromEstimate', {
+            price: localEstimate.costMinor > 0 ? localEstimate.display : localizer.text('ui.zeroLocalPrice'),
           })));
-          const exchangeList = createElement('ul');
-          profile.exchanges.forEach((exchange) => {
-            const donors = Object.entries(exchange.donors)
-              .map(([documentId, quantity]) => `${localizer.text(documentId)} × ${formatNumber(quantity, localizer.locale)}`)
-              .join(' + ');
-            exchangeList.append(createElement('li', '', localizer.text('ui.exchangeInstruction', {
-              donors,
-              received: localizer.text(exchange.receivedDocumentId),
-            })));
-          });
-          planDetails.append(exchangeList);
+        } else {
+          funding.append(createElement('p', '', localizer.text('ui.localPriceUnavailable')));
         }
-        if (profile.purchases.classifiedDocumentsPurchased > 0) {
-          planDetails.append(createElement('p', '', localizer.text('ui.purchaseSummary', {
-            count: formatNumber(profile.purchases.classifiedDocumentsPurchased, localizer.locale),
-            tarCoins: formatNumber(profile.purchases.tarCoinsSpent, localizer.locale),
-          })));
-          const purchaseList = createElement('ul');
-          profile.purchases.bundleCounts.forEach((count, index) => {
-            if (count === 0) return;
-            const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
-            purchaseList.append(createElement('li', '', localizer.text('ui.classifiedBundleInstruction', {
-              documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
-              count: formatNumber(count, localizer.locale),
-            })));
-          });
-          planDetails.append(purchaseList);
-        }
-        detailSecondary.append(planDetails);
+        buyoutContent.append(funding);
 
-        if (result.goal === 'all-unclaimed-rewards') {
-          const buyout = createElement('details');
-          buyout.append(createElement('summary', '', localizer.text('ui.buyout')));
-          buyout.append(createElement('p', '', localizer.text('ui.additionalTarCoins', {
-            count: formatNumber(result.buyout.minimumAdditionalTarCoins, localizer.locale),
+        const classified = createElement('section', 'buyout-section');
+        const classifiedList = document.createElement('ul');
+        classified.append(
+          createElement('h3', '', localizer.text('ui.classifiedBundles')),
+          createElement('p', '', localizer.text('ui.buyoutClassified', {
+            purchased: formatNumber(estimate.classifiedDocumentsPurchased, localizer.locale),
+            excess: formatNumber(estimate.excessClassifiedDocuments, localizer.locale),
+          })),
+        );
+        estimate.bundleCounts.forEach((count, index) => {
+          if (count === 0) return;
+          const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
+          classifiedList.append(createElement('li', '', localizer.text('ui.classifiedBundleInstruction', {
+            documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
+            count: formatNumber(count, localizer.locale),
           })));
-          buyout.append(createElement('p', '', localizer.text('ui.buyoutFunding', {
-            starting: formatNumber(result.buyout.startingTarCoinsUsed, localizer.locale),
-            earned: formatNumber(result.buyout.earnedTarCoinsUsed, localizer.locale),
+        });
+        if (classifiedList.childElementCount > 0) classified.append(classifiedList);
+        else classified.append(createElement('p', '', localizer.text('ui.noBundlesRequired')));
+        buyoutContent.append(classified);
+
+        const packages = createElement('section', 'buyout-section');
+        const packageList = document.createElement('ul');
+        packages.append(createElement('h3', '', localizer.text('ui.tarCoinPackages')));
+        localEstimate?.packageCounts.forEach((count, index) => {
+          if (count === 0) return;
+          const bundle = catalogs.optimizerRules.tarCoinBundles[index];
+          const price = localizer.price(bundle.localPriceId);
+          packageList.append(createElement('li', '', localizer.text('ui.tarCoinPackageInstruction', {
+            tarCoins: formatNumber(bundle.tarCoins, localizer.locale),
+            count: formatNumber(count, localizer.locale),
+            price: price?.display ?? localizer.text('ui.localPriceUnavailable'),
           })));
-          buyout.append(createElement('p', '', localizer.text('ui.buyoutClassified', {
-            purchased: formatNumber(result.buyout.classifiedDocumentsPurchased, localizer.locale),
-            excess: formatNumber(result.buyout.excessClassifiedDocuments, localizer.locale),
-          })));
-          if (result.buyout.localEstimate?.display && result.buyout.localEstimate.costMinor > 0) {
-            buyout.append(createElement('p', '', localizer.text('ui.fromEstimate', {
-              price: result.buyout.localEstimate.display,
-            })));
-          }
-          detailSecondary.append(buyout);
+        });
+        if (packageList.childElementCount > 0 && localEstimate) {
+          packages.append(
+            packageList,
+            createElement('p', '', localizer.text('ui.tarCoinPackageSummary', {
+              purchased: formatNumber(localEstimate.tarCoinsPurchased, localizer.locale),
+              excess: formatNumber(localEstimate.excessTarCoins, localizer.locale),
+            })),
+          );
+        } else if (estimate.minimumAdditionalTarCoins === 0) {
+          packages.append(createElement('p', '', localizer.text('ui.noTarCoinPackagesRequired')));
+        } else {
+          packages.append(createElement('p', '', localizer.text('ui.localPriceUnavailable')));
         }
+        buyoutContent.append(packages);
+      };
+
+      const refreshBuyoutLink = (result) => {
+        currentOptimizerResult = result;
+        if (result.goal !== 'all-unclaimed-rewards') {
+          buyoutLink.hidden = true;
+          return;
+        }
+        const estimate = result.buyout.localEstimate;
+        const label = estimate
+          ? localizer.text('ui.approximateBuyoutPrice', {
+              price: estimate.costMinor > 0 ? estimate.display : localizer.text('ui.zeroLocalPrice'),
+            })
+          : localizer.text('ui.buyoutLink');
+        buyoutLink.hidden = false;
+        buyoutLink.textContent = label;
+        buyoutLink.title = localizer.text('ui.buyout');
+        buyoutLink.setAttribute('aria-label', localizer.text('ui.openBuyoutEstimate', { price: label }));
       };
 
       const renderRaidDocuments = (nextRaid) => {
@@ -2312,30 +2455,30 @@
 
       const renderRouteDetails = (profile, result) => {
         currentNextRaid = profile.nextRaid;
-        focusEyebrow.textContent = localizer.text(`optimizer.${profile.profile}`);
-        focusSummary.textContent = localizer.text('ui.estimatedDays', {
-          count: formatNumber(profile.schedule.length, localizer.locale),
-        });
-        detailEyebrow.textContent = localizer.text('ui.projectedOutcome');
+        currentProfile = profile;
+        currentOptimizerResult = result;
+        refreshBuyoutLink(result);
+        viewRouteScheduleButton.textContent = localizer.text('ui.viewFullSchedule');
+        viewRouteScheduleButton.disabled = !(
+          profile.schedule.length > 0
+          || profile.projectedImmediateRewardIds.length > 0
+          || profile.exchanges.length > 0
+          || profile.purchases.classifiedDocumentsPurchased > 0
+        );
         commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
-        commitRaidButton.hidden = true;
         commitRaidButton.disabled = true;
 
         if (!profile.route.available) {
+          focusEyebrow.textContent = localizer.text('ui.nextRaid');
           focusHeading.textContent = localizer.text('optimizer.noRoute');
           focusContent.replaceChildren(createElement('p', 'focus-message', localizer.text('optimizer.noRoute')));
-          detailHeading.textContent = localizer.text('ui.routeStop');
-          detailContent.replaceChildren(createElement('p', 'focus-message', localizer.text('optimizer.noRoute')));
-          appendPlanGuidance(profile, result);
           return;
         }
 
         if (!profile.nextRaid) {
+          focusEyebrow.textContent = localizer.text('ui.nextRaid');
           focusHeading.textContent = localizer.text('ui.readyNow');
           focusContent.replaceChildren(createElement('p', 'focus-message', localizer.text('ui.noFarmingNeeded')));
-          detailHeading.textContent = localizer.text('ui.projectedOutcome');
-          detailContent.replaceChildren(createElement('p', 'focus-message', localizer.text('ui.noFarmingNeeded')));
-          appendPlanGuidance(profile, result);
           return;
         }
 
@@ -2343,43 +2486,27 @@
         focusEyebrow.textContent = localizer.text(nextRaid.purpose === 'crate-stockpile'
           ? 'ui.crateStockpileRaid'
           : 'ui.nextRaid');
-        focusHeading.textContent = localizer.text(nextRaid.locationId);
+        focusHeading.textContent = localizer.text('ui.raidLocationSummary', {
+          location: localizer.text(nextRaid.locationId),
+          difficulty: localizer.text(nextRaid.difficultyId),
+          minutes: formatNumber(nextRaid.maxRaidTimeMin, localizer.locale),
+        });
         renderRaidDocuments(nextRaid);
-        detailHeading.textContent = localizer.text(nextRaid.locationId);
-        const facts = createElement('dl', 'route-facts');
-        const addFact = (label, value) => {
-          const row = document.createElement('div');
-          row.append(createElement('dt', '', label), createElement('dd', '', value));
-          facts.append(row);
-        };
-        addFact(localizer.text('optimizer.safest'), localizer.text(nextRaid.difficultyId));
-        addFact(localizer.text('optimizer.fastest'), `${formatNumber(nextRaid.maxRaidTimeMin, localizer.locale)} min`);
-        const priorities = nextRaid.documents
-          .filter((documentRecommendation) => documentRecommendation.role !== 'optional')
-          .map((documentRecommendation) => localizer.text(documentRecommendation.documentId))
-          .join(' · ');
-        addFact(localizer.text(nextRaid.purpose === 'crate-stockpile'
-          ? 'ui.stockpileDocuments'
-          : 'ui.priorityDocuments'), priorities);
-        detailContent.replaceChildren(facts);
-        commitRaidButton.hidden = false;
         commitRaidButton.disabled = false;
-        appendPlanGuidance(profile, result);
       };
 
       const showOptimizerLoading = () => {
-        focusEyebrow.textContent = localizer.text(`optimizer.${state.selectedProfile}`);
+        focusEyebrow.textContent = localizer.text('ui.nextRaid');
         focusHeading.textContent = localizer.text('ui.nextRaid');
-        focusSummary.textContent = '';
         focusContent.replaceChildren(createElement('p', 'focus-loading', '…'));
-        detailEyebrow.textContent = localizer.text('ui.projectedOutcome');
-        detailHeading.textContent = localizer.text('ui.routeStop');
-        detailContent.replaceChildren(createElement('p', 'focus-loading', '…'));
-        detailSecondary.replaceChildren();
+        viewRouteScheduleButton.textContent = localizer.text('ui.viewFullSchedule');
+        viewRouteScheduleButton.disabled = true;
         commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
-        commitRaidButton.hidden = false;
         commitRaidButton.disabled = true;
+        buyoutLink.hidden = true;
         currentNextRaid = undefined;
+        currentProfile = undefined;
+        currentOptimizerResult = undefined;
       };
 
       refreshOptimization = () => {
@@ -2404,8 +2531,12 @@
       optimizerWorker.addEventListener('message', ({ data }) => {
         if (data.requestId !== optimizerRequestId) return;
         if (data.error) {
+          focusEyebrow.textContent = localizer.text('ui.nextRaid');
           focusHeading.textContent = localizer.text('optimizer.noRoute');
           focusContent.replaceChildren(createElement('p', 'focus-message', data.error));
+          viewRouteScheduleButton.disabled = true;
+          commitRaidButton.disabled = true;
+          buyoutLink.hidden = true;
           return;
         }
         const result = data.result;
@@ -2446,9 +2577,25 @@
         refreshOptimization();
       });
 
+      viewRouteScheduleButton.addEventListener('click', () => {
+        if (!currentProfile) return;
+        renderScheduleProjection(currentProfile);
+        routeScheduleDialog.showModal();
+      });
+
+      buyoutLink.addEventListener('click', () => {
+        if (!currentOptimizerResult || currentOptimizerResult.goal !== 'all-unclaimed-rewards') return;
+        renderBuyout(currentOptimizerResult);
+        buyoutDialog.showModal();
+      });
+
       closeRouteScheduleButton.addEventListener('click', () => routeScheduleDialog.close());
       routeScheduleDialog.addEventListener('click', (event) => {
         if (event.target === routeScheduleDialog) routeScheduleDialog.close();
+      });
+      closeBuyoutButton.addEventListener('click', () => buyoutDialog.close());
+      buyoutDialog.addEventListener('click', (event) => {
+        if (event.target === buyoutDialog) buyoutDialog.close();
       });
 
       const modeData = [

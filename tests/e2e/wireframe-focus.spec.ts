@@ -3,6 +3,48 @@ import { expect, test } from '@playwright/test';
 import { documentQuantity, openWireframe, setDocumentQuantity } from './wireframe-helpers';
 
 const dogtagReward = 'rewards.dogtag01.name';
+const gameDataVersion = '1.1.0.0.46657.8.6.2026';
+
+async function seedOptimizerState(
+  page: Parameters<typeof openWireframe>[0],
+  input: {
+    claimedRewardIds: string[];
+    ownedDocuments?: Record<string, number>;
+    classifiedDocuments?: number;
+    tarCoins?: number;
+    spendTarCoinsOnClassifiedDocuments?: boolean;
+  },
+): Promise<void> {
+  const envelope = (payload: object) => encodeURIComponent(JSON.stringify({
+    gameDataVersion,
+    schemaVersion: 1,
+    payload,
+  }));
+  await page.context().addCookies([
+    {
+      name: 'kord-breach-progress',
+      value: envelope({
+        claimedRewardIds: input.claimedRewardIds,
+        ownedDocuments: input.ownedDocuments ?? {},
+        classifiedDocuments: input.classifiedDocuments ?? 0,
+        tarCoins: input.tarCoins ?? 0,
+        crateCount: 1,
+      }),
+      url: page.url(),
+    },
+    {
+      name: 'kord-breach-settings',
+      value: envelope({
+        mode: 'pvp-seasonal',
+        spendTarCoinsOnClassifiedDocuments: input.spendTarCoinsOnClassifiedDocuments ?? false,
+        locale: 'en',
+      }),
+      url: page.url(),
+    },
+  ]);
+  await page.reload();
+  await expect(page.locator('[data-season-name]')).toHaveText('KORD BREACH');
+}
 
 test('offers a raid beside the starting Classified Document redemption option', async ({ page }) => {
   await openWireframe(page);
@@ -26,8 +68,11 @@ test('shows both location documents with one clear farming priority', async ({ p
   await expect(optional).toHaveCount(1);
   await expect(priority).toContainText('Priority');
   await expect(optional).toContainText('Optional pickup');
-  await expect(page.locator('[data-detail-content]')).toContainText(/Easy|Normal|Hard|Insane/u);
-  await expect(page.locator('[data-detail-content]')).toContainText(/\d+ min/u);
+  await expect(page.locator('[data-focus-heading]')).toHaveText(/.+ \((Easy|Normal|Hard|Insane), \d+ min\)/u);
+  await expect(page.locator('.detail-rail')).toHaveCount(0);
+  await expect(page.locator('.focus-heading__actions [data-view-route-schedule]')).toBeVisible();
+  await expect(page.locator('.focus-heading__actions [data-commit-raid]')).toBeVisible();
+  await expect(page.locator('.focus-stage')).not.toContainText(/Estimated days/iu);
 
   const priorityOpacity = await priority.locator('.focus-document__image-frame').evaluate((element) => Number(getComputedStyle(element).opacity));
   const optionalOpacity = await optional.locator('.focus-document__image-frame').evaluate((element) => Number(getComputedStyle(element).opacity));
@@ -70,10 +115,27 @@ test('accepts a zero-yield Commit and exposes the projected schedule on demand',
   await page.getByRole('button', { name: 'View full schedule' }).click();
   const dialog = page.locator('[data-route-schedule-dialog]');
   await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-route-schedule-estimate]')).toHaveText(/Estimated days: \d+/u);
   await expect(dialog.locator('.schedule-projection-day')).not.toHaveCount(0);
+  await expect(dialog.locator('.schedule-day-column--raids')).not.toHaveCount(0);
+  await expect(dialog.locator('.schedule-day-column--rewards')).not.toHaveCount(0);
+  await expect(dialog.getByRole('heading', { name: 'Raids' }).first()).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'Rewards to redeem' }).first()).toBeVisible();
+  await expect(dialog).not.toContainText('Plan details');
+  await expect(dialog).not.toContainText('Owned Classified Documents consumed');
   await expect(dialog).not.toContainText(/Page \d+ unlocked/iu);
   await dialog.getByRole('button', { name: 'Close' }).click();
   await expect(dialog).toBeHidden();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'View full schedule' }).click();
+  const [raidColumn, rewardColumn] = await Promise.all([
+    dialog.locator('.schedule-day-column--raids').first().boundingBox(),
+    dialog.locator('.schedule-day-column--rewards').first().boundingBox(),
+  ]);
+  expect(raidColumn).not.toBeNull();
+  expect(rewardColumn).not.toBeNull();
+  expect(rewardColumn!.y).toBeGreaterThanOrEqual(raidColumn!.y + raidColumn!.height);
 });
 
 test('keeps both location documents useful for optional crate stockpiling', async ({ page }) => {
@@ -85,4 +147,59 @@ test('keeps both location documents useful for optional crate stockpiling', asyn
   await expect(page.locator('.focus-document--optional')).toHaveCount(0);
   await expect(page.locator('[data-focus-content]')).toContainText('Crate stockpile');
   await expect(page.locator('[data-commit-raid]')).toBeVisible();
+});
+
+test('keeps required exchanges and Classified purchases visible in the full schedule', async ({ page }) => {
+  await openWireframe(page);
+  const allRewardIds = await page.locator('[data-reward-id]').evaluateAll((inputs) =>
+    inputs.map((input) => (input as HTMLInputElement).dataset.rewardId ?? ''),
+  );
+  const claimedExceptDogtag = allRewardIds.filter((rewardId) => rewardId !== dogtagReward);
+
+  await seedOptimizerState(page, {
+    claimedRewardIds: claimedExceptDogtag,
+    ownedDocuments: { 'documents.project.name': 5 },
+  });
+  await page.getByRole('button', { name: 'View full schedule' }).click();
+  let dialog = page.locator('[data-route-schedule-dialog]');
+  await expect(dialog.getByRole('heading', { name: 'Plan actions' })).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'Regular-document exchanges' })).toBeVisible();
+  await expect(dialog.locator('.schedule-plan-actions')).toContainText(/Project documentation × 5.*Financial documents/su);
+  await dialog.getByRole('button', { name: 'Close' }).click();
+
+  await seedOptimizerState(page, {
+    claimedRewardIds: claimedExceptDogtag,
+    tarCoins: 500,
+    spendTarCoinsOnClassifiedDocuments: true,
+  });
+  await page.getByRole('button', { name: 'View full schedule' }).click();
+  dialog = page.locator('[data-route-schedule-dialog]');
+  await expect(dialog.getByRole('heading', { name: 'Classified Document purchases' })).toBeVisible();
+  await expect(dialog.locator('.schedule-plan-actions')).toContainText('Purchased Classified Documents: 20; TarCoins spent: 500');
+  await expect(dialog.locator('.schedule-plan-actions')).toContainText('20 Classified Documents × 1');
+  await expect(dialog).not.toContainText('Owned Classified Documents consumed');
+});
+
+test('opens a detailed buyout from the approximate Documents price', async ({ page }) => {
+  await openWireframe(page);
+
+  const buyoutLink = page.locator('[data-buyout-link]');
+  await expect(buyoutLink).toBeVisible({ timeout: 10_000 });
+  await expect(buyoutLink).toHaveText(/^\(~\$[\d,.]+\)$/u);
+  await expect(buyoutLink).toHaveCSS('text-decoration-line', 'underline');
+  await buyoutLink.click();
+
+  const dialog = page.locator('[data-buyout-dialog]');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'TarCoin funding' })).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'Classified Document bundles' })).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'TarCoin packages' })).toBeVisible();
+  await expect(dialog.locator('.buyout-section').nth(1).locator('li')).not.toHaveCount(0);
+  await expect(dialog.locator('.buyout-section').nth(2).locator('li')).not.toHaveCount(0);
+  await expect(dialog.locator('.buyout-section').nth(2)).toContainText('FROM $');
+  await dialog.getByRole('button', { name: 'Close' }).click();
+  await expect(dialog).toBeHidden();
+
+  await page.locator('[data-reward-claim-all]').click();
+  await expect(buyoutLink).toBeHidden({ timeout: 10_000 });
 });

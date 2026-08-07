@@ -7,23 +7,24 @@ The application SHALL render as semantic HTML and CSS with TypeScript compiled t
 - **WHEN** the GitHub Pages production build is opened
 - **THEN** the interface and optimizer load from generated static HTML, CSS, JavaScript, image, and JSON assets
 
-### Requirement: Five-region Battle Pass layout
-The desktop interface SHALL use a header containing global profile, locale, and setup access; a left reward column; a center current-route-day column; a right selected-stop context column; and a footer containing document inventory and the asset disclaimer. Normal-content placement SHALL be isolated in one editable CSS layout map, typography SHALL use one shared proportional caption/label/body/heading/metric/display token scale, and internal gaps, padding, and region spacing SHALL use one shared golden-ratio token scale. Layout, typography, spacing, and palette or visual-state styling SHALL remain independently editable.
+### Requirement: Two-column Battle Pass layout
+The desktop interface SHALL use a header containing global profile, locale, setup access, and linked buyout estimate; a left reward column; one expanded Focus column containing the current next raid and persistent owned-document ribbon; and a separate credits footer containing the asset disclaimer and reset action. Normal-content placement SHALL be isolated in one editable CSS layout map, typography SHALL use one shared proportional caption/label/body/heading/metric/display token scale, and internal gaps, padding, and region spacing SHALL use one shared golden-ratio token scale. Layout, typography, spacing, and palette or visual-state styling SHALL remain independently editable.
 
 #### Scenario: Desktop layout
 - **WHEN** the viewport supports the desktop layout
-- **THEN** the left, center, and right columns appear between the header and footer in that order
+- **THEN** the left reward column and expanded Focus column appear between the header and footer in that order
+- **AND** the Focus column spans the former center and right-column tracks
 
 #### Scenario: Narrow-screen layout
 - **WHEN** the viewport cannot fit the three columns accessibly
-- **THEN** the regions stack as header, center route day, right stop context, left reward selection, and footer without viewport-level horizontal scrolling
+- **THEN** the regions stack as header, Focus next raid with its internally scrolling owned-document ribbon, left reward selection, and credits footer without viewport-level horizontal scrolling
 
 #### Scenario: Adjust desktop placement
 - **WHEN** a maintainer changes a documented rail width, spacing value, type size, or named grid track in the layout map
 - **THEN** the live interface uses that value without requiring a duplicate static page or changes to optimizer, state, localization, or visual-state code
 
 ### Requirement: Battle Pass-inspired presentation
-The interface SHALL use the supplied screenshots as the source of truth for a green-toned, dense Battle Pass-inspired visual hierarchy while preserving readable contrast, visible keyboard focus, semantic controls, responsive behavior, and practical touch targets. All five regions SHALL share one continuous stage. Strong framing SHALL be limited to outer regions, selected states, the document ribbon, dialogs, and the toast; unclaimed regular content rows SHALL use spacing and separators instead of repeated bordered or elevated containers, while completed reward and page states MAY use one restrained green gradient.
+The interface SHALL use the supplied screenshots as the source of truth for a green-toned, dense Battle Pass-inspired visual hierarchy while preserving readable contrast, visible keyboard focus, semantic controls, responsive behavior, and practical touch targets. All major regions SHALL share one continuous stage. Strong framing SHALL be limited to outer regions, selected states, the document ribbon, dialogs, and the toast; unclaimed regular content rows SHALL use spacing and separators instead of repeated bordered or elevated containers, while completed reward and page states MAY use one restrained green gradient.
 
 #### Scenario: Keyboard navigation
 - **WHEN** a player navigates interactive controls using only a keyboard
@@ -139,7 +140,7 @@ The interface SHALL provide one semantic claimed checkbox for each reward and gl
 - **AND** no document inventory is consumed
 
 ### Requirement: Center-column optimizer output
-The center column SHALL render one flat next-raid workspace focused on the selected route profile's next raid, estimated days, warnings, empty states, and completed states. A projected immediately redeemable reward SHALL NOT replace, hide, or disable the next-raid workspace. Reward checkboxes SHALL remain the only confirmed progression state, and projected claims SHALL NOT mutate inventory. When Battle Pass farming remains, the center SHALL show one recommended location and exactly the regular document types available there. Priority documents assigned by the optimizer SHALL remain fully emphasized; available documents that do not advance the current recommendation SHALL be dimmed. When every remaining reward requirement is already covered, the center SHALL show an optional crate-stockpile raid and SHALL keep both location documents fully emphasized. Each displayed document SHALL have a transient non-negative raid-result input. The center SHALL NOT duplicate regular-document deficits or the selected mode's daily limit.
+The expanded Focus column SHALL render one flat next-raid workspace focused on the selected route profile's next raid, warnings, empty states, and completed states. Its header SHALL show the route purpose and a compact localized location summary containing official difficulty and maximum raid time, with View full schedule and Commit beside it. Estimated days SHALL NOT appear in the normal workspace. A projected immediately redeemable reward SHALL NOT replace, hide, or disable the next-raid workspace. Reward checkboxes SHALL remain the only confirmed progression state, and projected claims SHALL NOT mutate inventory. When Battle Pass farming remains, Focus SHALL show one recommended location and exactly the regular document types available there. Priority documents assigned by the optimizer SHALL remain fully emphasized; available documents that do not advance the current recommendation SHALL be dimmed. When every remaining reward requirement is already covered, Focus SHALL show an optional crate-stockpile raid and SHALL keep both location documents fully emphasized. Each displayed document SHALL have a transient non-negative raid-result input. Focus SHALL NOT duplicate regular-document deficits, the selected mode's daily limit, or Classified consumed/remaining optimizer statistics.
 
 #### Scenario: Inputs change
 - **WHEN** a player changes any optimizer input
@@ -174,20 +175,21 @@ The center column SHALL render one flat next-raid workspace focused on the selec
 - **THEN** the document inventory, cookie state, and optimizer recommendation do not change
 
 #### Scenario: Buyout estimate is presented
-- **WHEN** unclaimed rewards have deficits that can be covered by configured Classified Document bundles
-- **THEN** the right context column shows the localized gross TarCoin price and minimum additional TarCoins required, with a collapsible breakdown of starting and earned TarCoins used, bundle counts, purchased Classified Documents, and excess
-- **AND** the estimate remains explicitly informational when TarCoin spending is disabled
+- **WHEN** at least one Battle Pass reward remains unclaimed
+- **THEN** the Documents progress label shows a link-styled approximate localized local-price estimate when complete pricing is available
+- **AND** activating only that price link opens a native modal showing starting and earned TarCoins used, minimum additional and gross TarCoins, Classified bundle counts, purchased and excess Classified Documents, and local TarCoin package counts, storefront prices, total price, purchased TarCoins, and excess
+- **AND** the estimate remains explicitly informational and independent of the TarCoin spending selector
 
 #### Scenario: Local purchase estimate is available
 - **WHEN** additional TarCoins are required and complete same-currency package prices exist for the active locale
-- **THEN** the right context column labels the minimum local package cost as a `FROM` estimate and shows its package breakdown and excess TarCoins
+- **THEN** the linked header price is visibly approximate and the modal labels the minimum local package cost as a `FROM` estimate and shows its package breakdown and excess TarCoins
 
 #### Scenario: Classified Documents have no redeemable use
 - **WHEN** the player owns Classified Documents but no unclaimed reward has an eligible missing-document deficit
-- **THEN** the right context column reports that the Classified quantity remains unchanged and shows no Classified redemption or purchase action
+- **THEN** the persistent Classified counter remains unchanged and the full schedule shows no Classified purchase action
 
-### Requirement: Header setup and right-column route context
-The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal, optional TarCoin spending, TarCoin balance, and conditional crate count. The right column SHALL instead show the recommended location, official difficulty, maximum raid time, priority- or stockpile-document summary, Commit action, projected reward outcome, full-schedule access, and flat non-mutating exchange, purchase, plan, and buyout guidance. The optimizer objective SHALL always rush Page 12 and then complete all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, a separate daily-limit readout, or controls that mutate inventory for suggested exchanges or purchases.
+### Requirement: Header setup and Focus actions
+The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal, optional TarCoin spending, TarCoin balance, and conditional crate count. The Focus header SHALL instead show the recommended location, official difficulty, maximum raid time, View full schedule, and Commit. The full schedule SHALL preserve flat non-mutating exchange and Classified-purchase guidance, while the independent buyout SHALL move to the Documents progress price link and modal. The optimizer objective SHALL always rush Page 12 and then complete all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, a separate daily-limit readout, or controls that mutate inventory for suggested exchanges or purchases.
 
 #### Scenario: Mode selection applies its default
 - **WHEN** the player selects PvE, PvP, or PvP Seasonal
@@ -203,7 +205,7 @@ The header SHALL contain a compact setup button labelled with the selected game 
 - **THEN** the effective daily limit changes to that mode's default while location maximum raid times and difficulty ratings remain unchanged
 
 ### Requirement: Header progress and route alternative presentation
-The header's primary navigation area SHALL present total-based document progress, claimed-reward progress, and one Fastest/Safest toggle. The document total SHALL be derived from every Battle Pass requirement quantity, and the reward total SHALL be derived from every Battle Pass reward. The toggle SHALL default to Safest, persist as a UI preference, and control the focused result, footer deficits, and full schedule. The interface SHALL render only the selected profile at a time and SHALL NOT display the internal abstract profile-cost value.
+The header's primary navigation area SHALL present total-based document progress, a link-styled approximate localized remaining-pass price beside the Documents label while rewards remain, claimed-reward progress, and one Fastest/Safest toggle. The document total SHALL be derived from every Battle Pass requirement quantity, and the reward total SHALL be derived from every Battle Pass reward. The toggle SHALL default to Safest, persist as a UI preference, and control the focused result and full schedule. The independent buyout price SHALL update with state and locale but SHALL NOT change with the selected route profile or spending selector. The interface SHALL render only the selected profile at a time and SHALL NOT display the internal abstract profile-cost value.
 
 #### Scenario: Initial progress uses catalog totals
 - **WHEN** the player opens the planner without valid persisted progress
@@ -243,8 +245,8 @@ The header's primary navigation area SHALL present total-based document progress
 - **WHEN** a route profile cannot cover every remaining document with catalog-eligible locations
 - **THEN** the center column explains that the profile is unavailable and does not show a partial route
 
-### Requirement: Footer document inventory
-The lower band SHALL provide one contiguous in-game-inspired document-ribbon section containing an inventory tile for every regular and Classified Document. Each tile SHALL use a dedicated image row, a fixed text band below the image containing its localized name and optional deficit, and a separate quantity-control row containing decrement, direct numeric entry, and increment actions. Document names and deficits SHALL NOT be absolutely positioned over artwork. Each regular-document tile SHALL show the selected profile's remaining deficit when it is nonzero; Classified Documents and zero deficits SHALL show no deficit label. A separate sibling credits footer SHALL appear below the document section with spacing and a dividing rule; the disclaimer SHALL NOT be part of the document section.
+### Requirement: Focus document inventory
+The bottom of the expanded Focus region SHALL provide one contiguous in-game-inspired document-ribbon section containing an inventory tile for every regular and Classified Document. Each tile SHALL keep its localized title separate above square artwork and a separate quantity-control row containing decrement, direct numeric entry, and increment actions. Document names SHALL NOT be positioned over artwork. The ribbon SHALL use one centered horizontal row on desktop and SHALL scroll internally at narrow widths rather than increasing page height. A separate sibling credits footer SHALL appear below the workspace with spacing and a dividing rule; the disclaimer SHALL NOT be part of the document section.
 
 #### Scenario: Enter an owned quantity directly
 - **WHEN** the player enters a valid non-negative integer for a document
@@ -274,11 +276,12 @@ The separate credits footer SHALL persistently state that Escape from Tarkov and
 - **THEN** the disclaimer remains available without opening a modal and cannot be dismissed with the cookie notice
 
 ### Requirement: Focused daily-plan disclosure
-The center column SHALL present the selected profile's next raid as a flat planning estimate. A `View full schedule` action SHALL open a native dialog containing every projected day as rule-separated manifest rows with farming targets, locations, routing factors, and rewards to claim. The schedule SHALL NOT render day cards or page-unlocked labels and SHALL NOT create daily farming state.
+The Focus column SHALL present the selected profile's next raid without an estimated-day value. A `View full schedule` action SHALL open a native dialog whose header contains the estimated days. The dialog SHALL preserve every selected-profile regular-document exchange and opt-in Classified purchase in a visible non-collapsible Plan actions section, omit Classified consumed/remaining statistics, show projected immediately redeemable rewards separately, and render every projected day as a rule-separated manifest with distinct Raids and Rewards to redeem regions. The schedule SHALL NOT render day cards or page-unlocked labels and SHALL NOT create daily farming state.
 
 #### Scenario: Multi-day estimate
 - **WHEN** the remaining farming quantity spans multiple daily limits
-- **THEN** the default view shows only the selected profile's next action and estimated days
+- **THEN** the default view shows only the selected profile's next raid and its location factors
+- **AND** estimated days appear only inside the full-schedule dialog
 - **AND** the player can explicitly open and close the complete schedule dialog
 
 ### Requirement: Dynamic page unlock guidance
@@ -307,7 +310,7 @@ The application SHALL show a non-blocking dismissible toast on first use explain
 - **THEN** the toast does not appear on the next visit with valid dismissal state
 
 ### Requirement: Complete reset
-The centered link-styled reset button in the credits footer below the document ribbon SHALL require deliberate confirmation, delete all optimizer cookies including notice dismissal, and restore catalog and UI defaults.
+The centered link-styled reset button in the credits footer below the workspace SHALL require deliberate confirmation, delete all optimizer cookies including notice dismissal, and restore catalog and UI defaults.
 
 #### Scenario: Confirm reset
 - **WHEN** the player confirms a complete reset

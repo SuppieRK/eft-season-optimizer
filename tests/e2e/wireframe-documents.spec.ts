@@ -86,7 +86,8 @@ test('updates quantities, progress, boundaries, and cookie-restored values toget
 test('shows the centered asset disclaimer and resets cookie-backed state', async ({ page }) => {
   await openWireframe(page);
 
-  const lowerBand = page.locator('.lower-band');
+  const focus = page.locator('.focus-stage');
+  const shell = page.locator('.wireframe-shell');
   const strip = page.locator('.document-strip');
   const images = page.locator('.document-strip__images');
   const footer = page.locator('.wireframe-footer');
@@ -98,15 +99,19 @@ test('shows the centered asset disclaimer and resets cookie-backed state', async
   await expect(reset).toHaveJSProperty('tagName', 'BUTTON');
   await expect(reset).toHaveCSS('text-decoration-line', 'underline');
 
+  await expect(focus.locator('.document-strip')).toHaveCount(1);
   await expect(strip.locator('.wireframe-footer')).toHaveCount(0);
+  await expect(focus.locator('.wireframe-footer')).toHaveCount(0);
   await expect(footer.locator('.wireframe-footer__separator')).toBeVisible();
-  const [lowerBandBox, stripBox, imagesBox, footerBox] = await Promise.all([lowerBand, strip, images, footer].map((element) => element.boundingBox()));
-  expect(lowerBandBox).not.toBeNull();
+  const [focusBox, shellBox, stripBox, imagesBox, footerBox] = await Promise.all([focus, shell, strip, images, footer].map((element) => element.boundingBox()));
+  expect(focusBox).not.toBeNull();
+  expect(shellBox).not.toBeNull();
   expect(stripBox).not.toBeNull();
   expect(imagesBox).not.toBeNull();
   expect(footerBox).not.toBeNull();
-  expect(footerBox!.y - (stripBox!.y + stripBox!.height)).toBeGreaterThanOrEqual(8);
-  expect(Math.abs(footerBox!.x + footerBox!.width / 2 - (lowerBandBox!.x + lowerBandBox!.width / 2))).toBeLessThanOrEqual(1);
+  expect(stripBox!.y + stripBox!.height).toBeLessThanOrEqual(focusBox!.y + focusBox!.height + 1);
+  expect(footerBox!.y - (focusBox!.y + focusBox!.height)).toBeGreaterThanOrEqual(8);
+  expect(Math.abs(footerBox!.x + footerBox!.width / 2 - (shellBox!.x + shellBox!.width / 2))).toBeLessThanOrEqual(1);
   const [disclaimerBox, resetBox, separatorBox] = await Promise.all([disclaimer, reset, footer.locator('.wireframe-footer__separator')].map((element) => element.boundingBox()));
   expect(disclaimerBox).not.toBeNull();
   expect(resetBox).not.toBeNull();

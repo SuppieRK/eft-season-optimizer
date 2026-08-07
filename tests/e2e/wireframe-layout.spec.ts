@@ -8,7 +8,7 @@ function gapBetween(left: Box, right: Box): number {
   return right.x - (left.x + left.width);
 }
 
-test('keeps the three header and workspace columns aligned on the desktop grid', async ({ page }) => {
+test('keeps the header tracks aligned with the reward rail and expanded Focus region', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWireframe(page);
 
@@ -18,27 +18,36 @@ test('keeps the three header and workspace columns aligned on the desktop grid',
   const workspaceBoxes = await Promise.all([
     page.locator('.reward-rail').boundingBox(),
     page.locator('.focus-stage').boundingBox(),
-    page.locator('.detail-rail').boundingBox(),
   ]);
   expect(headerBoxes).toHaveLength(3);
   expect(workspaceBoxes.every(Boolean)).toBe(true);
+  await expect(page.locator('.detail-rail')).toHaveCount(0);
+  await expect(page.locator('.lower-band')).toHaveCount(0);
 
-  for (let index = 0; index < 3; index += 1) {
-    expect(Math.abs(headerBoxes[index]!.x - workspaceBoxes[index]!.x)).toBeLessThanOrEqual(1);
-    expect(Math.abs(headerBoxes[index]!.width - workspaceBoxes[index]!.width)).toBeLessThanOrEqual(1);
-  }
+  expect(Math.abs(headerBoxes[0]!.x - workspaceBoxes[0]!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(headerBoxes[0]!.width - workspaceBoxes[0]!.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(headerBoxes[1]!.x - workspaceBoxes[1]!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(
+    headerBoxes[2]!.x + headerBoxes[2]!.width
+    - (workspaceBoxes[1]!.x + workspaceBoxes[1]!.width),
+  )).toBeLessThanOrEqual(1);
 
   const horizontalGap = gapBetween(headerBoxes[0]!, headerBoxes[1]!);
   expect(horizontalGap).toBeGreaterThan(0);
   expect(Math.abs(horizontalGap - gapBetween(headerBoxes[1]!, headerBoxes[2]!))).toBeLessThanOrEqual(1);
   expect(Math.abs(horizontalGap - gapBetween(workspaceBoxes[0]!, workspaceBoxes[1]!))).toBeLessThanOrEqual(1);
 
-  const documentStrip = await page.locator('.document-strip').boundingBox();
+  const focus = page.locator('.focus-stage');
+  const documentStrip = await focus.locator('.document-strip').boundingBox();
   expect(documentStrip).not.toBeNull();
-  expect(Math.abs(documentStrip!.x - workspaceBoxes[0]!.x)).toBeLessThanOrEqual(1);
-  expect(Math.abs(documentStrip!.x + documentStrip!.width - (workspaceBoxes[2]!.x + workspaceBoxes[2]!.width))).toBeLessThanOrEqual(1);
-  const verticalGap = documentStrip!.y - (workspaceBoxes[0]!.y + workspaceBoxes[0]!.height);
-  expect(Math.abs(verticalGap - horizontalGap)).toBeLessThanOrEqual(1);
+  expect(Math.abs(documentStrip!.x - workspaceBoxes[1]!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(documentStrip!.x + documentStrip!.width - (workspaceBoxes[1]!.x + workspaceBoxes[1]!.width))).toBeLessThanOrEqual(1);
+  expect(documentStrip!.y + documentStrip!.height).toBeLessThanOrEqual(workspaceBoxes[1]!.y + workspaceBoxes[1]!.height + 1);
+
+  const footer = await page.locator('.wireframe-footer').boundingBox();
+  expect(footer).not.toBeNull();
+  expect(footer!.y).toBeGreaterThanOrEqual(workspaceBoxes[1]!.y + workspaceBoxes[1]!.height);
+  expect(footer!.y + footer!.height).toBeLessThanOrEqual(900);
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
@@ -49,7 +58,7 @@ test('preserves the desktop grid and avoids viewport overflow at the wide review
 
   await expect(page.locator('.reward-rail')).toBeVisible();
   await expect(page.locator('.focus-stage')).toBeVisible();
-  await expect(page.locator('.detail-rail')).toBeVisible();
+  await expect(page.locator('.detail-rail')).toHaveCount(0);
   await expect(page.locator('.document-strip')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
@@ -62,11 +71,16 @@ test('stacks the always-available raid workspace without mobile viewport overflo
   await expect(page.locator('[data-commit-raid]')).toBeVisible();
   const regionY = await Promise.all([
     page.locator('.focus-stage'),
-    page.locator('.detail-rail'),
     page.locator('.reward-rail'),
-    page.locator('.document-strip'),
+    page.locator('.wireframe-footer'),
   ].map(async (locator) => (await locator.boundingBox())?.y ?? -1));
   expect(regionY).toEqual([...regionY].sort((left, right) => left - right));
+  await expect(page.locator('.focus-stage .document-strip')).toHaveCount(1);
+  const ribbonOverflow = await page.locator('.document-strip').evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }));
+  expect(ribbonOverflow.scrollWidth).toBeGreaterThan(ribbonOverflow.clientWidth);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
