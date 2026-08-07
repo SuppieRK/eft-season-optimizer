@@ -13,7 +13,7 @@ export const documentIds = [
 ] as const;
 
 export async function openWireframe(page: Page): Promise<void> {
-  await page.goto('wireframe.html');
+  await page.goto('./');
   await expect(page.locator('[data-season-name]')).toHaveText('KORD BREACH');
   await expect(page.locator('.reward-page')).toHaveCount(12);
 }

@@ -8,10 +8,18 @@ const htmlPath = path.join(dist, 'index.html');
 const html = fs.readFileSync(htmlPath, 'utf8');
 const documents = JSON.parse(fs.readFileSync('public/data/documents.json', 'utf8'));
 
+assert.match(html, /wireframe-shell/, 'dist/index.html does not contain the reviewed optimizer interface');
+assert.ok(!fs.existsSync(path.join(dist, 'wireframe.html')), 'dist contains a duplicate wireframe page');
+
 for (const assetPath of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
   const url = assetPath[1];
-  assert.ok(url.startsWith(base), `${url} is outside the configured Pages base path`);
-  assert.ok(fs.existsSync(path.join(dist, url.slice(base.length))), `${url} is missing from dist`);
+  const relativePath = url.startsWith(base)
+    ? url.slice(base.length)
+    : url.startsWith('./')
+      ? url.slice(2)
+      : undefined;
+  assert.ok(relativePath, `${url} is outside the configured Pages base path`);
+  assert.ok(fs.existsSync(path.join(dist, relativePath)), `${url} is missing from dist`);
 }
 
 for (const relativePath of [

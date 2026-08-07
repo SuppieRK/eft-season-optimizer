@@ -1,11 +1,16 @@
 ## ADDED Requirements
 
 ### Requirement: Framework-free static interface
-The application SHALL render as semantic HTML and CSS with TypeScript compiled to browser JavaScript, without requiring a UI framework, backend, account, or server-side API.
+The application SHALL render as semantic HTML and CSS with TypeScript compiled to browser JavaScript, without requiring a UI framework, backend, account, or server-side API. The reviewed Battle Pass workspace SHALL be the sole production `index.html` entry, and the build SHALL NOT expose a separate `wireframe.html` application page.
 
 #### Scenario: Production site loads from static assets
 - **WHEN** the GitHub Pages production build is opened
 - **THEN** the interface and optimizer load from generated static HTML, CSS, JavaScript, image, and JSON assets
+
+#### Scenario: One application entry is built
+- **WHEN** local development, Playwright, or the production deployment opens the repository base URL
+- **THEN** it loads the reviewed Battle Pass workspace from `index.html`
+- **AND** no alternate `wireframe.html` page is available in the build
 
 ### Requirement: Two-column Battle Pass layout
 The desktop interface SHALL use a header containing global profile, locale, setup access, and linked buyout estimate; a left reward column; one expanded Focus column containing the current next raid and persistent owned-document ribbon; and a separate credits footer containing the asset disclaimer and reset action. Normal-content placement SHALL be isolated in one editable CSS layout map, typography SHALL use one shared proportional caption/label/body/heading/metric/display token scale, and internal gaps, padding, and region spacing SHALL use one shared golden-ratio token scale. Layout, typography, spacing, and palette or visual-state styling SHALL remain independently editable.

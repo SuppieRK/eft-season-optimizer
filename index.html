@@ -3,11 +3,2675 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#17251f" />
     <title>KORD BREACH Optimizer</title>
+    <link rel="stylesheet" href="./src/typography.css" />
+    <link rel="stylesheet" href="./src/spacing.css" />
+    <style>
+      :root {
+        --canvas-width: 94vw;
+        --canvas-height: 94vh;
+        --canvas-min-width: 1180px;
+        --canvas-min-height: 720px;
+        --workspace-height: clamp(500px, 62vh, 720px);
+        --grid-gap: var(--space-m);
+        --header-height: clamp(96px, 10vh, 160px);
+        --reward-column: 24.4fr;
+        --focus-column: 50.3fr;
+        --detail-column: 25.3fr;
+        --section-heading-height: clamp(54px, 5.2vh, 84px);
+        --document-strip-image-size: clamp(64px, 5vw, 96px);
+        --header-control-padding-block: var(--space-s);
+        --header-control-padding-inline: calc(var(--space-s) + var(--space-xxs));
+        --header-control-chevron-gap: var(--header-control-padding-inline);
+        --header-control-chevron-correction: 0.125em;
+        --line: #697078;
+        --line-muted: #41464d;
+        --surface: #17191c;
+        --surface-alt: #1d2024;
+        --label: #d7d9dc;
+        --label-muted: #a8adb3;
+        --document-frame: #4f8175;
+        --classified-frame: #8d5155;
+        --reward-complete-background:
+          linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--document-frame) 10%, transparent),
+            color-mix(in srgb, var(--document-frame) 30%, transparent)
+          );
+        --reward-redeemable-background:
+          linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--document-frame) 6%, transparent),
+            color-mix(in srgb, var(--document-frame) 16%, transparent)
+          );
+        --tooltip-surface: #050607;
+        --tooltip-line: #777e84;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-width: var(--canvas-min-width);
+        min-height: var(--canvas-min-height);
+        margin: 0;
+      }
+
+      body {
+        display: flow-root;
+        min-block-size: 100vh;
+        overflow: auto;
+        background: #0f1012;
+        color: var(--label);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+      }
+
+      .wireframe-shell {
+        display: grid;
+        grid-template-rows: var(--header-height) var(--workspace-height) auto;
+        gap: var(--grid-gap);
+        inline-size: var(--canvas-width);
+        min-inline-size: calc(var(--canvas-min-width) - 6vw);
+        block-size: auto;
+        min-block-size: calc(var(--canvas-min-height) - 6vh);
+        margin: 3vh auto;
+      }
+
+      .wireframe-header,
+      .wireframe-workspace {
+        display: grid;
+        grid-template-columns:
+          var(--reward-column)
+          var(--focus-column)
+          var(--detail-column);
+        column-gap: var(--grid-gap);
+        min-block-size: 0;
+      }
+
+      .wireframe-workspace {
+        grid-template-areas: "reward focus focus";
+        grid-template-rows: minmax(0, 1fr);
+      }
+
+      .region,
+      .slot {
+        position: relative;
+        min-inline-size: 0;
+        min-block-size: 0;
+      }
+
+      .region {
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(135deg, transparent 0 49.8%, #22262a 50% 50.2%, transparent 50.4%)
+            0 0 / 28px 28px,
+          var(--surface);
+      }
+
+      .slot {
+        background: color-mix(in srgb, var(--surface-alt) 82%, transparent);
+      }
+
+      .region-label,
+      .slot-label {
+        position: absolute;
+        z-index: 1;
+        inset-block-start: var(--space-s);
+        inset-inline-start: var(--space-s);
+        max-inline-size: calc(100% - (2 * var(--space-s)));
+        padding: var(--space-xxs) var(--space-xs);
+        background: var(--surface);
+        color: var(--label);
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .slot-label {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        font-weight: 600;
+      }
+
+      .region > .region-label {
+        inset-inline-start: auto;
+        inset-inline-end: var(--space-s);
+      }
+
+      .header-slot {
+        border: 1px solid var(--line);
+        background: var(--surface-alt);
+      }
+
+      .season-slot {
+        display: flex;
+        align-items: center;
+        gap: var(--space-m);
+        padding: var(--space-m);
+      }
+
+      .season-number {
+        padding-inline-end: var(--space-m);
+        border-inline-end: 1px solid var(--line-muted);
+        color: var(--label-muted);
+        font-size: var(--font-size-display);
+        font-weight: 700;
+        line-height: 0.81;
+      }
+
+      .season-details {
+        display: grid;
+        gap: var(--space-xs);
+        min-inline-size: 0;
+      }
+
+      .season-name,
+      .season-timer {
+        white-space: nowrap;
+      }
+
+      .season-name {
+        overflow: hidden;
+        font-size: var(--font-size-body);
+        letter-spacing: 0.08em;
+        text-overflow: ellipsis;
+      }
+
+      .season-timer {
+        color: var(--label-muted);
+        font-size: var(--font-size-label);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.05em;
+      }
+
+      .primary-navigation-slot {
+        display: grid;
+        grid-template-columns: minmax(120px, 1fr) minmax(110px, 0.85fr) auto;
+        align-items: center;
+        gap: var(--space-l);
+        padding: var(--space-m);
+      }
+
+      .navigation-progress {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+        gap: var(--space-xs) var(--space-s);
+        min-inline-size: 0;
+      }
+
+      .navigation-progress__label {
+        overflow: hidden;
+        color: var(--label-muted);
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.08em;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .navigation-progress__label-line {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-xs);
+        min-inline-size: 0;
+      }
+
+      .navigation-progress__buyout {
+        flex: 0 0 auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--document-frame);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        cursor: pointer;
+      }
+
+      .navigation-progress__buyout:hover {
+        color: var(--label);
+      }
+
+      .navigation-progress__buyout:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: var(--space-xxs);
+      }
+
+      .navigation-progress__value {
+        color: var(--label);
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        line-height: var(--line-height-ui);
+        white-space: nowrap;
+      }
+
+      .navigation-progress__separator {
+        padding-inline: var(--space-xxs);
+        color: var(--label-muted);
+      }
+
+      .navigation-progress progress {
+        grid-column: 1 / -1;
+        inline-size: 100%;
+        block-size: 4px;
+        overflow: hidden;
+        border: 0;
+        border-radius: 0;
+        appearance: none;
+        background: var(--line-muted);
+      }
+
+      .navigation-progress progress::-webkit-progress-bar {
+        background: var(--line-muted);
+      }
+
+      .navigation-progress progress::-webkit-progress-value {
+        background: var(--label);
+      }
+
+      .navigation-progress progress::-moz-progress-bar {
+        background: var(--label);
+      }
+
+      .route-profile-toggle {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        margin: 0;
+        padding: 0;
+        border: 1px solid var(--line-muted);
+      }
+
+      .route-profile-option {
+        position: relative;
+        cursor: pointer;
+      }
+
+      .route-profile-option + .route-profile-option {
+        border-inline-start: 1px solid var(--line-muted);
+      }
+
+      .route-profile-option input {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        opacity: 0;
+      }
+
+      .route-profile-option span {
+        display: grid;
+        place-items: center;
+        min-inline-size: clamp(76px, 5vw, 104px);
+        padding-block: var(--header-control-padding-block);
+        padding-inline: var(--header-control-padding-inline);
+        color: var(--label-muted);
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .route-profile-option input:checked + span {
+        background: var(--label);
+        color: var(--surface);
+      }
+
+      .route-profile-option input:focus-visible + span {
+        outline: 2px solid var(--label);
+        outline-offset: 2px;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .account-slot {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-s);
+        padding: var(--space-s);
+      }
+
+      .header-select-shell,
+      .ss-main.header-select,
+      .ss-content.header-select {
+        color: var(--label);
+        font-family: inherit;
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        --ss-bg-color: var(--surface);
+        --ss-border-color: var(--line-muted);
+        --ss-focus-color: var(--label);
+        --ss-font-color: var(--label);
+        --ss-main-height: auto;
+        --ss-option-height: auto;
+        --ss-primary-color: var(--line-muted);
+        --ss-spacing-s: 0px;
+        --ss-spacing-m: var(--space-xs);
+        --ss-spacing-l: var(--space-s);
+      }
+
+      .ss-main.header-select {
+        inline-size: max-content;
+        padding-block: var(--header-control-padding-block);
+        padding-inline-start: var(--header-control-padding-inline);
+        padding-inline-end: calc(
+          var(--header-control-padding-inline) - var(--header-control-chevron-correction)
+        );
+        border-radius: 0;
+      }
+
+      .ss-main.header-select:focus {
+        box-shadow: 0 0 0 2px var(--label);
+      }
+
+      .ss-main.header-select .ss-values {
+        flex: 0 1 auto;
+        padding: 0;
+      }
+
+      .ss-main.header-select .ss-values .ss-single {
+        display: flex;
+        flex: 0 1 auto;
+        align-items: center;
+        inline-size: auto;
+        max-inline-size: none;
+        padding: 0;
+        line-height: var(--line-height-ui);
+      }
+
+      .ss-main.header-select .ss-arrow {
+        inline-size: 10px;
+        block-size: 10px;
+        margin: 0 0 0 var(--header-control-chevron-gap);
+      }
+
+      .ss-main.header-select .ss-arrow path {
+        stroke: var(--label-muted);
+      }
+
+      .ss-content.header-select {
+        border-radius: 0;
+      }
+
+      .ss-content.header-select .ss-list .ss-option {
+        min-block-size: var(--ss-option-height);
+        padding-block: var(--header-control-padding-block);
+        padding-inline: var(--header-control-padding-inline);
+        color: var(--label);
+        line-height: var(--line-height-ui);
+      }
+
+      .ss-content.header-select .ss-list .ss-option:hover:not(.ss-disabled),
+      .ss-content.header-select .ss-list .ss-option.ss-highlighted,
+      .ss-content.header-select .ss-list .ss-option:not(.ss-disabled).ss-selected {
+        border-inline-start: 0;
+        background: var(--line-muted);
+        color: var(--label);
+      }
+
+      .mode-select-shell,
+      .language-select-shell {
+        inline-size: fit-content;
+      }
+
+      .ss-main.language-select .ss-single,
+      .ss-content.language-select .ss-option {
+        justify-content: center;
+      }
+
+      .locale-choice {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        min-block-size: 1.272em;
+      }
+
+      .locale-choice__flag {
+        display: block;
+        inline-size: auto;
+        block-size: 1em;
+        flex: 0 0 auto;
+      }
+
+      .locale-choice__name {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .reward-rail {
+        grid-area: reward;
+        display: grid;
+        grid-template-rows: var(--section-heading-height) minmax(0, 1fr);
+      }
+
+      .focus-stage {
+        grid-area: focus;
+        display: grid;
+        grid-template-rows: var(--section-heading-height) minmax(0, 1fr) auto;
+      }
+
+      .focus-heading {
+        padding: var(--space-s) var(--space-m);
+        border-block-end-style: solid;
+      }
+
+      .focus-heading {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: var(--space-m);
+      }
+
+      .focus-heading h2 {
+        margin: 0;
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .focus-heading__eyebrow {
+        display: block;
+        margin-block-end: var(--space-xxs);
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .focus-heading__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-s);
+      }
+
+      .focus-heading__actions button {
+        min-block-size: 2.618em;
+        padding: var(--space-xs) var(--space-m);
+        border: 1px solid var(--line-muted);
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .focus-heading__actions [data-commit-raid] {
+        border-color: var(--document-frame);
+        background: color-mix(in srgb, var(--document-frame) 24%, var(--surface));
+      }
+
+      .focus-heading__actions button:hover,
+      .focus-heading__actions button:focus-visible {
+        border-color: var(--label-muted);
+        background: var(--line-muted);
+        outline: 0;
+      }
+
+      .focus-heading__actions [data-commit-raid]:hover,
+      .focus-heading__actions [data-commit-raid]:focus-visible {
+        background: color-mix(in srgb, var(--document-frame) 42%, var(--surface));
+      }
+
+      .focus-heading__actions button:disabled {
+        border-color: var(--line-muted);
+        background: transparent;
+        color: var(--label-muted);
+        cursor: default;
+        opacity: 0.55;
+      }
+
+      .focus-content {
+        display: grid;
+        align-content: center;
+        gap: var(--space-l);
+        padding: var(--space-m);
+        overflow: auto;
+        border-block-end: 0;
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+      }
+
+      .focus-loading,
+      .focus-message {
+        margin: 0;
+        color: var(--label-muted);
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-body);
+        text-align: center;
+      }
+
+      .focus-message strong {
+        display: block;
+        margin-block-end: var(--space-xs);
+        color: var(--label);
+        font-size: var(--font-size-heading);
+        line-height: var(--line-height-ui);
+      }
+
+      .focus-instruction {
+        margin: 0;
+        color: var(--label-muted);
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-body);
+        text-align: center;
+      }
+
+      .focus-documents {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(118px, 140px));
+        justify-content: center;
+        gap: var(--space-xl);
+      }
+
+      .focus-document {
+        display: grid;
+        align-content: start;
+        gap: var(--space-s);
+        min-inline-size: 0;
+        margin: 0;
+      }
+
+      .focus-document__status {
+        min-block-size: 1lh;
+        color: var(--document-frame);
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.08em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .focus-document--optional .focus-document__status {
+        color: var(--label-muted);
+      }
+
+      .focus-document__image-frame {
+        position: relative;
+        aspect-ratio: 1;
+        overflow: hidden;
+        border: 2px solid var(--document-frame);
+        background: var(--surface-alt);
+        transition:
+          filter 120ms ease-out,
+          opacity 120ms ease-out;
+      }
+
+      .focus-document--optional .focus-document__image-frame {
+        border-color: var(--line-muted);
+        filter: grayscale(0.88);
+        opacity: 0.34;
+      }
+
+      .focus-document__image-frame img {
+        display: block;
+        inline-size: 100%;
+        block-size: 100%;
+        object-fit: cover;
+      }
+
+      .focus-document figcaption {
+        min-block-size: 1lh;
+        text-align: center;
+      }
+
+      .focus-document figcaption strong {
+        overflow-wrap: anywhere;
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-ui);
+      }
+
+      .raid-result-stepper {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        border: 1px solid var(--line-muted);
+        background: var(--surface-alt);
+      }
+
+      .raid-result-stepper button,
+      .raid-result-stepper input {
+        min-inline-size: 0;
+        block-size: 2.618em;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        text-align: center;
+      }
+
+      .raid-result-stepper button {
+        inline-size: 2.618em;
+        cursor: pointer;
+      }
+
+      .raid-result-stepper button:hover {
+        background: var(--line-muted);
+      }
+
+      .raid-result-stepper input {
+        inline-size: 100%;
+        border-inline: 1px solid var(--line-muted);
+        appearance: textfield;
+      }
+
+      .raid-result-stepper input::-webkit-inner-spin-button,
+      .raid-result-stepper input::-webkit-outer-spin-button {
+        appearance: none;
+      }
+
+      .raid-result-stepper button:focus-visible,
+      .raid-result-stepper input:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: 2px;
+      }
+
+      .route-schedule-dialog,
+      .buyout-dialog {
+        inline-size: min(900px, calc(100vw - (2 * var(--space-xl))));
+        max-block-size: min(760px, calc(100vh - (2 * var(--space-xl))));
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--surface);
+        color: var(--label);
+      }
+
+      .route-schedule-dialog::backdrop,
+      .buyout-dialog::backdrop {
+        background: rgb(0 0 0 / 72%);
+      }
+
+      .route-schedule-dialog > header,
+      .buyout-dialog > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-m);
+        padding: var(--space-m);
+        border-block-end: 1px solid var(--line-muted);
+      }
+
+      .route-schedule-dialog h2,
+      .buyout-dialog h2 {
+        margin: 0;
+        font-size: var(--font-size-heading);
+      }
+
+      .route-schedule-dialog header strong {
+        display: block;
+        margin-block-start: var(--space-xxs);
+        color: var(--document-frame);
+        font-size: var(--font-size-label);
+      }
+
+      .route-schedule-dialog header button,
+      .buyout-dialog header button {
+        padding: var(--space-xs) var(--space-s);
+        border: 1px solid var(--line-muted);
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      [data-route-schedule-content],
+      [data-buyout-content] {
+        max-block-size: calc(100vh - 10rem);
+        padding: 0 var(--space-m);
+        overflow: auto;
+      }
+
+      .schedule-plan-actions,
+      .schedule-immediate,
+      .buyout-section {
+        padding-block: var(--space-m);
+        border-block-end: 1px solid var(--line-muted);
+      }
+
+      .schedule-estimate-note {
+        margin: 0;
+        padding-block: var(--space-m);
+        border-block-end: 1px solid var(--line-muted);
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
+      .schedule-plan-actions h3,
+      .schedule-immediate h3,
+      .buyout-section h3 {
+        margin: 0 0 var(--space-s);
+        font-size: var(--font-size-label);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .schedule-plan-actions h4,
+      .schedule-day-column h4,
+      .buyout-section h4 {
+        margin: 0 0 var(--space-xs);
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .schedule-plan-actions ul,
+      .schedule-immediate ul,
+      .schedule-day-column ul,
+      .buyout-section ul {
+        display: grid;
+        gap: var(--space-xs);
+        margin: 0;
+        padding-inline-start: var(--space-l);
+      }
+
+      .schedule-plan-actions li,
+      .schedule-immediate li,
+      .schedule-day-column li,
+      .buyout-section li,
+      .buyout-section p {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
+      .schedule-day-column li strong,
+      .schedule-day-column li span {
+        display: block;
+      }
+
+      .schedule-day-column li strong {
+        color: var(--label);
+      }
+
+      .schedule-day-column li span {
+        margin-block-start: var(--space-xxs);
+      }
+
+      .schedule-action-group + .schedule-action-group {
+        margin-block-start: var(--space-m);
+      }
+
+      .schedule-projection-day {
+        display: grid;
+        gap: var(--space-s);
+        padding-block: var(--space-m);
+        border-block-end: 1px solid var(--line-muted);
+      }
+
+      .schedule-projection-day h3,
+      .schedule-projection-day p,
+      .schedule-projection-day ul {
+        margin: 0;
+      }
+
+      .schedule-projection-day h3 {
+        font-size: var(--font-size-label);
+      }
+
+      .schedule-projection-day__columns {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: var(--space-l);
+      }
+
+      .schedule-day-column + .schedule-day-column {
+        padding-inline-start: var(--space-l);
+        border-inline-start: 1px solid var(--line-muted);
+      }
+
+      .buyout-section p {
+        margin: 0;
+      }
+
+      .buyout-section p + p,
+      .buyout-section p + ul,
+      .buyout-section ul + p {
+        margin-block-start: var(--space-s);
+      }
+
+      .section-heading,
+      .detail-content,
+      .primary-action {
+        border-block-end: 1px dashed var(--line-muted);
+      }
+
+      .reward-heading {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: var(--space-s);
+        padding: var(--space-s) var(--space-m);
+        border-block-end-style: solid;
+      }
+
+      .reward-heading h2 {
+        margin: 0;
+        overflow: hidden;
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.06em;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .reward-heading__actions {
+        display: flex;
+        gap: var(--space-xs);
+      }
+
+      .reward-heading__actions button,
+      .reward-page__trigger {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .reward-heading__actions button {
+        padding: var(--space-xs) var(--space-s);
+        border: 1px solid var(--line-muted);
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .reward-heading__actions button:hover,
+      .reward-heading__actions button:focus-visible {
+        border-color: var(--label-muted);
+        background: var(--line-muted);
+      }
+
+      .reward-heading__actions button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      .reward-content {
+        overflow: auto;
+        border-block-end: 0;
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
+        scrollbar-color: var(--line) var(--surface);
+        scrollbar-width: thin;
+      }
+
+      .reward-page + .reward-page {
+        border-block-start: 1px solid var(--line-muted);
+      }
+
+      .reward-page__trigger {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: var(--space-m);
+        inline-size: 100%;
+        padding: var(--space-s) var(--space-m);
+        text-align: start;
+      }
+
+      .reward-page__chevron {
+        display: block;
+        inline-size: 0.75em;
+        block-size: 0.75em;
+        color: var(--label-muted);
+        transform: rotate(0deg);
+        transform-origin: center;
+        transition: transform 120ms ease-out;
+      }
+
+      .reward-page__trigger[aria-expanded="true"] {
+        background: var(--line-muted);
+      }
+
+      .reward-page--complete .reward-page__trigger,
+      .reward-page--complete .reward-page__trigger[aria-expanded="true"] {
+        background: var(--reward-complete-background);
+      }
+
+      .reward-page__trigger[aria-expanded="true"] .reward-page__chevron {
+        transform: rotate(180deg);
+      }
+
+      .reward-page__label {
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .reward-page__redeemable {
+        color: var(--document-frame);
+        font-size: var(--font-size-caption);
+        letter-spacing: 0.04em;
+      }
+
+      .reward-page__count {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+      }
+
+      .reward-page__panel[hidden] {
+        display: none;
+      }
+
+      .reward-page__items {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .reward-item {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        border-block-start: 1px solid color-mix(in srgb, var(--line-muted) 68%, transparent);
+      }
+
+      .reward-item::after {
+        position: absolute;
+        z-index: 2;
+        inset-block-start: 50%;
+        inset-inline-end: var(--space-l);
+        inline-size: 0.55rem;
+        block-size: 1rem;
+        border-right: 0.15rem solid var(--document-frame);
+        border-bottom: 0.15rem solid var(--document-frame);
+        content: "";
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-62%) rotate(45deg);
+        transition: opacity 120ms ease-out;
+      }
+
+      .reward-item label {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-items: center;
+        padding-block: var(--space-s);
+        padding-inline: var(--space-m) var(--space-xl);
+        cursor: pointer;
+      }
+
+      .reward-item input {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .reward-item:has(input:focus-visible) {
+        outline: 1px solid var(--label);
+        outline-offset: -2px;
+      }
+
+      .reward-item__copy {
+        display: grid;
+        gap: var(--space-xxs);
+        min-inline-size: 0;
+      }
+
+      .reward-item__name,
+      .reward-item__requirements {
+        overflow-wrap: anywhere;
+      }
+
+      .reward-item__name {
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+      }
+
+      .reward-item__requirements {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-ui);
+      }
+
+      .reward-item--redeemable {
+        background: var(--reward-redeemable-background);
+      }
+
+      .reward-item:has(input:checked) {
+        background: var(--reward-complete-background);
+      }
+
+      .reward-item:has(input:checked)::after {
+        opacity: 0.78;
+      }
+
+      .reward-item:has(input:checked) .reward-item__name {
+        color: color-mix(in srgb, var(--label) 78%, var(--document-frame));
+      }
+
+      .reward-item:has(input:checked) .reward-item__requirements {
+        color: color-mix(in srgb, var(--label-muted) 72%, var(--document-frame));
+      }
+
+      .reward-crate {
+        display: grid;
+        gap: var(--space-xxs);
+        padding: var(--space-m);
+      }
+
+      .redemption-dialog {
+        inline-size: min(30rem, calc(100vw - (2 * var(--space-l))));
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--surface);
+        color: var(--label);
+        box-shadow: 0 1rem 3rem rgb(0 0 0 / 55%);
+      }
+
+      .redemption-dialog::backdrop {
+        background: rgb(4 7 9 / 78%);
+      }
+
+      .redemption-dialog__content {
+        display: grid;
+        gap: var(--space-m);
+        padding: var(--space-l);
+      }
+
+      .redemption-dialog h2,
+      .redemption-dialog p,
+      .redemption-dialog ul {
+        margin: 0;
+      }
+
+      .redemption-dialog h2 {
+        font-size: var(--font-size-heading);
+        line-height: var(--line-height-ui);
+      }
+
+      .redemption-dialog p,
+      .redemption-dialog li {
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-copy);
+      }
+
+      .redemption-dialog ul {
+        display: grid;
+        gap: var(--space-xs);
+        padding-inline-start: var(--space-l);
+      }
+
+      .redemption-dialog__actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: var(--space-s);
+      }
+
+      .redemption-dialog__actions button {
+        padding: var(--space-s) var(--space-m);
+        border: 1px solid var(--line-muted);
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .redemption-dialog__actions button:hover,
+      .redemption-dialog__actions button:focus-visible {
+        border-color: var(--label-muted);
+        background: var(--line-muted);
+      }
+
+      .redemption-dialog__actions [data-redemption-subtract] {
+        border-color: var(--document-frame);
+        color: var(--document-frame);
+      }
+
+      .document-strip {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        padding: var(--space-s) var(--space-m);
+        overflow: visible;
+        border-block-start: 1px solid var(--line-muted);
+        background: color-mix(in srgb, var(--surface-alt) 82%, transparent);
+      }
+
+      .document-strip__images {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-m);
+      }
+
+      .document-strip__item {
+        position: relative;
+        display: grid;
+        grid-template-rows: auto auto auto;
+        gap: var(--space-xs);
+        inline-size: var(--document-strip-image-size);
+        margin: 0;
+      }
+
+      .document-strip__title {
+        display: grid;
+        place-items: center;
+        min-block-size: calc(var(--font-size-label) * var(--line-height-ui));
+        color: var(--label);
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+
+      .document-strip__image-frame {
+        border: 1px solid var(--document-frame);
+        background: color-mix(in srgb, var(--document-frame) 10%, var(--surface));
+      }
+
+      .document-strip__item--classified .document-strip__image-frame {
+        border-color: var(--classified-frame);
+        background: color-mix(in srgb, var(--classified-frame) 18%, var(--surface));
+      }
+
+      .document-strip__image-frame img {
+        display: block;
+        inline-size: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+      }
+
+      .document-strip__item:hover .document-strip__image-frame,
+      .document-strip__item:focus-within .document-strip__image-frame {
+        border-color: color-mix(in srgb, var(--document-frame) 55%, var(--label));
+      }
+
+      .document-strip__item--classified:hover .document-strip__image-frame,
+      .document-strip__item--classified:focus-within .document-strip__image-frame {
+        border-color: color-mix(in srgb, var(--classified-frame) 60%, var(--label));
+      }
+
+      .document-strip__quantity {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 0;
+        inline-size: 100%;
+        border: 1px solid var(--line-muted);
+        background: var(--surface-alt);
+      }
+
+      .document-strip__quantity button,
+      .document-strip__quantity input {
+        min-inline-size: 0;
+        block-size: 1.618em;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        text-align: center;
+      }
+
+      .document-strip__quantity button {
+        inline-size: 1.618em;
+        cursor: pointer;
+      }
+
+      .document-strip__quantity button:hover {
+        border-color: var(--label-muted);
+        background: var(--line-muted);
+      }
+
+      .document-strip__quantity button:focus-visible,
+      .document-strip__quantity input:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: 2px;
+      }
+
+      .document-strip__quantity input {
+        inline-size: 100%;
+        border-inline: 1px solid var(--line-muted);
+        appearance: textfield;
+      }
+
+      .document-strip__quantity input::-webkit-inner-spin-button,
+      .document-strip__quantity input::-webkit-outer-spin-button {
+        margin: 0;
+        appearance: none;
+      }
+
+      .document-strip__tooltip {
+        position: absolute;
+        z-index: 10;
+        inset-block-end: calc(100% + var(--space-s));
+        inset-inline-start: 50%;
+        inline-size: clamp(220px, 18vw, 300px);
+        padding: var(--space-s);
+        border: 1px solid var(--tooltip-line);
+        background: var(--tooltip-surface);
+        color: var(--label-muted);
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, var(--space-xs));
+        transition:
+          opacity 120ms ease-out,
+          transform 120ms ease-out;
+      }
+
+      .document-strip__tooltip strong {
+        display: block;
+        margin-block-end: var(--space-xs);
+        color: var(--label);
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-ui);
+      }
+
+      .document-strip__tooltip p {
+        margin: 0;
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-body);
+      }
+
+      .document-strip__tooltip ul {
+        margin: var(--space-s) 0 0;
+        padding-block-start: var(--space-s);
+        padding-inline-start: var(--space-m);
+        border-block-start: 1px solid var(--line-muted);
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-ui);
+      }
+
+      .document-strip__tooltip li + li {
+        margin-block-start: var(--space-xxs);
+      }
+
+      .document-strip__item:hover .document-strip__tooltip,
+      .document-strip__item:focus-within .document-strip__tooltip {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      .wireframe-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-s);
+        max-inline-size: 76rem;
+        margin-inline: auto;
+        padding: var(--space-s) var(--space-m);
+        border-block-start: 1px solid var(--line-muted);
+        text-align: center;
+      }
+
+      .wireframe-footer__disclaimer {
+        margin: 0;
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
+      .wireframe-footer__separator {
+        flex: 0 0 1px;
+        align-self: stretch;
+        min-block-size: 1em;
+        background: var(--line-muted);
+      }
+
+      .wireframe-footer__reset {
+        flex: 0 0 auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--document-frame);
+        font: inherit;
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        cursor: pointer;
+      }
+
+      .wireframe-footer__reset:hover {
+        color: var(--label);
+      }
+
+      .wireframe-footer__reset:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: var(--space-xxs);
+      }
+
+      @media (max-width: 1180px) {
+        :root {
+          --canvas-width: calc(100vw - (2 * var(--space-m)));
+          --canvas-height: auto;
+          --canvas-min-width: 320px;
+          --canvas-min-height: 0px;
+          --header-height: auto;
+          --workspace-height: auto;
+        }
+
+        html,
+        body {
+          min-width: 320px;
+          min-height: 0;
+        }
+
+        .wireframe-shell {
+          grid-template-rows: auto auto auto;
+          inline-size: var(--canvas-width);
+          min-inline-size: 0;
+          block-size: auto;
+          min-block-size: 0;
+          margin: var(--space-m) auto;
+        }
+
+        .wireframe-header {
+          grid-template-columns: minmax(0, 1fr);
+          row-gap: var(--grid-gap);
+        }
+
+        .wireframe-workspace {
+          grid-template-areas:
+            "focus"
+            "reward";
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto;
+          row-gap: var(--grid-gap);
+        }
+
+        .primary-navigation-slot {
+          grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        }
+
+        .navigation-progress {
+          grid-template-columns: minmax(0, 1fr);
+          align-items: start;
+        }
+
+        .navigation-progress__value {
+          justify-self: end;
+        }
+
+        .navigation-progress progress {
+          grid-column: 1;
+        }
+
+        .route-profile-toggle {
+          grid-column: 1 / -1;
+        }
+
+        .account-slot {
+          justify-content: space-between;
+        }
+
+        .reward-rail,
+        .focus-stage {
+          grid-template-rows: auto;
+        }
+
+        .focus-stage {
+          grid-template-rows: auto auto auto;
+        }
+
+        .focus-heading {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .focus-heading__actions {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .focus-heading__actions button {
+          white-space: normal;
+        }
+
+        .focus-content {
+          overflow: visible;
+        }
+
+        .focus-documents {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: var(--space-m);
+        }
+
+        .reward-content {
+          overflow: visible;
+        }
+
+        .document-strip {
+          justify-items: start;
+          max-inline-size: 100%;
+          overflow-x: auto;
+        }
+
+        .document-strip__images {
+          justify-content: flex-start;
+          min-inline-size: max-content;
+        }
+
+        .schedule-projection-day__columns {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .schedule-day-column + .schedule-day-column {
+          padding-block-start: var(--space-m);
+          padding-inline-start: 0;
+          border-block-start: 1px solid var(--line-muted);
+          border-inline-start: 0;
+        }
+
+        .wireframe-footer {
+          flex-direction: column;
+          gap: var(--space-xs);
+        }
+
+        .wireframe-footer__separator {
+          align-self: auto;
+          inline-size: min(12rem, 100%);
+          min-block-size: 0;
+          block-size: 1px;
+        }
+      }
+
+    </style>
   </head>
   <body>
-    <div id="app" aria-busy="true"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <div class="wireframe-shell">
+      <header class="wireframe-header" aria-label="Header">
+        <section class="slot header-slot season-slot" aria-label="Season identity">
+          <span class="season-number" aria-label="Season 1">S1</span>
+          <div class="season-details">
+            <strong class="season-name" data-season-name>…</strong>
+            <time class="season-timer" data-season-timer>…</time>
+          </div>
+        </section>
+        <section class="slot header-slot primary-navigation-slot" aria-label="Primary navigation">
+          <div class="navigation-progress">
+            <div class="navigation-progress__label-line">
+              <span class="navigation-progress__label" data-document-progress-label>…</span>
+              <button class="navigation-progress__buyout" type="button" data-buyout-link hidden></button>
+            </div>
+            <strong class="navigation-progress__value">
+              <span data-document-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-document-progress-total>…</span>
+            </strong>
+            <progress data-document-progress value="0" max="1"></progress>
+          </div>
+          <div class="navigation-progress">
+            <span class="navigation-progress__label" data-reward-progress-label>…</span>
+            <strong class="navigation-progress__value">
+              <span data-reward-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-reward-progress-total>…</span>
+            </strong>
+            <progress data-reward-progress value="0" max="1"></progress>
+          </div>
+          <fieldset class="route-profile-toggle">
+            <legend class="visually-hidden" data-route-profile-label>…</legend>
+            <label class="route-profile-option">
+              <input type="radio" name="route-profile" value="fastest" />
+              <span data-fastest-label>…</span>
+            </label>
+            <label class="route-profile-option">
+              <input type="radio" name="route-profile" value="safest" checked />
+              <span data-safest-label>…</span>
+            </label>
+          </fieldset>
+        </section>
+        <section class="slot header-slot account-slot" aria-label="Back and account utilities">
+          <div class="header-select-shell mode-select-shell">
+            <select class="header-select mode-select" data-mode-select></select>
+          </div>
+          <div class="header-select-shell language-select-shell">
+            <select class="header-select language-select" data-language-select></select>
+          </div>
+        </section>
+      </header>
+
+      <main class="wireframe-workspace" aria-label="Battle Pass workspace">
+        <section class="region reward-rail" aria-labelledby="reward-rail-heading">
+          <div class="slot section-heading reward-heading">
+            <h2 id="reward-rail-heading" data-reward-heading></h2>
+            <div class="reward-heading__actions">
+              <button type="button" data-reward-claim-all></button>
+              <button type="button" data-reward-clear-all></button>
+            </div>
+          </div>
+          <div class="slot detail-content reward-content" data-reward-pages></div>
+        </section>
+
+        <section class="region focus-stage" aria-labelledby="focus-stage-heading">
+          <div class="slot section-heading focus-heading">
+            <div>
+              <span class="focus-heading__eyebrow" data-focus-eyebrow></span>
+              <h2 id="focus-stage-heading" data-focus-heading></h2>
+            </div>
+            <div class="focus-heading__actions">
+              <button type="button" data-view-route-schedule disabled></button>
+              <button type="button" data-commit-raid disabled></button>
+            </div>
+          </div>
+          <div class="slot primary-content focus-content" data-focus-content aria-live="polite">
+            <p class="focus-loading">…</p>
+          </div>
+          <section class="document-strip" aria-label="Document strip">
+            <div class="document-strip__images">
+            <figure class="document-strip__item" data-document-id="documents.financial.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/financial.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.pmc.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/pmc.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.project.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/project.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.blueprints.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/blueprints.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.test.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/test.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.user.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/user.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.medical.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/medical.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item" data-document-id="documents.technical.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/technical.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            <figure class="document-strip__item document-strip__item--classified" data-document-id="documents.classified.name">
+              <figcaption class="document-strip__title" data-document-title></figcaption>
+              <div class="document-strip__image-frame"><img src="./assets/documents/classified.png" alt="" /></div>
+              <div class="document-strip__quantity">
+                <button type="button" data-document-decrement>−</button>
+                <input type="number" min="0" step="1" value="0" data-document-quantity />
+                <button type="button" data-document-increment>+</button>
+              </div>
+              <div class="document-strip__tooltip" role="tooltip">
+                <strong data-document-tooltip-name></strong>
+                <p data-document-tooltip-description></p>
+              </div>
+            </figure>
+            </div>
+          </section>
+        </section>
+      </main>
+      <footer class="wireframe-footer">
+        <p class="wireframe-footer__disclaimer" data-asset-disclaimer></p>
+        <span class="wireframe-footer__separator" aria-hidden="true"></span>
+        <button class="wireframe-footer__reset" type="button" data-reset-cookie-state></button>
+      </footer>
+    </div>
+    <dialog class="route-schedule-dialog" data-route-schedule-dialog aria-labelledby="route-schedule-title">
+      <header>
+        <div>
+          <h2 id="route-schedule-title"></h2>
+          <strong data-route-schedule-estimate></strong>
+        </div>
+        <button type="button" data-close-route-schedule></button>
+      </header>
+      <div data-route-schedule-content></div>
+    </dialog>
+    <dialog class="buyout-dialog" data-buyout-dialog aria-labelledby="buyout-title">
+      <header>
+        <h2 id="buyout-title"></h2>
+        <button type="button" data-close-buyout></button>
+      </header>
+      <div data-buyout-content></div>
+    </dialog>
+    <script type="module">
+      import SlimSelect from 'slim-select';
+      import 'slim-select/styles';
+      import englishFlagUrl from 'flag-icons/flags/4x3/gb.svg?no-inline';
+      import { loadCatalogs } from './src/catalogs.ts';
+      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatNumber } from './src/localization.ts';
+      import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from './src/persistence.ts';
+      import { countPageRedeemableRewards, planRewardRedemption } from './src/redeemable.ts';
+      import { getClassifiedDocumentMinimum, reduceState } from './src/state.ts';
+
+      const initialize = async () => {
+      const catalogs = await loadCatalogs();
+      let state = restoreState(browserCookieAdapter, catalogs);
+      const localizer = createLocalizer(catalogs.localization);
+      const name = document.querySelector('[data-season-name]');
+      const timer = document.querySelector('[data-season-timer]');
+      const modeSelect = document.querySelector('[data-mode-select]');
+      const resetCookieState = document.querySelector('[data-reset-cookie-state]');
+      const languageSelect = document.querySelector('[data-language-select]');
+      const buyoutLink = document.querySelector('[data-buyout-link]');
+      const focusEyebrow = document.querySelector('[data-focus-eyebrow]');
+      const focusHeading = document.querySelector('[data-focus-heading]');
+      const focusContent = document.querySelector('[data-focus-content]');
+      const viewRouteScheduleButton = document.querySelector('[data-view-route-schedule]');
+      const commitRaidButton = document.querySelector('[data-commit-raid]');
+      const routeScheduleDialog = document.querySelector('[data-route-schedule-dialog]');
+      const routeScheduleTitle = document.querySelector('#route-schedule-title');
+      const routeScheduleEstimate = document.querySelector('[data-route-schedule-estimate]');
+      const routeScheduleContent = document.querySelector('[data-route-schedule-content]');
+      const closeRouteScheduleButton = document.querySelector('[data-close-route-schedule]');
+      const buyoutDialog = document.querySelector('[data-buyout-dialog]');
+      const buyoutTitle = document.querySelector('#buyout-title');
+      const buyoutContent = document.querySelector('[data-buyout-content]');
+      const closeBuyoutButton = document.querySelector('[data-close-buyout]');
+      const endsAt = catalogs.battlePass.endsAt;
+      const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
+      const documentTotal = rewards.reduce(
+        (total, reward) => total + reward.requirements.reduce((rewardTotal, requirement) => rewardTotal + requirement.quantity, 0),
+        0,
+      );
+      const rewardTotal = rewards.length;
+      const getClaimedDocumentQuantities = () => {
+        const claimedRewards = new Set(state.claimedRewardIds);
+        const quantities = {};
+        rewards.forEach((reward) => {
+          if (!claimedRewards.has(reward.id)) return;
+          reward.requirements.forEach(({ documentId, quantity }) => {
+            quantities[documentId] = (quantities[documentId] ?? 0) + quantity;
+          });
+        });
+        return quantities;
+      };
+
+      name.textContent = localizer.text(catalogs.battlePass.id);
+      timer.dateTime = new Date(endsAt * 1000).toISOString();
+      document.querySelector('[data-asset-disclaimer]').textContent = localizer.text('footer.disclaimer');
+      resetCookieState.textContent = localizer.text('ui.resetCookieStorage');
+      resetCookieState.addEventListener('click', () => {
+        const resetState = resetPersistedState(
+          browserCookieAdapter,
+          catalogs,
+          window.confirm(localizer.text('ui.resetConfirm')),
+        );
+        if (resetState) window.location.reload();
+      });
+
+      const configureProgress = ({ labelId, labelSelector, currentSelector, totalSelector, progressSelector, total }) => {
+        const label = localizer.text(labelId);
+        const progress = document.querySelector(progressSelector);
+        const current = document.querySelector(currentSelector);
+        document.querySelector(labelSelector).textContent = label;
+        document.querySelector(totalSelector).textContent = formatNumber(total, localizer.locale);
+        progress.max = total;
+        progress.setAttribute('aria-label', label);
+        return (value) => {
+          const boundedValue = Math.min(total, Math.max(0, value));
+          current.textContent = formatNumber(boundedValue, localizer.locale);
+          progress.value = boundedValue;
+        };
+      };
+
+      const updateDocumentProgress = configureProgress({
+        labelId: 'battlePass.documents',
+        labelSelector: '[data-document-progress-label]',
+        currentSelector: '[data-document-progress-current]',
+        totalSelector: '[data-document-progress-total]',
+        progressSelector: '[data-document-progress]',
+        total: documentTotal,
+      });
+      const updateRewardProgress = configureProgress({
+        labelId: 'battlePass.rewards',
+        labelSelector: '[data-reward-progress-label]',
+        currentSelector: '[data-reward-progress-current]',
+        totalSelector: '[data-reward-progress-total]',
+        progressSelector: '[data-reward-progress]',
+        total: rewardTotal,
+      });
+
+      const refreshProgress = () => {
+        const claimedDocumentTotal = Object.values(getClaimedDocumentQuantities())
+          .reduce((total, quantity) => total + quantity, 0);
+        const ownedDocumentTotal = catalogs.documents.documents.reduce((total, documentRecord) => {
+          const quantity = documentRecord.kind === 'classified'
+            ? state.classifiedDocuments
+            : state.ownedDocuments[documentRecord.id] ?? 0;
+          return total + quantity;
+        }, 0);
+        updateDocumentProgress(claimedDocumentTotal + ownedDocumentTotal);
+        updateRewardProgress(state.claimedRewardIds.length);
+      };
+
+      let refreshRewardRail = () => {};
+      let refreshDocumentQuantities = () => {};
+      let refreshOptimization = () => {};
+      const dispatch = (action) => {
+        state = reduceState(state, action, catalogs);
+        try {
+          saveState(state, browserCookieAdapter);
+        } catch (error) {
+          console.error(error);
+        }
+        refreshProgress();
+        refreshRewardRail();
+        refreshDocumentQuantities();
+        refreshOptimization();
+      };
+
+      refreshProgress();
+
+      document.querySelector('[data-route-profile-label]').textContent = localizer.text('ui.routePreference');
+      document.querySelector('[data-fastest-label]').textContent = localizer.text('optimizer.fastest');
+      document.querySelector('[data-safest-label]').textContent = localizer.text('optimizer.safest');
+      document.querySelectorAll('input[name="route-profile"]').forEach((input) => {
+        input.checked = input.value === state.selectedProfile;
+        input.addEventListener('change', () => {
+          if (input.checked) dispatch({ type: 'set-profile', profile: input.value });
+        });
+      });
+
+      const rewardHeading = document.querySelector('[data-reward-heading]');
+      const claimAllButton = document.querySelector('[data-reward-claim-all]');
+      const clearAllButton = document.querySelector('[data-reward-clear-all]');
+      const rewardPages = document.querySelector('[data-reward-pages]');
+      const documentNames = Object.fromEntries(catalogs.documents.documents.map((documentRecord) => [documentRecord.id, localizer.text(documentRecord.id)]));
+      const documentAbbreviations = Object.fromEntries(Object.entries(documentNames).map(([documentId, documentName]) => [documentId, documentName.trim().split(/\s+/u)[0]]));
+      const redemptionDialog = document.createElement('dialog');
+      const redemptionContent = document.createElement('div');
+      const redemptionTitle = document.createElement('h2');
+      const redemptionMessage = document.createElement('p');
+      const redemptionDocuments = document.createElement('ul');
+      const redemptionActions = document.createElement('div');
+      const subtractDocumentsButton = document.createElement('button');
+      const redeemOnlyButton = document.createElement('button');
+      const cancelRedemptionButton = document.createElement('button');
+      const redemptionTitleId = 'reward-redemption-title';
+      let pendingRewardId;
+
+      redemptionDialog.className = 'redemption-dialog';
+      redemptionDialog.setAttribute('aria-labelledby', redemptionTitleId);
+      redemptionContent.className = 'redemption-dialog__content';
+      redemptionTitle.id = redemptionTitleId;
+      redemptionActions.className = 'redemption-dialog__actions';
+      subtractDocumentsButton.type = 'button';
+      subtractDocumentsButton.dataset.redemptionSubtract = '';
+      subtractDocumentsButton.textContent = localizer.text('battlePass.redeemAndSubtract');
+      redeemOnlyButton.type = 'button';
+      redeemOnlyButton.textContent = localizer.text('battlePass.redeemOnly');
+      cancelRedemptionButton.type = 'button';
+      cancelRedemptionButton.textContent = localizer.text('ui.cancel');
+      redemptionActions.append(cancelRedemptionButton, redeemOnlyButton, subtractDocumentsButton);
+      redemptionContent.append(redemptionTitle, redemptionMessage, redemptionDocuments, redemptionActions);
+      redemptionDialog.append(redemptionContent);
+      document.body.append(redemptionDialog);
+
+      const openRedemptionDialog = (reward, plan) => {
+        pendingRewardId = reward.id;
+        redemptionTitle.textContent = localizer.text('battlePass.redeemRewardTitle', { reward: localizer.text(reward.id) });
+        redemptionMessage.textContent = localizer.text('battlePass.subtractDocumentsPrompt');
+        redemptionDocuments.replaceChildren();
+        Object.entries(plan.regularDocuments).forEach(([documentId, quantity]) => {
+          const item = document.createElement('li');
+          item.textContent = `${documentNames[documentId]} (${formatNumber(quantity, localizer.locale)})`;
+          redemptionDocuments.append(item);
+        });
+        if (plan.classifiedDocuments > 0) {
+          const item = document.createElement('li');
+          item.textContent = `${localizer.text('battlePass.classifiedDocuments')} (${formatNumber(plan.classifiedDocuments, localizer.locale)})`;
+          redemptionDocuments.append(item);
+        }
+        redemptionDocuments.hidden = redemptionDocuments.childElementCount === 0;
+        redemptionDialog.showModal();
+        subtractDocumentsButton.focus({ preventScroll: true });
+      };
+
+      const closeRedemptionDialog = () => {
+        if (redemptionDialog.open) redemptionDialog.close();
+      };
+
+      subtractDocumentsButton.addEventListener('click', () => {
+        const rewardId = pendingRewardId;
+        closeRedemptionDialog();
+        if (rewardId) dispatch({ type: 'redeem-reward', rewardId });
+      });
+      redeemOnlyButton.addEventListener('click', () => {
+        const rewardId = pendingRewardId;
+        closeRedemptionDialog();
+        if (rewardId) dispatch({ type: 'claim-reward', rewardId, claimed: true });
+      });
+      cancelRedemptionButton.addEventListener('click', closeRedemptionDialog);
+      redemptionDialog.addEventListener('close', () => {
+        pendingRewardId = undefined;
+        refreshRewardRail();
+      });
+
+      const pageViews = catalogs.battlePass.pages.map((page) => {
+        const pageSection = document.createElement('section');
+        const trigger = document.createElement('button');
+        const pageLabel = document.createElement('span');
+        const redeemableCount = document.createElement('span');
+        const claimedCount = document.createElement('span');
+        const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const chevronPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const panel = document.createElement('div');
+        const itemList = document.createElement('ul');
+        const triggerId = `reward-page-trigger-${page.page}`;
+        const panelId = `reward-page-panel-${page.page}`;
+
+        pageSection.className = 'reward-page';
+        trigger.className = 'reward-page__trigger';
+        trigger.type = 'button';
+        trigger.id = triggerId;
+        trigger.setAttribute('aria-controls', panelId);
+        pageLabel.className = 'reward-page__label';
+        pageLabel.textContent = `${localizer.text('battlePass.page')} ${String(page.page).padStart(2, '0')}`;
+        redeemableCount.className = 'reward-page__redeemable';
+        pageLabel.append(' ', redeemableCount);
+        claimedCount.className = 'reward-page__count';
+        chevron.classList.add('reward-page__chevron');
+        chevron.setAttribute('viewBox', '0 0 12 8');
+        chevron.setAttribute('aria-hidden', 'true');
+        chevron.setAttribute('focusable', 'false');
+        chevronPath.setAttribute('d', 'M1 1.25 6 6.25 11 1.25');
+        chevronPath.setAttribute('fill', 'none');
+        chevronPath.setAttribute('stroke', 'currentColor');
+        chevronPath.setAttribute('stroke-width', '1.5');
+        chevronPath.setAttribute('stroke-linecap', 'square');
+        chevronPath.setAttribute('stroke-linejoin', 'miter');
+        chevron.append(chevronPath);
+        panel.className = 'reward-page__panel';
+        panel.id = panelId;
+        panel.setAttribute('role', 'region');
+        panel.setAttribute('aria-labelledby', triggerId);
+        itemList.className = 'reward-page__items';
+
+        const rewardInputs = page.rewards.map((reward) => {
+          const item = document.createElement('li');
+          const label = document.createElement('label');
+          const checkbox = document.createElement('input');
+          const copy = document.createElement('span');
+          const rewardName = document.createElement('span');
+          const requirements = document.createElement('span');
+          const fullName = localizer.text(reward.id);
+
+          item.className = 'reward-item';
+          checkbox.type = 'checkbox';
+          checkbox.dataset.rewardId = reward.id;
+          checkbox.setAttribute('aria-label', `${localizer.text('battlePass.claimReward')}: ${fullName}`);
+          copy.className = 'reward-item__copy';
+          rewardName.className = 'reward-item__name';
+          rewardName.textContent = fullName;
+          requirements.className = 'reward-item__requirements';
+          requirements.textContent = reward.requirements.map(({ documentId, quantity }) => `${documentAbbreviations[documentId]} (${formatNumber(quantity, localizer.locale)})`).join(' · ');
+          requirements.title = formatAccessibleRequirements(reward.requirements, documentNames, localizer.locale);
+          copy.append(rewardName, requirements);
+          label.append(checkbox, copy);
+          item.append(label);
+          itemList.append(item);
+
+          checkbox.addEventListener('change', () => {
+            if (!checkbox.checked) {
+              dispatch({ type: 'claim-reward', rewardId: reward.id, claimed: false });
+              return;
+            }
+            const plan = planRewardRedemption(reward, state.ownedDocuments, state.classifiedDocuments);
+            if (!plan.canRedeem) {
+              dispatch({ type: 'claim-reward', rewardId: reward.id, claimed: true });
+              return;
+            }
+            checkbox.checked = false;
+            openRedemptionDialog(reward, plan);
+          });
+          return { reward, rewardId: reward.id, checkbox, item };
+        });
+
+        trigger.append(pageLabel, claimedCount, chevron);
+        trigger.addEventListener('click', () => dispatch({ type: 'set-page', page: page.page }));
+        panel.append(itemList);
+        pageSection.append(trigger, panel);
+        rewardPages.append(pageSection);
+        return { page, pageSection, trigger, panel, redeemableCount, claimedCount, rewardInputs };
+      });
+
+      const crateReward = document.createElement('article');
+      const crateRewardName = document.createElement('strong');
+      const crateRewardRequirement = document.createElement('span');
+      crateReward.className = 'reward-crate';
+      crateRewardName.className = 'reward-item__name';
+      crateRewardName.textContent = localizer.text('battlePass.blackDivisionCrate');
+      crateRewardRequirement.className = 'reward-item__requirements';
+      crateRewardRequirement.textContent = localizer.text('ui.anyRegularDocuments', {
+        count: formatNumber(catalogs.optimizerRules.exchange.regularDocumentsPerBlackDivisionGearCrate, localizer.locale),
+      });
+      crateReward.append(crateRewardName, crateRewardRequirement);
+
+      rewardHeading.textContent = localizer.text('battlePass.rewards');
+      claimAllButton.textContent = localizer.text('battlePass.claimAll');
+      clearAllButton.textContent = localizer.text('battlePass.clearAll');
+      claimAllButton.addEventListener('click', () => dispatch({ type: 'claim-all', claimed: true }));
+      clearAllButton.addEventListener('click', () => dispatch({ type: 'claim-all', claimed: false }));
+
+      refreshRewardRail = () => {
+        const claimedRewards = new Set(state.claimedRewardIds);
+        const allRewardsClaimed = rewards.every((reward) => claimedRewards.has(reward.id));
+        rewardPages.replaceChildren(...(allRewardsClaimed ? [crateReward] : pageViews.map(({ pageSection }) => pageSection)));
+        claimAllButton.disabled = allRewardsClaimed;
+        pageViews.forEach(({ page, pageSection, trigger, panel, redeemableCount, claimedCount, rewardInputs }) => {
+          const selected = page.page === state.selectedPage;
+          const claimedOnPage = rewardInputs.filter(({ rewardId }) => claimedRewards.has(rewardId)).length;
+          const redeemableOnPage = countPageRedeemableRewards({
+            page,
+            claimedRewardIds: state.claimedRewardIds,
+            ownedDocuments: state.ownedDocuments,
+            classifiedDocuments: state.classifiedDocuments,
+          });
+          trigger.setAttribute('aria-expanded', String(selected));
+          pageSection.classList.toggle('reward-page--complete', claimedOnPage === rewardInputs.length);
+          panel.hidden = !selected;
+          redeemableCount.textContent = redeemableOnPage > 0
+            ? localizer.text('battlePass.redeemableCount', { count: formatNumber(redeemableOnPage, localizer.locale) })
+            : '';
+          claimedCount.textContent = `${formatNumber(claimedOnPage, localizer.locale)} / ${formatNumber(page.rewards.length, localizer.locale)}`;
+          rewardInputs.forEach(({ reward, rewardId, checkbox, item }) => {
+            const claimed = claimedRewards.has(rewardId);
+            const redeemable = !claimed && planRewardRedemption(
+              reward,
+              state.ownedDocuments,
+              state.classifiedDocuments,
+            ).canRedeem;
+            checkbox.checked = claimed;
+            item.classList.toggle('reward-item--redeemable', redeemable);
+          });
+        });
+      };
+      refreshRewardRail();
+
+      const documentsById = new Map(catalogs.documents.documents.map((document) => [document.id, document]));
+      const documentQuantityViews = [];
+      document.querySelectorAll('[data-document-id]').forEach((tile, index) => {
+        const documentId = tile.dataset.documentId;
+        const documentRecord = documentsById.get(documentId);
+        if (!documentRecord) throw new Error(`Unknown wireframe document: ${documentId}`);
+
+        const fullName = localizer.text(documentRecord.id);
+        const tooltip = tile.querySelector('.document-strip__tooltip');
+        const quantityInput = tile.querySelector('[data-document-quantity]');
+        const decrementButton = tile.querySelector('[data-document-decrement]');
+        const incrementButton = tile.querySelector('[data-document-increment]');
+        const tooltipId = `document-strip-tooltip-${index}`;
+        tooltip.id = tooltipId;
+        tile.querySelector('[data-document-title]').textContent = fullName.trim().split(/\s+/u)[0];
+        tile.querySelector('img').alt = localizer.text(documentRecord.imageAltId);
+        tile.querySelector('[data-document-tooltip-name]').textContent = fullName;
+        tile.querySelector('[data-document-tooltip-description]').textContent = localizer.text(documentRecord.descriptionId);
+
+        if (documentRecord.sourceLocationIds.length > 0) {
+          const locationList = document.createElement('ul');
+          documentRecord.sourceLocationIds.forEach((locationId) => {
+            const location = document.createElement('li');
+            location.textContent = localizer.text(locationId);
+            locationList.append(location);
+          });
+          tooltip.append(locationList);
+        }
+
+        const quantityLabel = localizer.text('ui.quantity');
+        quantityInput.setAttribute('aria-label', `${quantityLabel} ${fullName}`);
+        decrementButton.setAttribute('aria-label', `${quantityLabel} − ${fullName}`);
+        incrementButton.setAttribute('aria-label', `${quantityLabel} + ${fullName}`);
+        [quantityInput, decrementButton, incrementButton].forEach((control) => control.setAttribute('aria-describedby', tooltipId));
+
+        const readQuantity = () => documentRecord.kind === 'classified'
+          ? state.classifiedDocuments
+          : state.ownedDocuments[documentId] ?? 0;
+        const readMinimumQuantity = () => documentRecord.kind === 'classified'
+          ? getClassifiedDocumentMinimum(state.claimedRewardIds)
+          : 0;
+        const setQuantity = (quantity) => {
+          const normalizedQuantity = Math.max(readMinimumQuantity(), Math.trunc(quantity));
+          dispatch(documentRecord.kind === 'classified'
+            ? { type: 'set-classified-documents', quantity: normalizedQuantity }
+            : { type: 'set-owned-document', documentId, quantity: normalizedQuantity });
+          quantityInput.value = String(readQuantity());
+        };
+        quantityInput.min = String(readMinimumQuantity());
+        quantityInput.value = String(readQuantity());
+        decrementButton.addEventListener('click', () => setQuantity(Number(quantityInput.value) - 1));
+        incrementButton.addEventListener('click', () => setQuantity(Number(quantityInput.value) + 1));
+        quantityInput.addEventListener('change', () => {
+          const quantity = Number(quantityInput.value);
+          setQuantity(Number.isFinite(quantity) ? quantity : 0);
+        });
+        documentQuantityViews.push({ quantityInput, readMinimumQuantity, readQuantity });
+      });
+
+      refreshDocumentQuantities = () => {
+        documentQuantityViews.forEach(({ quantityInput, readMinimumQuantity, readQuantity }) => {
+          quantityInput.min = String(readMinimumQuantity());
+          quantityInput.value = String(readQuantity());
+        });
+      };
+      refreshDocumentQuantities();
+
+      const optimizerWorker = new Worker(new URL('./src/optimizer-worker.ts', import.meta.url), { type: 'module' });
+      let optimizerRequestId = 0;
+      let currentNextRaid;
+      let currentProfile;
+      let currentOptimizerResult;
+
+      const createElement = (tagName, className, textContent) => {
+        const element = document.createElement(tagName);
+        if (className) element.className = className;
+        if (textContent !== undefined) element.textContent = textContent;
+        return element;
+      };
+
+      const documentAssetUrl = (imagePath) => `${import.meta.env.BASE_URL}${imagePath.replace(/^\//u, '')}`;
+
+      const renderScheduleProjection = (profile) => {
+        routeScheduleTitle.textContent = localizer.text('ui.fullSchedule');
+        routeScheduleEstimate.textContent = localizer.text('ui.estimatedDays', {
+          count: formatNumber(profile.schedule.length, localizer.locale),
+        });
+        closeRouteScheduleButton.textContent = localizer.text('ui.close');
+        routeScheduleContent.replaceChildren();
+        routeScheduleContent.append(createElement('p', 'schedule-estimate-note', localizer.text('ui.planEstimate')));
+
+        if (profile.exchanges.length > 0 || profile.purchases.classifiedDocumentsPurchased > 0) {
+          const actions = createElement('section', 'schedule-plan-actions');
+          actions.append(createElement('h3', '', localizer.text('ui.planActions')));
+          if (profile.exchanges.length > 0) {
+            const group = createElement('div', 'schedule-action-group');
+            const list = document.createElement('ul');
+            group.append(createElement('h4', '', localizer.text('ui.regularExchanges')));
+            profile.exchanges.forEach((exchange) => {
+              const donors = Object.entries(exchange.donors)
+                .map(([documentId, quantity]) => `${localizer.text(documentId)} × ${formatNumber(quantity, localizer.locale)}`)
+                .join(' + ');
+              list.append(createElement('li', '', localizer.text('ui.exchangeInstruction', {
+                donors,
+                received: localizer.text(exchange.receivedDocumentId),
+              })));
+            });
+            group.append(list);
+            actions.append(group);
+          }
+          if (profile.purchases.classifiedDocumentsPurchased > 0) {
+            const group = createElement('div', 'schedule-action-group');
+            const summary = createElement('p', '', localizer.text('ui.purchaseSummary', {
+              count: formatNumber(profile.purchases.classifiedDocumentsPurchased, localizer.locale),
+              tarCoins: formatNumber(profile.purchases.tarCoinsSpent, localizer.locale),
+            }));
+            const list = document.createElement('ul');
+            group.append(createElement('h4', '', localizer.text('ui.classifiedPurchases')), summary);
+            profile.purchases.bundleCounts.forEach((count, index) => {
+              if (count === 0) return;
+              const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
+              list.append(createElement('li', '', localizer.text('ui.classifiedBundleInstruction', {
+                documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
+                count: formatNumber(count, localizer.locale),
+              })));
+            });
+            group.append(list);
+            actions.append(group);
+          }
+          routeScheduleContent.append(actions);
+        }
+
+        if (profile.projectedImmediateRewardIds.length > 0) {
+          const immediate = createElement('section', 'schedule-immediate');
+          const list = document.createElement('ul');
+          immediate.append(createElement('h3', '', localizer.text('ui.rewardsAvailableNow')));
+          profile.projectedImmediateRewardIds.forEach((rewardId) => list.append(createElement('li', '', localizer.text(rewardId))));
+          immediate.append(list);
+          routeScheduleContent.append(immediate);
+        }
+
+        profile.schedule.forEach((day) => {
+          const daySection = createElement('section', 'schedule-projection-day');
+          const columns = createElement('div', 'schedule-projection-day__columns');
+          const raids = createElement('section', 'schedule-day-column schedule-day-column--raids');
+          const raidList = document.createElement('ul');
+          const rewardClaims = createElement('section', 'schedule-day-column schedule-day-column--rewards');
+          const rewardList = document.createElement('ul');
+          daySection.append(createElement('h3', '', localizer.text('ui.scheduleDay', {
+            day: formatNumber(day.day, localizer.locale),
+            count: formatNumber(day.documentQuantity, localizer.locale),
+          })));
+          raids.append(createElement('h4', '', localizer.text('ui.raids')));
+          day.locations.forEach((location) => {
+            const targets = location.documents
+              .map((assignment) => `${localizer.text(assignment.documentId)} × ${formatNumber(assignment.quantity, localizer.locale)}`)
+              .join(' · ');
+            const item = document.createElement('li');
+            item.append(
+              createElement('strong', '', localizer.text('ui.raidLocationSummary', {
+                location: localizer.text(location.locationId),
+                difficulty: localizer.text(location.difficultyId),
+                minutes: formatNumber(location.maxRaidTimeMin, localizer.locale),
+              })),
+              createElement('span', '', targets),
+            );
+            raidList.append(item);
+          });
+          raids.append(raidList);
+          rewardClaims.append(createElement('h4', '', localizer.text('ui.rewardsToRedeem')));
+          day.rewardIdsClaimed.forEach((rewardId) => rewardList.append(createElement('li', '', localizer.text(rewardId))));
+          if (rewardList.childElementCount > 0) rewardClaims.append(rewardList);
+          else rewardClaims.append(createElement('p', '', localizer.text('ui.noRewardsToRedeem')));
+          columns.append(raids, rewardClaims);
+          daySection.append(columns);
+          routeScheduleContent.append(daySection);
+        });
+      };
+
+      const renderBuyout = (result) => {
+        const estimate = result.buyout;
+        const localEstimate = estimate.localEstimate;
+        buyoutTitle.textContent = localizer.text('ui.buyout');
+        closeBuyoutButton.textContent = localizer.text('ui.close');
+        buyoutContent.replaceChildren();
+
+        const funding = createElement('section', 'buyout-section');
+        funding.append(
+          createElement('h3', '', localizer.text('ui.buyoutFundingHeading')),
+          createElement('p', '', localizer.text('ui.buyoutGrossTarCoins', {
+            count: formatNumber(estimate.grossTarCoinsSpent, localizer.locale),
+          })),
+          createElement('p', '', localizer.text('ui.additionalTarCoins', {
+            count: formatNumber(estimate.minimumAdditionalTarCoins, localizer.locale),
+          })),
+          createElement('p', '', localizer.text('ui.buyoutFunding', {
+            starting: formatNumber(estimate.startingTarCoinsUsed, localizer.locale),
+            earned: formatNumber(estimate.earnedTarCoinsUsed, localizer.locale),
+          })),
+        );
+        if (localEstimate) {
+          funding.append(createElement('p', '', localizer.text('ui.fromEstimate', {
+            price: localEstimate.costMinor > 0 ? localEstimate.display : localizer.text('ui.zeroLocalPrice'),
+          })));
+        } else {
+          funding.append(createElement('p', '', localizer.text('ui.localPriceUnavailable')));
+        }
+        buyoutContent.append(funding);
+
+        const classified = createElement('section', 'buyout-section');
+        const classifiedList = document.createElement('ul');
+        classified.append(
+          createElement('h3', '', localizer.text('ui.classifiedBundles')),
+          createElement('p', '', localizer.text('ui.buyoutClassified', {
+            purchased: formatNumber(estimate.classifiedDocumentsPurchased, localizer.locale),
+            excess: formatNumber(estimate.excessClassifiedDocuments, localizer.locale),
+          })),
+        );
+        estimate.bundleCounts.forEach((count, index) => {
+          if (count === 0) return;
+          const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
+          classifiedList.append(createElement('li', '', localizer.text('ui.classifiedBundleInstruction', {
+            documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
+            count: formatNumber(count, localizer.locale),
+          })));
+        });
+        if (classifiedList.childElementCount > 0) classified.append(classifiedList);
+        else classified.append(createElement('p', '', localizer.text('ui.noBundlesRequired')));
+        buyoutContent.append(classified);
+
+        const packages = createElement('section', 'buyout-section');
+        const packageList = document.createElement('ul');
+        packages.append(createElement('h3', '', localizer.text('ui.tarCoinPackages')));
+        localEstimate?.packageCounts.forEach((count, index) => {
+          if (count === 0) return;
+          const bundle = catalogs.optimizerRules.tarCoinBundles[index];
+          const price = localizer.price(bundle.localPriceId);
+          packageList.append(createElement('li', '', localizer.text('ui.tarCoinPackageInstruction', {
+            tarCoins: formatNumber(bundle.tarCoins, localizer.locale),
+            count: formatNumber(count, localizer.locale),
+            price: price?.display ?? localizer.text('ui.localPriceUnavailable'),
+          })));
+        });
+        if (packageList.childElementCount > 0 && localEstimate) {
+          packages.append(
+            packageList,
+            createElement('p', '', localizer.text('ui.tarCoinPackageSummary', {
+              purchased: formatNumber(localEstimate.tarCoinsPurchased, localizer.locale),
+              excess: formatNumber(localEstimate.excessTarCoins, localizer.locale),
+            })),
+          );
+        } else if (estimate.minimumAdditionalTarCoins === 0) {
+          packages.append(createElement('p', '', localizer.text('ui.noTarCoinPackagesRequired')));
+        } else {
+          packages.append(createElement('p', '', localizer.text('ui.localPriceUnavailable')));
+        }
+        buyoutContent.append(packages);
+      };
+
+      const refreshBuyoutLink = (result) => {
+        currentOptimizerResult = result;
+        if (result.goal !== 'all-unclaimed-rewards') {
+          buyoutLink.hidden = true;
+          return;
+        }
+        const estimate = result.buyout.localEstimate;
+        const label = estimate
+          ? localizer.text('ui.approximateBuyoutPrice', {
+              price: estimate.costMinor > 0 ? estimate.display : localizer.text('ui.zeroLocalPrice'),
+            })
+          : localizer.text('ui.buyoutLink');
+        buyoutLink.hidden = false;
+        buyoutLink.textContent = label;
+        buyoutLink.title = localizer.text('ui.buyout');
+        buyoutLink.setAttribute('aria-label', localizer.text('ui.openBuyoutEstimate', { price: label }));
+      };
+
+      const renderRaidDocuments = (nextRaid) => {
+        const instruction = createElement('p', 'focus-instruction', localizer.text('ui.enterRaidResult'));
+        const documentGrid = createElement('div', 'focus-documents');
+        nextRaid.documents.forEach((recommendation) => {
+          const documentRecord = documentsById.get(recommendation.documentId);
+          if (!documentRecord) return;
+          const isOptional = recommendation.role === 'optional';
+          const figure = createElement('figure', `focus-document${isOptional ? ' focus-document--optional' : ''}`);
+          figure.dataset.focusDocument = recommendation.documentId;
+          figure.dataset.documentRole = recommendation.role;
+          const statusId = recommendation.role === 'priority'
+            ? 'ui.priorityDocument'
+            : recommendation.role === 'stockpile' ? 'ui.stockpileDocument' : 'ui.optionalDocument';
+          const status = createElement('span', 'focus-document__status', localizer.text(statusId));
+          const imageFrame = createElement('div', 'focus-document__image-frame');
+          const image = document.createElement('img');
+          image.src = documentAssetUrl(documentRecord.imagePath);
+          image.alt = localizer.text(documentRecord.imageAltId);
+          imageFrame.append(image);
+          const caption = document.createElement('figcaption');
+          caption.append(createElement('strong', '', documentAbbreviations[documentRecord.id]));
+          const stepper = createElement('div', 'raid-result-stepper');
+          const decrement = createElement('button', '', '−');
+          const input = document.createElement('input');
+          const increment = createElement('button', '', '+');
+          decrement.type = 'button';
+          increment.type = 'button';
+          input.type = 'number';
+          input.min = '0';
+          input.step = '1';
+          input.value = '0';
+          input.dataset.raidResult = recommendation.documentId;
+          input.setAttribute('aria-label', `${localizer.text('ui.raidResult')}: ${localizer.text(documentRecord.id)}`);
+          decrement.setAttribute('aria-label', `${localizer.text('ui.raidResult')} − ${localizer.text(documentRecord.id)}`);
+          increment.setAttribute('aria-label', `${localizer.text('ui.raidResult')} + ${localizer.text(documentRecord.id)}`);
+          const updateDraft = (quantity) => {
+            input.value = String(Math.max(0, Math.trunc(quantity)));
+            input.setCustomValidity('');
+          };
+          decrement.addEventListener('click', () => updateDraft(Number(input.value) - 1));
+          increment.addEventListener('click', () => updateDraft(Number(input.value) + 1));
+          input.addEventListener('input', () => input.setCustomValidity(''));
+          input.addEventListener('change', () => {
+            const quantity = Number(input.value);
+            if (Number.isInteger(quantity) && quantity >= 0) updateDraft(quantity);
+          });
+          stepper.append(decrement, input, increment);
+          figure.append(status, imageFrame, caption, stepper);
+          documentGrid.append(figure);
+        });
+        focusContent.replaceChildren(instruction, documentGrid);
+      };
+
+      const renderRouteDetails = (profile, result) => {
+        currentNextRaid = profile.nextRaid;
+        currentProfile = profile;
+        currentOptimizerResult = result;
+        refreshBuyoutLink(result);
+        viewRouteScheduleButton.textContent = localizer.text('ui.viewFullSchedule');
+        viewRouteScheduleButton.disabled = !(
+          profile.schedule.length > 0
+          || profile.projectedImmediateRewardIds.length > 0
+          || profile.exchanges.length > 0
+          || profile.purchases.classifiedDocumentsPurchased > 0
+        );
+        commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
+        commitRaidButton.disabled = true;
+
+        if (!profile.route.available) {
+          focusEyebrow.textContent = localizer.text('ui.nextRaid');
+          focusHeading.textContent = localizer.text('optimizer.noRoute');
+          focusContent.replaceChildren(createElement('p', 'focus-message', localizer.text('optimizer.noRoute')));
+          return;
+        }
+
+        if (!profile.nextRaid) {
+          focusEyebrow.textContent = localizer.text('ui.nextRaid');
+          focusHeading.textContent = localizer.text('ui.readyNow');
+          focusContent.replaceChildren(createElement('p', 'focus-message', localizer.text('ui.noFarmingNeeded')));
+          return;
+        }
+
+        const nextRaid = profile.nextRaid;
+        focusEyebrow.textContent = localizer.text(nextRaid.purpose === 'crate-stockpile'
+          ? 'ui.crateStockpileRaid'
+          : 'ui.nextRaid');
+        focusHeading.textContent = localizer.text('ui.raidLocationSummary', {
+          location: localizer.text(nextRaid.locationId),
+          difficulty: localizer.text(nextRaid.difficultyId),
+          minutes: formatNumber(nextRaid.maxRaidTimeMin, localizer.locale),
+        });
+        renderRaidDocuments(nextRaid);
+        commitRaidButton.disabled = false;
+      };
+
+      const showOptimizerLoading = () => {
+        focusEyebrow.textContent = localizer.text('ui.nextRaid');
+        focusHeading.textContent = localizer.text('ui.nextRaid');
+        focusContent.replaceChildren(createElement('p', 'focus-loading', '…'));
+        viewRouteScheduleButton.textContent = localizer.text('ui.viewFullSchedule');
+        viewRouteScheduleButton.disabled = true;
+        commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
+        commitRaidButton.disabled = true;
+        buyoutLink.hidden = true;
+        currentNextRaid = undefined;
+        currentProfile = undefined;
+        currentOptimizerResult = undefined;
+      };
+
+      refreshOptimization = () => {
+        const requestId = ++optimizerRequestId;
+        showOptimizerLoading();
+        optimizerWorker.postMessage({
+          requestId,
+          input: {
+            catalogs,
+            claimedRewardIds: state.claimedRewardIds,
+            ownedDocuments: state.ownedDocuments,
+            classifiedDocuments: state.classifiedDocuments,
+            tarCoins: state.tarCoins,
+            spendTarCoinsOnClassifiedDocuments: state.spendTarCoinsOnClassifiedDocuments,
+            mode: state.mode,
+            locale: state.locale,
+            crateCount: state.crateCount,
+          },
+        });
+      };
+
+      optimizerWorker.addEventListener('message', ({ data }) => {
+        if (data.requestId !== optimizerRequestId) return;
+        if (data.error) {
+          focusEyebrow.textContent = localizer.text('ui.nextRaid');
+          focusHeading.textContent = localizer.text('optimizer.noRoute');
+          focusContent.replaceChildren(createElement('p', 'focus-message', data.error));
+          viewRouteScheduleButton.disabled = true;
+          commitRaidButton.disabled = true;
+          buyoutLink.hidden = true;
+          return;
+        }
+        const result = data.result;
+        const profile = result.profiles[result.goal === 'black-division-crates' ? 'fastest' : state.selectedProfile];
+        renderRouteDetails(profile, result);
+      });
+
+      commitRaidButton.addEventListener('click', () => {
+        if (!currentNextRaid) return;
+        const inputs = [...focusContent.querySelectorAll('[data-raid-result]')];
+        const updates = [];
+        for (const input of inputs) {
+          const quantity = Number(input.value);
+          if (!Number.isInteger(quantity) || quantity < 0) {
+            input.setCustomValidity(localizer.text('ui.invalidQuantity'));
+            input.reportValidity();
+            return;
+          }
+          updates.push({ documentId: input.dataset.raidResult, quantity });
+        }
+        let nextState = state;
+        updates.forEach(({ documentId, quantity }) => {
+          nextState = reduceState(nextState, {
+            type: 'set-owned-document',
+            documentId,
+            quantity: (nextState.ownedDocuments[documentId] ?? 0) + quantity,
+          }, catalogs);
+        });
+        state = nextState;
+        try {
+          saveState(state, browserCookieAdapter);
+        } catch (error) {
+          console.error(error);
+        }
+        refreshProgress();
+        refreshRewardRail();
+        refreshDocumentQuantities();
+        refreshOptimization();
+      });
+
+      viewRouteScheduleButton.addEventListener('click', () => {
+        if (!currentProfile) return;
+        renderScheduleProjection(currentProfile);
+        routeScheduleDialog.showModal();
+      });
+
+      buyoutLink.addEventListener('click', () => {
+        if (!currentOptimizerResult || currentOptimizerResult.goal !== 'all-unclaimed-rewards') return;
+        renderBuyout(currentOptimizerResult);
+        buyoutDialog.showModal();
+      });
+
+      closeRouteScheduleButton.addEventListener('click', () => routeScheduleDialog.close());
+      routeScheduleDialog.addEventListener('click', (event) => {
+        if (event.target === routeScheduleDialog) routeScheduleDialog.close();
+      });
+      closeBuyoutButton.addEventListener('click', () => buyoutDialog.close());
+      buyoutDialog.addEventListener('click', (event) => {
+        if (event.target === buyoutDialog) buyoutDialog.close();
+      });
+
+      const modeData = [
+        ['pvp-seasonal', 'mode.pvpSeasonal'],
+        ['pvp', 'mode.pvp'],
+        ['pve', 'mode.pve'],
+      ].map(([mode, labelId]) => {
+        const limit = formatNumber(catalogs.optimizerRules.dailyDocumentLimits[mode], localizer.locale);
+        return {
+          text: `${localizer.text(labelId)} · ${limit} / ${localizer.text('ui.day')}`,
+          value: mode,
+          selected: mode === state.mode,
+        };
+      });
+
+      new SlimSelect({
+        select: modeSelect,
+        data: modeData,
+        settings: {
+          ariaLabel: localizer.text('optimizer.mode'),
+          modal: 'off',
+          showSearch: false,
+        },
+        events: {
+          afterChange: (selection) => {
+            const mode = selection[0]?.value;
+            if (mode && mode !== state.mode) dispatch({ type: 'set-mode', mode });
+          },
+        },
+      });
+
+      const languageNames = new Intl.DisplayNames([localizer.locale], { type: 'language' });
+      const englishName = languageNames.of('en') ?? 'en';
+      const localeChoice = document.createElement('span');
+      localeChoice.className = 'locale-choice';
+      const localeFlag = document.createElement('img');
+      localeFlag.className = 'locale-choice__flag';
+      localeFlag.src = englishFlagUrl;
+      localeFlag.alt = '';
+      const localeName = document.createElement('span');
+      localeName.className = 'locale-choice__name';
+      localeName.textContent = englishName;
+      localeChoice.append(localeFlag, localeName);
+
+      new SlimSelect({
+        select: languageSelect,
+        data: [{ text: englishName, value: 'en', html: localeChoice.outerHTML, selected: true }],
+        settings: {
+          ariaLabel: localizer.text('ui.locale'),
+          modal: 'off',
+          showSearch: false,
+        },
+      });
+
+      refreshOptimization();
+
+      const updateTimer = () => {
+        const totalSeconds = Math.max(0, Math.ceil(endsAt - Date.now() / 1000));
+        if (totalSeconds === 0) {
+          timer.textContent = localizer.text('season.ended');
+          return false;
+        }
+
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const compact = `${days}d ${hours}h ${minutes}m`;
+        const accessible = [
+          formatCountdownUnit(days, localizer.locale, 'day'),
+          formatCountdownUnit(hours, localizer.locale, 'hour'),
+          formatCountdownUnit(minutes, localizer.locale, 'minute'),
+        ].join(', ');
+        timer.textContent = compact;
+        timer.setAttribute('aria-label', localizer.text('season.countdown', { time: accessible }));
+        return true;
+      };
+
+      if (updateTimer()) {
+        const timerId = window.setInterval(() => {
+          if (!updateTimer()) window.clearInterval(timerId);
+        }, 1000);
+      }
+      };
+
+      void initialize();
+    </script>
   </body>
 </html>

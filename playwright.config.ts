@@ -28,7 +28,7 @@ export default defineConfig({
     ? undefined
     : {
         command: 'npm run dev -- --host 127.0.0.1 --port 4173',
-        url: `${localBaseUrl}wireframe.html`,
+        url: localBaseUrl,
         reuseExistingServer: !process.env.CI,
         timeout: 60_000,
       },

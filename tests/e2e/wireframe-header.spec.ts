@@ -81,7 +81,7 @@ test('orders and persists game modes while keeping the language selector icon-on
   await expect(page.locator('.ss-main.mode-select')).toContainText('PvP · 15 / day');
 });
 
-test('loads the implemented wireframe without application errors or failed app resources', async ({ page }) => {
+test('loads the production application without errors or failed app resources', async ({ page }) => {
   const errors: string[] = [];
   const failedResources: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
