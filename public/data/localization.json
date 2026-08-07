@@ -913,6 +913,12 @@
       }
     },
     {
+      "id": "ui.resetCookieStorage",
+      "localizations": {
+        "en": "Reset cookie storage"
+      }
+    },
+    {
       "id": "ui.resetConfirm",
       "localizations": {
         "en": "Reset all planner selections?"

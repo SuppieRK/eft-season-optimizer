@@ -14,7 +14,7 @@
         --canvas-min-height: 720px;
         --grid-gap: var(--space-m);
         --header-height: clamp(96px, 10vh, 160px);
-        --lower-band-height: clamp(136px, 13vh, 200px);
+        --lower-band-height: clamp(196px, 20vh, 268px);
         --reward-column: 24.4fr;
         --focus-column: 50.3fr;
         --detail-column: 25.3fr;
@@ -762,10 +762,18 @@
         color: var(--document-frame);
       }
 
-      .document-strip {
+      .lower-band {
         grid-area: documents;
         display: grid;
-        place-items: center;
+        grid-template-rows: minmax(0, 1fr) auto;
+        row-gap: var(--space-m);
+      }
+
+      .document-strip {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        padding: var(--space-s) var(--space-m);
       }
 
       .document-strip__images {
@@ -927,6 +935,70 @@
         transform: translate(-50%, 0);
       }
 
+      .wireframe-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-s);
+        max-inline-size: 76rem;
+        margin-inline: auto;
+        padding: var(--space-s) var(--space-m);
+        border-block-start: 1px solid var(--line-muted);
+        text-align: center;
+      }
+
+      .wireframe-footer__disclaimer {
+        margin: 0;
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
+      .wireframe-footer__separator {
+        flex: 0 0 1px;
+        align-self: stretch;
+        min-block-size: 1em;
+        background: var(--line-muted);
+      }
+
+      .wireframe-footer__reset {
+        flex: 0 0 auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--document-frame);
+        font: inherit;
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        cursor: pointer;
+      }
+
+      .wireframe-footer__reset:hover {
+        color: var(--label);
+      }
+
+      .wireframe-footer__reset:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: var(--space-xxs);
+      }
+
+      @media (max-width: 52rem) {
+        .wireframe-footer {
+          flex-direction: column;
+          gap: var(--space-xs);
+        }
+
+        .wireframe-footer__separator {
+          align-self: auto;
+          inline-size: min(12rem, 100%);
+          min-block-size: 0;
+          block-size: 1px;
+        }
+      }
+
     </style>
   </head>
   <body>
@@ -1011,8 +1083,9 @@
           </div>
         </aside>
 
-        <section class="region document-strip" aria-label="Document strip">
-          <div class="document-strip__images">
+        <div class="region lower-band">
+          <section class="document-strip" aria-label="Document strip">
+            <div class="document-strip__images">
             <figure class="document-strip__item" data-document-id="documents.financial.name">
               <figcaption class="document-strip__title" data-document-title></figcaption>
               <div class="document-strip__image-frame"><img src="./assets/documents/financial.png" alt="" /></div>
@@ -1130,8 +1203,14 @@
                 <p data-document-tooltip-description></p>
               </div>
             </figure>
-          </div>
-        </section>
+            </div>
+          </section>
+          <footer class="wireframe-footer">
+            <p class="wireframe-footer__disclaimer" data-asset-disclaimer></p>
+            <span class="wireframe-footer__separator" aria-hidden="true"></span>
+            <button class="wireframe-footer__reset" type="button" data-reset-cookie-state></button>
+          </footer>
+        </div>
       </main>
     </div>
     <script type="module">
@@ -1140,7 +1219,7 @@
       import englishFlagUrl from 'flag-icons/flags/4x3/gb.svg?no-inline';
       import { loadCatalogs } from './src/catalogs.ts';
       import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatNumber } from './src/localization.ts';
-      import { browserCookieAdapter, restoreState, saveState } from './src/persistence.ts';
+      import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from './src/persistence.ts';
       import { countPageRedeemableRewards, planRewardRedemption } from './src/redeemable.ts';
       import { getClassifiedDocumentMinimum, reduceState } from './src/state.ts';
 
@@ -1150,6 +1229,7 @@
       const name = document.querySelector('[data-season-name]');
       const timer = document.querySelector('[data-season-timer]');
       const modeSelect = document.querySelector('[data-mode-select]');
+      const resetCookieState = document.querySelector('[data-reset-cookie-state]');
       const languageSelect = document.querySelector('[data-language-select]');
       const endsAt = catalogs.battlePass.endsAt;
       const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
@@ -1172,6 +1252,16 @@
 
       name.textContent = localizer.text(catalogs.battlePass.id);
       timer.dateTime = new Date(endsAt * 1000).toISOString();
+      document.querySelector('[data-asset-disclaimer]').textContent = localizer.text('footer.disclaimer');
+      resetCookieState.textContent = localizer.text('ui.resetCookieStorage');
+      resetCookieState.addEventListener('click', () => {
+        const resetState = resetPersistedState(
+          browserCookieAdapter,
+          catalogs,
+          window.confirm(localizer.text('ui.resetConfirm')),
+        );
+        if (resetState) window.location.reload();
+      });
 
       const configureProgress = ({ labelId, labelSelector, currentSelector, totalSelector, progressSelector, total }) => {
         const label = localizer.text(labelId);

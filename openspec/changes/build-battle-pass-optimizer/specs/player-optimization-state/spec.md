@@ -158,7 +158,7 @@ The center column SHALL render one flat current-route-day workspace focused on t
 - **THEN** the right context column reports that the Classified quantity remains unchanged and shows no Classified redemption or purchase action
 
 ### Requirement: Header setup and right-column route context
-The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal, optional TarCoin spending, TarCoin balance, conditional crate count, and reset controls. The right column SHALL instead show the selected route stop's location, assigned documents, official difficulty, maximum raid time, complete-day claim outcome, full-schedule access, and flat plan and buyout disclosures. The optimizer objective SHALL always be all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, or a separate daily-limit readout.
+The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal, optional TarCoin spending, TarCoin balance, and conditional crate count. The right column SHALL instead show the selected route stop's location, assigned documents, official difficulty, maximum raid time, complete-day claim outcome, full-schedule access, and flat plan and buyout disclosures. The optimizer objective SHALL always be all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, or a separate daily-limit readout.
 
 #### Scenario: Mode selection applies its default
 - **WHEN** the player selects PvE, PvP, or PvP Seasonal
@@ -215,7 +215,7 @@ The header's primary navigation area SHALL present total-based document progress
 - **THEN** the center column explains that the profile is unavailable and does not show a partial route
 
 ### Requirement: Footer document inventory
-The footer SHALL provide one contiguous in-game-inspired document ribbon containing an inventory tile for every regular and Classified Document. Each tile SHALL use a dedicated image row, a fixed text band below the image containing its localized name and optional deficit, and a separate quantity-control row containing decrement, direct numeric entry, and increment actions. Document names and deficits SHALL NOT be absolutely positioned over artwork. Each regular-document tile SHALL show the selected profile's remaining deficit when it is nonzero; Classified Documents and zero deficits SHALL show no deficit label.
+The lower band SHALL provide one contiguous in-game-inspired document-ribbon section containing an inventory tile for every regular and Classified Document. Each tile SHALL use a dedicated image row, a fixed text band below the image containing its localized name and optional deficit, and a separate quantity-control row containing decrement, direct numeric entry, and increment actions. Document names and deficits SHALL NOT be absolutely positioned over artwork. Each regular-document tile SHALL show the selected profile's remaining deficit when it is nonzero; Classified Documents and zero deficits SHALL show no deficit label. A separate sibling credits footer SHALL appear below the document section with spacing and a dividing rule; the disclaimer SHALL NOT be part of the document section.
 
 #### Scenario: Enter an owned quantity directly
 - **WHEN** the player enters a valid non-negative integer for a document
@@ -238,7 +238,7 @@ The footer SHALL provide one contiguous in-game-inspired document ribbon contain
 - **THEN** the interface reports a localized validation error and does not commit the invalid value
 
 ### Requirement: Persistent asset disclaimer
-The footer SHALL persistently state that Escape from Tarkov and all displayed game image assets belong to Battlestate Games and that the optimizer is an unofficial fan-made tool.
+The separate credits footer SHALL persistently state that Escape from Tarkov and all displayed game image assets belong to Battlestate Games and that the optimizer is an unofficial fan-made tool. It SHALL center the localized disclaimer and a semantic link-styled button labelled `Reset cookie storage` on one line with a vertical divider, then stack them on separate lines with a horizontal divider when the available viewport width is sufficiently small.
 
 #### Scenario: Disclaimer remains available
 - **WHEN** the optimizer is displayed at any goal or progress state
@@ -278,7 +278,7 @@ The application SHALL show a non-blocking dismissible toast on first use explain
 - **THEN** the toast does not appear on the next visit with valid dismissal state
 
 ### Requirement: Complete reset
-The reset action SHALL require deliberate confirmation, delete all optimizer cookies including notice dismissal, and restore catalog and UI defaults.
+The centered link-styled reset button in the credits footer below the document ribbon SHALL require deliberate confirmation, delete all optimizer cookies including notice dismissal, and restore catalog and UI defaults.
 
 #### Scenario: Confirm reset
 - **WHEN** the player confirms a complete reset

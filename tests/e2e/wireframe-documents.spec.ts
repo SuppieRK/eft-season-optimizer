@@ -82,3 +82,65 @@ test('updates quantities, progress, boundaries, and cookie-restored values toget
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
   await expect(page.locator('[data-document-progress-current]')).toHaveText('10');
 });
+
+test('shows the centered asset disclaimer and resets cookie-backed state', async ({ page }) => {
+  await openWireframe(page);
+
+  const lowerBand = page.locator('.lower-band');
+  const strip = page.locator('.document-strip');
+  const images = page.locator('.document-strip__images');
+  const footer = page.locator('.wireframe-footer');
+  const disclaimer = page.locator('[data-asset-disclaimer]');
+  const reset = page.locator('[data-reset-cookie-state]');
+
+  await expect(disclaimer).toHaveText('Escape from Tarkov and all game image assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool.');
+  await expect(reset).toHaveText('Reset cookie storage');
+  await expect(reset).toHaveJSProperty('tagName', 'BUTTON');
+  await expect(reset).toHaveCSS('text-decoration-line', 'underline');
+
+  await expect(strip.locator('.wireframe-footer')).toHaveCount(0);
+  await expect(footer.locator('.wireframe-footer__separator')).toBeVisible();
+  const [lowerBandBox, stripBox, imagesBox, footerBox] = await Promise.all([lowerBand, strip, images, footer].map((element) => element.boundingBox()));
+  expect(lowerBandBox).not.toBeNull();
+  expect(stripBox).not.toBeNull();
+  expect(imagesBox).not.toBeNull();
+  expect(footerBox).not.toBeNull();
+  expect(footerBox!.y - (stripBox!.y + stripBox!.height)).toBeGreaterThanOrEqual(8);
+  expect(Math.abs(footerBox!.x + footerBox!.width / 2 - (lowerBandBox!.x + lowerBandBox!.width / 2))).toBeLessThanOrEqual(1);
+  const [disclaimerBox, resetBox, separatorBox] = await Promise.all([disclaimer, reset, footer.locator('.wireframe-footer__separator')].map((element) => element.boundingBox()));
+  expect(disclaimerBox).not.toBeNull();
+  expect(resetBox).not.toBeNull();
+  expect(separatorBox).not.toBeNull();
+  expect(Math.abs(disclaimerBox!.y + disclaimerBox!.height / 2 - (resetBox!.y + resetBox!.height / 2))).toBeLessThanOrEqual(1);
+  expect(separatorBox!.height).toBeGreaterThan(separatorBox!.width);
+
+  await documentTile(page, 'documents.financial.name').locator('[data-document-increment]').click({ clickCount: 2 });
+  await page.locator('#reward-page-trigger-2').click();
+  await page.locator('.route-profile-option').filter({ hasText: 'Fastest' }).click();
+  await expect(documentQuantity(page, 'documents.financial.name')).toHaveValue('2');
+  expect((await page.context().cookies()).length).toBeGreaterThan(0);
+
+  let confirmation = '';
+  page.once('dialog', async (dialog) => {
+    confirmation = dialog.message();
+    await dialog.accept();
+  });
+  await Promise.all([page.waitForNavigation(), reset.click()]);
+
+  expect(confirmation).toBe('Reset all planner selections?');
+  await expect(documentQuantity(page, 'documents.financial.name')).toHaveValue('0');
+  await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
+  await expect(page.locator('#reward-page-trigger-1')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('input[name="route-profile"][value="safest"]')).toBeChecked();
+  const plannerCookies = (await page.context().cookies()).filter((cookie) => cookie.name.startsWith('kord-breach-'));
+  expect(plannerCookies).toEqual([]);
+
+  await page.setViewportSize({ width: 700, height: 900 });
+  await expect(footer).toHaveCSS('flex-direction', 'column');
+  const [narrowDisclaimerBox, narrowResetBox, narrowSeparatorBox] = await Promise.all([disclaimer, reset, footer.locator('.wireframe-footer__separator')].map((element) => element.boundingBox()));
+  expect(narrowDisclaimerBox).not.toBeNull();
+  expect(narrowResetBox).not.toBeNull();
+  expect(narrowSeparatorBox).not.toBeNull();
+  expect(narrowResetBox!.y).toBeGreaterThanOrEqual(narrowDisclaimerBox!.y + narrowDisclaimerBox!.height);
+  expect(narrowSeparatorBox!.width).toBeGreaterThan(narrowSeparatorBox!.height);
+});
