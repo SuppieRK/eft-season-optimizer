@@ -70,6 +70,7 @@ export interface BuyoutEstimate {
   readonly earnedTarCoinsUsed: number;
   readonly minimumAdditionalTarCoins: number;
   readonly localEstimate?: LocalTarCoinEstimate;
+  readonly keepBattlePassTarCoinsLocalEstimate?: LocalTarCoinEstimate;
 }
 
 export interface RouteResult {
@@ -1307,7 +1308,9 @@ function calculateBuyout(input: OptimizerInput, rewards: readonly RewardRecord[]
       earnedAwarded += reward.tarCoinsAwarded;
     }
   }
-  const localEstimate = estimateLocalTarCoins(additional, input.catalogs, input.locale ?? input.catalogs.localization.defaultLocale);
+  const locale = input.locale ?? input.catalogs.localization.defaultLocale;
+  const localEstimate = estimateLocalTarCoins(additional, input.catalogs, locale);
+  const keepBattlePassTarCoinsLocalEstimate = estimateLocalTarCoins(grossSpent, input.catalogs, locale);
   return {
     bundleCounts,
     classifiedDocumentsPurchased: purchased,
@@ -1319,6 +1322,7 @@ function calculateBuyout(input: OptimizerInput, rewards: readonly RewardRecord[]
     earnedTarCoinsUsed: earnedUsed,
     minimumAdditionalTarCoins: additional,
     ...(localEstimate ? { localEstimate } : {}),
+    ...(keepBattlePassTarCoinsLocalEstimate ? { keepBattlePassTarCoinsLocalEstimate } : {}),
   };
 }
 
@@ -1412,6 +1416,7 @@ function emptyBuyout(bundleCount: number, packageCount: number): BuyoutEstimate 
     earnedTarCoinsUsed: 0,
     minimumAdditionalTarCoins: 0,
     localEstimate: estimateZeroLocalTarCoins(packageCount),
+    keepBattlePassTarCoinsLocalEstimate: estimateZeroLocalTarCoins(packageCount),
   };
 }
 

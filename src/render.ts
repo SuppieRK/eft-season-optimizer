@@ -226,7 +226,7 @@ function renderBuyout(localizer: ReturnType<typeof createLocalizer>, result: Opt
   const localPrice = buyout.localEstimate && buyout.localEstimate.costMinor > 0 && buyout.localEstimate.currency
     ? formatLocalPrice({ amountMinor: buyout.localEstimate.costMinor, currency: buyout.localEstimate.currency, display: buyout.localEstimate.display }, localizer.locale)
     : undefined;
-  return `<details class="buyout"><summary>${escapeHtml(localizer.text('ui.buyout'))}</summary><div><p>${escapeHtml(localizer.text('ui.additionalTarCoins', { count: formatNumber(buyout.minimumAdditionalTarCoins, localizer.locale) }))}</p>${localPrice ? `<p>${escapeHtml(localizer.text('ui.fromEstimate', { price: localPrice }))}</p>` : ''}</div></details>`;
+  return `<details class="buyout"><summary>${escapeHtml(localizer.text('ui.buyout'))}</summary><div><p>${escapeHtml(localizer.text('ui.buyoutGrossTarCoins', { count: formatNumber(buyout.grossTarCoinsSpent, localizer.locale) }))}</p>${localPrice ? `<p>${escapeHtml(localizer.text('ui.tarCoinPackageCost', { price: localPrice }))}</p>` : ''}</div></details>`;
 }
 
 function renderFooter(localizer: ReturnType<typeof createLocalizer>, catalogs: Catalogs, state: AppState, result: OptimizerResult): string {

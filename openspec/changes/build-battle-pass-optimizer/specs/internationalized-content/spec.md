@@ -84,14 +84,14 @@ The application SHALL use locale-aware number, date, time, plural, and message f
 - **THEN** it is formatted using the active locale without changing its numeric value
 
 #### Scenario: Render a TarCoin price
-- **WHEN** a bundle price, gross buyout price, TarCoin balance contribution, or additional TarCoin requirement is displayed
+- **WHEN** a Classified bundle subtotal, Battle Pass TarCoin contribution, or TarCoin package total is displayed
 - **THEN** its invariant integer amount is formatted with the active locale's number rules and inserted into a dedicated localized TarCoin price message
 - **AND** the interface does not treat TarCoins as an ISO currency
 
 #### Scenario: Render a local real-money estimate
 - **WHEN** a complete same-currency TarCoin package estimate is available for the active locale
-- **THEN** its summed integer minor-unit amount is formatted for that locale and currency, and its message identifies the amount as a minimum or `FROM` estimate
-- **AND** individual package rows may preserve their exact localized storefront `display` values
+- **THEN** its summed integer minor-unit amount is formatted for that locale and currency in the table total
+- **AND** individual package rows preserve their exact localized storefront `display` values, including screenshot-backed `FROM` text
 
 ### Requirement: Localized compact requirement text
 The shortened document requirements in the left reward column SHALL use dedicated localized abbreviations and SHALL expose unabridged localized text to assistive technology.

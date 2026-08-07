@@ -928,6 +928,76 @@
         margin-block-start: var(--space-s);
       }
 
+      .buyout-scenario {
+        display: grid;
+        gap: var(--space-m);
+      }
+
+      .buyout-scenario h3 {
+        margin: 0;
+      }
+
+      .buyout-table {
+        inline-size: 100%;
+        border-collapse: collapse;
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        font-variant-numeric: tabular-nums;
+        line-height: var(--line-height-ui);
+        table-layout: fixed;
+      }
+
+      .buyout-table caption {
+        padding-block-end: var(--space-xs);
+        color: var(--label);
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        text-align: start;
+      }
+
+      .buyout-table th,
+      .buyout-table td {
+        padding: var(--space-xs) var(--space-s);
+        border-block-end: 1px solid var(--line-muted);
+        text-align: end;
+        white-space: nowrap;
+      }
+
+      .buyout-table th:first-child,
+      .buyout-table td:first-child {
+        padding-inline-start: 0;
+        text-align: start;
+        white-space: normal;
+      }
+
+      .buyout-table th:last-child,
+      .buyout-table td:last-child {
+        padding-inline-end: 0;
+      }
+
+      .buyout-table thead th {
+        color: var(--label-muted);
+        font-weight: 400;
+      }
+
+      .buyout-table tbody th,
+      .buyout-table tfoot th,
+      .buyout-table tfoot td {
+        color: var(--label);
+        font-weight: 700;
+      }
+
+      .buyout-table tfoot th,
+      .buyout-table tfoot td {
+        border-block-end: 0;
+      }
+
+      .buyout-table__empty {
+        color: var(--label-muted);
+        text-align: start !important;
+        white-space: normal !important;
+      }
+
       .section-heading,
       .detail-content,
       .primary-action {
@@ -1476,6 +1546,10 @@
         body {
           min-width: 320px;
           min-height: 0;
+        }
+
+        .buyout-dialog {
+          inline-size: calc(100vw - (2 * var(--space-m)));
         }
 
         .wireframe-shell {
@@ -2378,82 +2452,115 @@
 
       const renderBuyout = (result) => {
         const estimate = result.buyout;
-        const localEstimate = estimate.localEstimate;
         buyoutTitle.textContent = localizer.text('ui.buyout');
         closeBuyoutButton.textContent = localizer.text('ui.close');
         buyoutContent.replaceChildren();
 
-        const funding = createElement('section', 'buyout-section');
-        funding.append(
-          createElement('h3', '', localizer.text('ui.buyoutFundingHeading')),
-          createElement('p', '', localizer.text('ui.buyoutGrossTarCoins', {
-            count: formatNumber(estimate.grossTarCoinsSpent, localizer.locale),
-          })),
-          createElement('p', '', localizer.text('ui.additionalTarCoins', {
-            count: formatNumber(estimate.minimumAdditionalTarCoins, localizer.locale),
-          })),
-          createElement('p', '', localizer.text('ui.buyoutFunding', {
-            starting: formatNumber(estimate.startingTarCoinsUsed, localizer.locale),
-            earned: formatNumber(estimate.earnedTarCoinsUsed, localizer.locale),
-          })),
-        );
-        if (localEstimate) {
-          funding.append(createElement('p', '', localizer.text('ui.fromEstimate', {
-            price: localEstimate.costMinor > 0 ? localEstimate.display : localizer.text('ui.zeroLocalPrice'),
-          })));
-        } else {
-          funding.append(createElement('p', '', localizer.text('ui.localPriceUnavailable')));
-        }
-        buyoutContent.append(funding);
+        const createTable = (captionId, columnIds) => {
+          const table = createElement('table', 'buyout-table');
+          const caption = createElement('caption', '', localizer.text(captionId));
+          const head = document.createElement('thead');
+          const headRow = document.createElement('tr');
+          const body = document.createElement('tbody');
+          const foot = document.createElement('tfoot');
+          columnIds.forEach((columnId) => {
+            const heading = createElement('th', '', localizer.text(columnId));
+            heading.scope = 'col';
+            headRow.append(heading);
+          });
+          head.append(headRow);
+          table.append(caption, head, body, foot);
+          return { table, body, foot };
+        };
 
-        const classified = createElement('section', 'buyout-section');
-        const classifiedList = document.createElement('ul');
-        classified.append(
-          createElement('h3', '', localizer.text('ui.classifiedBundles')),
-          createElement('p', '', localizer.text('ui.buyoutClassified', {
-            purchased: formatNumber(estimate.classifiedDocumentsPurchased, localizer.locale),
-            excess: formatNumber(estimate.excessClassifiedDocuments, localizer.locale),
-          })),
-        );
-        estimate.bundleCounts.forEach((count, index) => {
-          if (count === 0) return;
-          const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
-          classifiedList.append(createElement('li', '', localizer.text('ui.classifiedBundleInstruction', {
-            documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
-            count: formatNumber(count, localizer.locale),
-          })));
-        });
-        if (classifiedList.childElementCount > 0) classified.append(classifiedList);
-        else classified.append(createElement('p', '', localizer.text('ui.noBundlesRequired')));
-        buyoutContent.append(classified);
+        const appendRow = (parent, values) => {
+          const row = document.createElement('tr');
+          values.forEach((value, index) => {
+            const cell = createElement(index === 0 ? 'th' : 'td', '', value);
+            if (index === 0) cell.scope = 'row';
+            row.append(cell);
+          });
+          parent.append(row);
+        };
 
-        const packages = createElement('section', 'buyout-section');
-        const packageList = document.createElement('ul');
-        packages.append(createElement('h3', '', localizer.text('ui.tarCoinPackages')));
-        localEstimate?.packageCounts.forEach((count, index) => {
-          if (count === 0) return;
-          const bundle = catalogs.optimizerRules.tarCoinBundles[index];
-          const price = localizer.price(bundle.localPriceId);
-          packageList.append(createElement('li', '', localizer.text('ui.tarCoinPackageInstruction', {
-            tarCoins: formatNumber(bundle.tarCoins, localizer.locale),
-            count: formatNumber(count, localizer.locale),
-            price: price?.display ?? localizer.text('ui.localPriceUnavailable'),
-          })));
-        });
-        if (packageList.childElementCount > 0 && localEstimate) {
-          packages.append(
-            packageList,
-            createElement('p', '', localizer.text('ui.tarCoinPackageSummary', {
-              purchased: formatNumber(localEstimate.tarCoinsPurchased, localizer.locale),
-              excess: formatNumber(localEstimate.excessTarCoins, localizer.locale),
-            })),
+        const appendEmptyRow = (parent, textContent) => {
+          const row = document.createElement('tr');
+          const cell = createElement('td', 'buyout-table__empty', textContent);
+          cell.colSpan = 3;
+          row.append(cell);
+          parent.append(row);
+        };
+
+        const createTarCoinTable = (localEstimate, battlePassTarCoinsUsed) => {
+          const { table, body, foot } = createTable('ui.tarCoinPackages', ['ui.source', 'ui.tarCoins', 'ui.price']);
+          table.dataset.buyoutTable = 'tar-coin-packages';
+          if (battlePassTarCoinsUsed > 0) {
+            const row = document.createElement('tr');
+            row.dataset.buyoutBattlePassTarCoins = '';
+            const source = createElement('th', '', localizer.text('ui.battlePassTarCoins'));
+            source.scope = 'row';
+            row.append(source, createElement('td', '', formatNumber(battlePassTarCoinsUsed, localizer.locale)), createElement('td', '', '—'));
+            body.append(row);
+          }
+          localEstimate?.packageCounts.forEach((count, index) => {
+            if (count === 0) return;
+            const bundle = catalogs.optimizerRules.tarCoinBundles[index];
+            const price = localizer.price(bundle.localPriceId);
+            appendRow(body, [
+              localizer.text('ui.tarCoinPackageSource', {
+                tarCoins: formatNumber(bundle.tarCoins, localizer.locale),
+                count: formatNumber(count, localizer.locale),
+              }),
+              formatNumber(bundle.tarCoins * count, localizer.locale),
+              price?.display ?? localizer.text('ui.localPriceUnavailable'),
+            ]);
+          });
+          if (body.childElementCount === 0) appendEmptyRow(body, localizer.text('ui.noTarCoinPackagesRequired'));
+          if (localEstimate) {
+            appendRow(foot, [
+              localizer.text('ui.total'),
+              formatNumber(battlePassTarCoinsUsed + localEstimate.tarCoinsPurchased, localizer.locale),
+              localEstimate.costMinor > 0 ? localEstimate.display : localizer.text('ui.zeroLocalPrice'),
+            ]);
+          } else appendEmptyRow(foot, localizer.text('ui.localPriceUnavailable'));
+          return table;
+        };
+
+        const createClassifiedTable = () => {
+          const { table, body, foot } = createTable('ui.classifiedBundles', ['ui.bundle', 'ui.quantity', 'ui.tarCoins']);
+          table.dataset.buyoutTable = 'classified-bundles';
+          estimate.bundleCounts.forEach((count, index) => {
+            if (count === 0) return;
+            const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
+            appendRow(body, [
+              localizer.text('ui.classifiedBundleSize', {
+                documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
+              }),
+              formatNumber(count, localizer.locale),
+              formatNumber(bundle.tarCoins * count, localizer.locale),
+            ]);
+          });
+          if (body.childElementCount === 0) appendEmptyRow(body, localizer.text('ui.noBundlesRequired'));
+          appendRow(foot, [localizer.text('ui.tarCoinsToSpend'), '', formatNumber(estimate.grossTarCoinsSpent, localizer.locale)]);
+          return table;
+        };
+
+        const createScenario = (scenario, headingId, localEstimate, battlePassTarCoinsUsed) => {
+          const section = createElement('section', 'buyout-section buyout-scenario');
+          section.dataset.buyoutScenario = scenario;
+          section.append(
+            createElement('h3', '', localizer.text(headingId)),
+            createTarCoinTable(localEstimate, battlePassTarCoinsUsed),
+            createClassifiedTable(),
           );
-        } else if (estimate.minimumAdditionalTarCoins === 0) {
-          packages.append(createElement('p', '', localizer.text('ui.noTarCoinPackagesRequired')));
-        } else {
-          packages.append(createElement('p', '', localizer.text('ui.localPriceUnavailable')));
-        }
-        buyoutContent.append(packages);
+          return section;
+        };
+
+        const battlePassTarCoinsUsed = estimate.startingTarCoinsUsed + estimate.earnedTarCoinsUsed;
+        buyoutContent.append(
+          createScenario('spend', 'ui.buyoutSpendBattlePassTarCoins', estimate.localEstimate, battlePassTarCoinsUsed),
+          createScenario('keep', 'ui.buyoutKeepBattlePassTarCoins', estimate.keepBattlePassTarCoinsLocalEstimate, 0),
+        );
       };
 
       const refreshBuyoutLink = (result) => {

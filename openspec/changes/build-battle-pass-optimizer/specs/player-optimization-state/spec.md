@@ -184,12 +184,15 @@ The expanded Focus column SHALL render one flat next-raid workspace focused on t
 #### Scenario: Buyout estimate is presented
 - **WHEN** at least one Battle Pass reward remains unclaimed
 - **THEN** the Documents progress label shows a link-styled approximate localized local-price estimate when complete pricing is available
-- **AND** activating only that price link opens a native modal showing starting and earned TarCoins used, minimum additional and gross TarCoins, Classified bundle counts, purchased and excess Classified Documents, and local TarCoin package counts, storefront prices, total price, purchased TarCoins, and excess
+- **AND** activating only that price link opens a native modal titled `Battle Pass buyout` with exactly two sections ordered Spend Battle Pass TarCoins and Keep Battle Pass TarCoins
+- **AND** each section shows TarCoin packages first and Classified Document bundles second in concise tables with source, quantity, TarCoins, storefront price, and totals
+- **AND** the spend table includes one aggregated Battle Pass TarCoin contribution while the keep table excludes it and buys enough TarCoins to cover gross Classified bundle spend
+- **AND** the modal does not show separate funding, calculation-explanation, minimum-additional, starting-versus-earned, or `FROM estimate` prose
 - **AND** the estimate remains explicitly informational and independent of the TarCoin spending selector
 
 #### Scenario: Local purchase estimate is available
 - **WHEN** additional TarCoins are required and complete same-currency package prices exist for the active locale
-- **THEN** the linked header price is visibly approximate and the modal labels the minimum local package cost as a `FROM` estimate and shows its package breakdown and excess TarCoins
+- **THEN** the linked header price is visibly approximate and both comparison tables show their package breakdown and calculated localized total
 
 #### Scenario: Classified Documents have no redeemable use
 - **WHEN** the player owns Classified Documents but no unclaimed reward has an eligible missing-document deficit

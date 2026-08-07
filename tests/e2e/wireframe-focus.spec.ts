@@ -220,12 +220,52 @@ test('opens a detailed buyout from the approximate Documents price', async ({ pa
 
   const dialog = page.locator('[data-buyout-dialog]');
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole('heading', { name: 'TarCoin funding' })).toBeVisible();
-  await expect(dialog.getByRole('heading', { name: 'Classified Document bundles' })).toBeVisible();
-  await expect(dialog.getByRole('heading', { name: 'TarCoin packages' })).toBeVisible();
-  await expect(dialog.locator('.buyout-section').nth(1).locator('li')).not.toHaveCount(0);
-  await expect(dialog.locator('.buyout-section').nth(2).locator('li')).not.toHaveCount(0);
-  await expect(dialog.locator('.buyout-section').nth(2)).toContainText('FROM $');
+  await expect(dialog.getByRole('heading', { name: 'Battle Pass buyout' })).toBeVisible();
+  const scenarios = dialog.locator('[data-buyout-scenario]');
+  await expect(scenarios).toHaveCount(2);
+  expect(await scenarios.evaluateAll((elements) => elements.map((element) => (element as HTMLElement).dataset.buyoutScenario))).toEqual([
+    'spend',
+    'keep',
+  ]);
+  const spend = scenarios.nth(0);
+  const keep = scenarios.nth(1);
+  await expect(spend.getByRole('heading', { name: 'Spend Battle Pass TarCoins' })).toBeVisible();
+  await expect(keep.getByRole('heading', { name: 'Keep Battle Pass TarCoins' })).toBeVisible();
+  for (const scenario of [spend, keep]) {
+    const tables = scenario.locator('[data-buyout-table]');
+    await expect(tables).toHaveCount(2);
+    expect(await tables.evaluateAll((elements) => elements.map((element) => (element as HTMLElement).dataset.buyoutTable))).toEqual([
+      'tar-coin-packages',
+      'classified-bundles',
+    ]);
+    await expect(tables.nth(0).locator('tbody tr')).not.toHaveCount(0);
+    await expect(tables.nth(1).locator('tbody tr')).not.toHaveCount(0);
+    await expect(tables.nth(1).locator('tfoot')).toContainText('TarCoins to spend');
+  }
+  await expect(spend.locator('[data-buyout-battle-pass-tar-coins]')).toHaveCount(1);
+  await expect(keep.locator('[data-buyout-battle-pass-tar-coins]')).toHaveCount(0);
+  await expect(spend.locator('[data-buyout-table="tar-coin-packages"]')).toContainText('FROM $');
+  await expect(keep.locator('[data-buyout-table="tar-coin-packages"]')).toContainText('FROM $');
+  expect(await spend.locator('[data-buyout-table="classified-bundles"] tbody').innerText())
+    .toBe(await keep.locator('[data-buyout-table="classified-bundles"] tbody').innerText());
+  await expect(dialog).not.toContainText('TarCoin funding');
+  await expect(dialog).not.toContainText('Gross TarCoins spent');
+  await expect(dialog).not.toContainText('Minimum additional TarCoins');
+  await expect(dialog).not.toContainText('Starting TarCoins used');
+  await expect(dialog).not.toContainText('FROM estimate');
+  await expect(dialog).not.toContainText('How this is calculated');
+  await expect(dialog).not.toContainText('Spending or keeping Battle Pass TarCoins');
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileGeometry = await dialog.evaluate((element) => {
+    const content = element.querySelector<HTMLElement>('[data-buyout-content]')!;
+    return {
+      contentClientWidth: content.clientWidth,
+      contentScrollWidth: content.scrollWidth,
+      widestTable: Math.max(...[...content.querySelectorAll('table')].map((table) => table.getBoundingClientRect().width)),
+    };
+  });
+  expect(mobileGeometry.contentScrollWidth).toBeLessThanOrEqual(mobileGeometry.contentClientWidth);
+  expect(mobileGeometry.widestTable).toBeLessThanOrEqual(mobileGeometry.contentClientWidth);
   await dialog.getByRole('button', { name: 'Close' }).click();
   await expect(dialog).toBeHidden();
 

@@ -121,11 +121,11 @@ The optimizer SHALL calculate an informational estimate for purchasing enough Cl
 - **THEN** the buyout estimate remains visible as informational output while no purchase affects the Fastest or Safest farming plan
 
 ### Requirement: Local TarCoin purchase estimate
-The optimizer SHALL use the TarCoin purchase packages configured in `optimizer-rules.json` and their locale-dependent structured prices from `localization.json` to estimate the minimum local real-money package cost of acquiring the additional TarCoins reported by the remaining-pass buyout. It SHALL minimize integer minor-unit cost, then excess purchased TarCoins, then package count. It SHALL calculate a local estimate only when every selected package has a price for the active locale and all selected prices use one currency. The unpriced `2,000` TarCoin “RECEIVED” offer SHALL NOT be included as a purchasable package.
+The optimizer SHALL use the TarCoin purchase packages configured in `optimizer-rules.json` and their locale-dependent structured prices from `localization.json` to calculate two local real-money package estimates for the remaining-pass buyout. The spend-Battle-Pass-TarCoins estimate SHALL cover the minimum additional TarCoins after applying available starting and reward-earned TarCoins. The keep-Battle-Pass-TarCoins estimate SHALL preserve those TarCoins and cover the gross TarCoin cost of the same required Classified Document bundle plan. Each estimate SHALL minimize integer minor-unit cost, then excess purchased TarCoins, then package count. It SHALL calculate an estimate only when every selected package has a price for the active locale and all selected prices use one currency. The unpriced `2,000` TarCoin “RECEIVED” offer SHALL NOT be included as a purchasable package.
 
 #### Scenario: Complete local prices exist
 - **WHEN** the buyout requires additional TarCoins and the active locale has complete same-currency prices
-- **THEN** the result reports the minimum package combination, total TarCoins purchased, excess TarCoins, integer minor-unit cost, currency, and localized `FROM` presentation
+- **THEN** the result reports spend and keep package combinations with total TarCoins purchased, excess TarCoins, integer minor-unit cost, currency, and localized storefront package prices
 
 #### Scenario: Local prices are incomplete
 - **WHEN** one or more packages needed by every valid minimum-cost combination lacks a price for the active locale or introduces a different currency
@@ -133,7 +133,7 @@ The optimizer SHALL use the TarCoin purchase packages configured in `optimizer-r
 
 #### Scenario: No additional TarCoins are required
 - **WHEN** starting and immediately earned TarCoins fund the complete buyout sequence
-- **THEN** the local purchase estimate reports zero packages and zero additional local cost
+- **THEN** the spend estimate reports zero packages and zero local cost while the keep estimate still covers gross TarCoin spend
 
 ### Requirement: Immediate reward TarCoin availability
 TarCoins granted by a Battle Pass reward SHALL become available immediately after that reward is redeemed, without waiting for completion of its Battle Pass page, and SHALL never be credited before redemption.

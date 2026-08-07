@@ -1179,7 +1179,7 @@
     {
       "id": "ui.buyout",
       "localizations": {
-        "en": "Informational remaining-pass buyout"
+        "en": "Battle Pass buyout"
       }
     },
     {
@@ -1203,19 +1203,79 @@
     {
       "id": "ui.openBuyoutEstimate",
       "localizations": {
-        "en": "Open remaining-pass buyout estimate: {price}"
-      }
-    },
-    {
-      "id": "ui.buyoutFundingHeading",
-      "localizations": {
-        "en": "TarCoin funding"
+        "en": "Open Battle Pass buyout: {price}"
       }
     },
     {
       "id": "ui.buyoutGrossTarCoins",
       "localizations": {
-        "en": "Gross TarCoins spent: {count}"
+        "en": "TarCoins to spend: {count}"
+      }
+    },
+    {
+      "id": "ui.buyoutSpendBattlePassTarCoins",
+      "localizations": {
+        "en": "Spend Battle Pass TarCoins"
+      }
+    },
+    {
+      "id": "ui.buyoutKeepBattlePassTarCoins",
+      "localizations": {
+        "en": "Keep Battle Pass TarCoins"
+      }
+    },
+    {
+      "id": "ui.source",
+      "localizations": {
+        "en": "Source"
+      }
+    },
+    {
+      "id": "ui.tarCoins",
+      "localizations": {
+        "en": "TarCoins"
+      }
+    },
+    {
+      "id": "ui.price",
+      "localizations": {
+        "en": "Price"
+      }
+    },
+    {
+      "id": "ui.bundle",
+      "localizations": {
+        "en": "Bundle"
+      }
+    },
+    {
+      "id": "ui.total",
+      "localizations": {
+        "en": "Total"
+      }
+    },
+    {
+      "id": "ui.battlePassTarCoins",
+      "localizations": {
+        "en": "Battle Pass TarCoins"
+      }
+    },
+    {
+      "id": "ui.tarCoinPackageSource",
+      "localizations": {
+        "en": "{tarCoins} × {count}"
+      }
+    },
+    {
+      "id": "ui.classifiedBundleSize",
+      "localizations": {
+        "en": "{documents} documents"
+      }
+    },
+    {
+      "id": "ui.tarCoinsToSpend",
+      "localizations": {
+        "en": "TarCoins to spend"
       }
     },
     {
@@ -1237,15 +1297,9 @@
       }
     },
     {
-      "id": "ui.tarCoinPackageInstruction",
+      "id": "ui.tarCoinPackageCost",
       "localizations": {
-        "en": "{tarCoins} TarCoins × {count} — {price}"
-      }
-    },
-    {
-      "id": "ui.tarCoinPackageSummary",
-      "localizations": {
-        "en": "TarCoins purchased: {purchased}; excess: {excess}"
+        "en": "Estimated package cost: {price}"
       }
     },
     {
@@ -1258,18 +1312,6 @@
       "id": "ui.localPriceUnavailable",
       "localizations": {
         "en": "A localized real-money price is unavailable."
-      }
-    },
-    {
-      "id": "ui.additionalTarCoins",
-      "localizations": {
-        "en": "Minimum additional TarCoins: {count}"
-      }
-    },
-    {
-      "id": "ui.fromEstimate",
-      "localizations": {
-        "en": "FROM estimate: {price}"
       }
     },
     {
@@ -1480,18 +1522,6 @@
       "id": "ui.classifiedBundleInstruction",
       "localizations": {
         "en": "{documents} Classified Documents × {count}"
-      }
-    },
-    {
-      "id": "ui.buyoutFunding",
-      "localizations": {
-        "en": "Starting TarCoins used: {starting}; earned used: {earned}"
-      }
-    },
-    {
-      "id": "ui.buyoutClassified",
-      "localizations": {
-        "en": "Classified Documents purchased: {purchased}; excess: {excess}"
       }
     },
     {

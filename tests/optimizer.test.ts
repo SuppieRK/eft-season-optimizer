@@ -203,7 +203,12 @@ describe('optimizer', () => {
     expect(staged.buyout.earnedTarCoinsAwarded).toBe(50);
     expect(staged.buyout.earnedTarCoinsUsed).toBe(50);
     expect(staged.buyout.localEstimate?.packageCounts[0]).toBe(1);
+    expect(staged.buyout.localEstimate?.excessTarCoins).toBe(50);
+    expect(staged.buyout.keepBattlePassTarCoinsLocalEstimate?.packageCounts[0]).toBe(1);
+    expect(staged.buyout.keepBattlePassTarCoinsLocalEstimate?.excessTarCoins).toBe(0);
     expect(staged.buyout.localEstimate?.currency).toBe('USD');
+    expect(disabled.buyout.localEstimate?.tarCoinsPurchased).toBe(0);
+    expect(disabled.buyout.keepBattlePassTarCoinsLocalEstimate?.tarCoinsPurchased).toBe(500);
     expect(disabled.profiles.fastest.purchases.classifiedDocumentsPurchased).toBe(0);
     expect(enabled.profiles.fastest.purchases.classifiedDocumentsPurchased).toBeGreaterThan(0);
     expect(enabled.buyout).toEqual(disabled.buyout);
