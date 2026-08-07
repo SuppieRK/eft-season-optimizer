@@ -129,6 +129,47 @@
         background: var(--surface-alt);
       }
 
+      .season-slot {
+        display: flex;
+        align-items: center;
+        gap: clamp(14px, 1vw, 24px);
+        padding: clamp(14px, 1.2vw, 28px);
+      }
+
+      .season-number {
+        padding-inline-end: clamp(14px, 1vw, 24px);
+        border-inline-end: 1px solid var(--line-muted);
+        color: var(--label-muted);
+        font-size: clamp(49px, 3.2vw, 70px);
+        font-weight: 700;
+        line-height: 0.81;
+      }
+
+      .season-details {
+        display: grid;
+        gap: 8px;
+        min-inline-size: 0;
+      }
+
+      .season-name,
+      .season-timer {
+        white-space: nowrap;
+      }
+
+      .season-name {
+        overflow: hidden;
+        font-size: clamp(15px, 1.05vw, 24px);
+        letter-spacing: 0.08em;
+        text-overflow: ellipsis;
+      }
+
+      .season-timer {
+        color: var(--label-muted);
+        font-size: clamp(12px, 0.78vw, 17px);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.05em;
+      }
+
       .reward-rail {
         grid-area: reward;
         display: grid;
@@ -174,8 +215,12 @@
   <body>
     <div class="wireframe-shell">
       <header class="wireframe-header" aria-label="Header">
-        <section class="slot header-slot" aria-label="Season identity">
-          <span class="slot-label">Season / identity slot</span>
+        <section class="slot header-slot season-slot" aria-label="Season identity">
+          <span class="season-number" aria-label="Season 1">S1</span>
+          <div class="season-details">
+            <strong class="season-name" data-season-name>…</strong>
+            <time class="season-timer" data-season-timer>…</time>
+          </div>
         </section>
         <section class="slot header-slot" aria-label="Primary navigation">
           <span class="slot-label">Primary navigation slot</span>
@@ -232,5 +277,45 @@
         </section>
       </main>
     </div>
+    <script type="module">
+      import { loadCatalogs } from './src/catalogs.ts';
+      import { createLocalizer, formatCountdownUnit } from './src/localization.ts';
+
+      const catalogs = await loadCatalogs();
+      const localizer = createLocalizer(catalogs.localization);
+      const name = document.querySelector('[data-season-name]');
+      const timer = document.querySelector('[data-season-timer]');
+      const endsAt = catalogs.battlePass.endsAt;
+
+      name.textContent = localizer.text(catalogs.battlePass.id);
+      timer.dateTime = new Date(endsAt * 1000).toISOString();
+
+      const updateTimer = () => {
+        const totalSeconds = Math.max(0, Math.ceil(endsAt - Date.now() / 1000));
+        if (totalSeconds === 0) {
+          timer.textContent = localizer.text('season.ended');
+          return false;
+        }
+
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const compact = `${days}d ${hours}h ${minutes}m`;
+        const accessible = [
+          formatCountdownUnit(days, localizer.locale, 'day'),
+          formatCountdownUnit(hours, localizer.locale, 'hour'),
+          formatCountdownUnit(minutes, localizer.locale, 'minute'),
+        ].join(', ');
+        timer.textContent = compact;
+        timer.setAttribute('aria-label', localizer.text('season.countdown', { time: accessible }));
+        return true;
+      };
+
+      if (updateTimer()) {
+        const timerId = window.setInterval(() => {
+          if (!updateTimer()) window.clearInterval(timerId);
+        }, 1000);
+      }
+    </script>
   </body>
 </html>
