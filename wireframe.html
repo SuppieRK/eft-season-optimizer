@@ -34,6 +34,12 @@
         --label-muted: #a8adb3;
         --document-frame: #4f8175;
         --classified-frame: #8d5155;
+        --reward-complete-background:
+          linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--document-frame) 10%, transparent),
+            color-mix(in srgb, var(--document-frame) 30%, transparent)
+          );
         --tooltip-surface: #050607;
         --tooltip-line: #777e84;
       }
@@ -548,6 +554,11 @@
         background: var(--line-muted);
       }
 
+      .reward-page--complete .reward-page__trigger,
+      .reward-page--complete .reward-page__trigger[aria-expanded="true"] {
+        background: var(--reward-complete-background);
+      }
+
       .reward-page__trigger[aria-expanded="true"] .reward-page__chevron {
         transform: rotate(180deg);
       }
@@ -558,6 +569,12 @@
         line-height: var(--line-height-ui);
         letter-spacing: 0.08em;
         text-transform: uppercase;
+      }
+
+      .reward-page__redeemable {
+        color: var(--document-frame);
+        font-size: var(--font-size-caption);
+        letter-spacing: 0.04em;
       }
 
       .reward-page__count {
@@ -579,23 +596,52 @@
       }
 
       .reward-item {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
         border-block-start: 1px solid color-mix(in srgb, var(--line-muted) 68%, transparent);
       }
 
+      .reward-item::after {
+        position: absolute;
+        z-index: 2;
+        inset-block-start: 50%;
+        inset-inline-end: var(--space-l);
+        inline-size: 0.55rem;
+        block-size: 1rem;
+        border-right: 0.15rem solid var(--document-frame);
+        border-bottom: 0.15rem solid var(--document-frame);
+        content: "";
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-62%) rotate(45deg);
+        transition: opacity 120ms ease-out;
+      }
+
       .reward-item label {
+        position: relative;
+        z-index: 1;
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr);
         align-items: center;
-        gap: var(--space-s);
-        padding: var(--space-s) var(--space-m);
+        padding-block: var(--space-s);
+        padding-inline: var(--space-m) var(--space-xl);
         cursor: pointer;
       }
 
       .reward-item input {
-        inline-size: 1em;
-        block-size: 1em;
-        margin: 0;
-        accent-color: var(--document-frame);
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .reward-item:has(input:focus-visible) {
+        outline: 1px solid var(--label);
+        outline-offset: -2px;
       }
 
       .reward-item__copy {
@@ -621,16 +667,99 @@
         line-height: var(--line-height-ui);
       }
 
-      .reward-item:has(input:checked) .reward-item__name,
+      .reward-item:has(input:checked) {
+        background: var(--reward-complete-background);
+      }
+
+      .reward-item:has(input:checked)::after {
+        opacity: 0.78;
+      }
+
+      .reward-item:has(input:checked) .reward-item__name {
+        color: color-mix(in srgb, var(--label) 78%, var(--document-frame));
+      }
+
       .reward-item:has(input:checked) .reward-item__requirements {
-        color: var(--label-muted);
-        text-decoration: line-through;
+        color: color-mix(in srgb, var(--label-muted) 72%, var(--document-frame));
       }
 
       .reward-crate {
         display: grid;
         gap: var(--space-xxs);
         padding: var(--space-m);
+      }
+
+      .redemption-dialog {
+        inline-size: min(30rem, calc(100vw - (2 * var(--space-l))));
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--surface);
+        color: var(--label);
+        box-shadow: 0 1rem 3rem rgb(0 0 0 / 55%);
+      }
+
+      .redemption-dialog::backdrop {
+        background: rgb(4 7 9 / 78%);
+      }
+
+      .redemption-dialog__content {
+        display: grid;
+        gap: var(--space-m);
+        padding: var(--space-l);
+      }
+
+      .redemption-dialog h2,
+      .redemption-dialog p,
+      .redemption-dialog ul {
+        margin: 0;
+      }
+
+      .redemption-dialog h2 {
+        font-size: var(--font-size-heading);
+        line-height: var(--line-height-ui);
+      }
+
+      .redemption-dialog p,
+      .redemption-dialog li {
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-copy);
+      }
+
+      .redemption-dialog ul {
+        display: grid;
+        gap: var(--space-xs);
+        padding-inline-start: var(--space-l);
+      }
+
+      .redemption-dialog__actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: var(--space-s);
+      }
+
+      .redemption-dialog__actions button {
+        padding: var(--space-s) var(--space-m);
+        border: 1px solid var(--line-muted);
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .redemption-dialog__actions button:hover,
+      .redemption-dialog__actions button:focus-visible {
+        border-color: var(--label-muted);
+        background: var(--line-muted);
+      }
+
+      .redemption-dialog__actions [data-redemption-subtract] {
+        border-color: var(--document-frame);
+        color: var(--document-frame);
       }
 
       .document-strip {
@@ -1012,7 +1141,8 @@
       import { loadCatalogs } from './src/catalogs.ts';
       import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatNumber } from './src/localization.ts';
       import { browserCookieAdapter, restoreState, saveState } from './src/persistence.ts';
-      import { reduceState } from './src/state.ts';
+      import { countPageRedeemableRewards, planRewardRedemption } from './src/redeemable.ts';
+      import { getClassifiedDocumentMinimum, reduceState } from './src/state.ts';
 
       const catalogs = await loadCatalogs();
       let state = restoreState(browserCookieAdapter, catalogs);
@@ -1089,6 +1219,7 @@
       };
 
       let refreshRewardRail = () => {};
+      let refreshDocumentQuantities = () => {};
       const dispatch = (action) => {
         state = reduceState(state, action, catalogs);
         try {
@@ -1098,6 +1229,7 @@
         }
         refreshProgress();
         refreshRewardRail();
+        refreshDocumentQuantities();
       };
 
       refreshProgress();
@@ -1118,10 +1250,80 @@
       const rewardPages = document.querySelector('[data-reward-pages]');
       const documentNames = Object.fromEntries(catalogs.documents.documents.map((documentRecord) => [documentRecord.id, localizer.text(documentRecord.id)]));
       const documentAbbreviations = Object.fromEntries(Object.entries(documentNames).map(([documentId, documentName]) => [documentId, documentName.trim().split(/\s+/u)[0]]));
+      const redemptionDialog = document.createElement('dialog');
+      const redemptionContent = document.createElement('div');
+      const redemptionTitle = document.createElement('h2');
+      const redemptionMessage = document.createElement('p');
+      const redemptionDocuments = document.createElement('ul');
+      const redemptionActions = document.createElement('div');
+      const subtractDocumentsButton = document.createElement('button');
+      const redeemOnlyButton = document.createElement('button');
+      const cancelRedemptionButton = document.createElement('button');
+      const redemptionTitleId = 'reward-redemption-title';
+      let pendingRewardId;
+
+      redemptionDialog.className = 'redemption-dialog';
+      redemptionDialog.setAttribute('aria-labelledby', redemptionTitleId);
+      redemptionContent.className = 'redemption-dialog__content';
+      redemptionTitle.id = redemptionTitleId;
+      redemptionActions.className = 'redemption-dialog__actions';
+      subtractDocumentsButton.type = 'button';
+      subtractDocumentsButton.dataset.redemptionSubtract = '';
+      subtractDocumentsButton.textContent = localizer.text('battlePass.redeemAndSubtract');
+      redeemOnlyButton.type = 'button';
+      redeemOnlyButton.textContent = localizer.text('battlePass.redeemOnly');
+      cancelRedemptionButton.type = 'button';
+      cancelRedemptionButton.textContent = localizer.text('ui.cancel');
+      redemptionActions.append(cancelRedemptionButton, redeemOnlyButton, subtractDocumentsButton);
+      redemptionContent.append(redemptionTitle, redemptionMessage, redemptionDocuments, redemptionActions);
+      redemptionDialog.append(redemptionContent);
+      document.body.append(redemptionDialog);
+
+      const openRedemptionDialog = (reward, plan) => {
+        pendingRewardId = reward.id;
+        redemptionTitle.textContent = localizer.text('battlePass.redeemRewardTitle', { reward: localizer.text(reward.id) });
+        redemptionMessage.textContent = localizer.text('battlePass.subtractDocumentsPrompt');
+        redemptionDocuments.replaceChildren();
+        Object.entries(plan.regularDocuments).forEach(([documentId, quantity]) => {
+          const item = document.createElement('li');
+          item.textContent = `${documentNames[documentId]} (${formatNumber(quantity, localizer.locale)})`;
+          redemptionDocuments.append(item);
+        });
+        if (plan.classifiedDocuments > 0) {
+          const item = document.createElement('li');
+          item.textContent = `${localizer.text('battlePass.classifiedDocuments')} (${formatNumber(plan.classifiedDocuments, localizer.locale)})`;
+          redemptionDocuments.append(item);
+        }
+        redemptionDocuments.hidden = redemptionDocuments.childElementCount === 0;
+        redemptionDialog.showModal();
+        subtractDocumentsButton.focus({ preventScroll: true });
+      };
+
+      const closeRedemptionDialog = () => {
+        if (redemptionDialog.open) redemptionDialog.close();
+      };
+
+      subtractDocumentsButton.addEventListener('click', () => {
+        const rewardId = pendingRewardId;
+        closeRedemptionDialog();
+        if (rewardId) dispatch({ type: 'redeem-reward', rewardId });
+      });
+      redeemOnlyButton.addEventListener('click', () => {
+        const rewardId = pendingRewardId;
+        closeRedemptionDialog();
+        if (rewardId) dispatch({ type: 'claim-reward', rewardId, claimed: true });
+      });
+      cancelRedemptionButton.addEventListener('click', closeRedemptionDialog);
+      redemptionDialog.addEventListener('close', () => {
+        pendingRewardId = undefined;
+        refreshRewardRail();
+      });
+
       const pageViews = catalogs.battlePass.pages.map((page) => {
         const pageSection = document.createElement('section');
         const trigger = document.createElement('button');
         const pageLabel = document.createElement('span');
+        const redeemableCount = document.createElement('span');
         const claimedCount = document.createElement('span');
         const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         const chevronPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -1137,6 +1339,8 @@
         trigger.setAttribute('aria-controls', panelId);
         pageLabel.className = 'reward-page__label';
         pageLabel.textContent = `${localizer.text('battlePass.page')} ${String(page.page).padStart(2, '0')}`;
+        redeemableCount.className = 'reward-page__redeemable';
+        pageLabel.append(' ', redeemableCount);
         claimedCount.className = 'reward-page__count';
         chevron.classList.add('reward-page__chevron');
         chevron.setAttribute('viewBox', '0 0 12 8');
@@ -1179,7 +1383,19 @@
           item.append(label);
           itemList.append(item);
 
-          checkbox.addEventListener('change', () => dispatch({ type: 'claim-reward', rewardId: reward.id, claimed: checkbox.checked }));
+          checkbox.addEventListener('change', () => {
+            if (!checkbox.checked) {
+              dispatch({ type: 'claim-reward', rewardId: reward.id, claimed: false });
+              return;
+            }
+            const plan = planRewardRedemption(reward, state.ownedDocuments, state.classifiedDocuments);
+            if (!plan.canRedeem) {
+              dispatch({ type: 'claim-reward', rewardId: reward.id, claimed: true });
+              return;
+            }
+            checkbox.checked = false;
+            openRedemptionDialog(reward, plan);
+          });
           return { rewardId: reward.id, checkbox };
         });
 
@@ -1188,7 +1404,7 @@
         panel.append(itemList);
         pageSection.append(trigger, panel);
         rewardPages.append(pageSection);
-        return { page, pageSection, trigger, panel, claimedCount, rewardInputs };
+        return { page, pageSection, trigger, panel, redeemableCount, claimedCount, rewardInputs };
       });
 
       const crateReward = document.createElement('article');
@@ -1214,11 +1430,21 @@
         const allRewardsClaimed = rewards.every((reward) => claimedRewards.has(reward.id));
         rewardPages.replaceChildren(...(allRewardsClaimed ? [crateReward] : pageViews.map(({ pageSection }) => pageSection)));
         claimAllButton.disabled = allRewardsClaimed;
-        pageViews.forEach(({ page, trigger, panel, claimedCount, rewardInputs }) => {
+        pageViews.forEach(({ page, pageSection, trigger, panel, redeemableCount, claimedCount, rewardInputs }) => {
           const selected = page.page === state.selectedPage;
           const claimedOnPage = rewardInputs.filter(({ rewardId }) => claimedRewards.has(rewardId)).length;
+          const redeemableOnPage = countPageRedeemableRewards({
+            page,
+            claimedRewardIds: state.claimedRewardIds,
+            ownedDocuments: state.ownedDocuments,
+            classifiedDocuments: state.classifiedDocuments,
+          });
           trigger.setAttribute('aria-expanded', String(selected));
+          pageSection.classList.toggle('reward-page--complete', claimedOnPage === rewardInputs.length);
           panel.hidden = !selected;
+          redeemableCount.textContent = redeemableOnPage > 0
+            ? localizer.text('battlePass.redeemableCount', { count: formatNumber(redeemableOnPage, localizer.locale) })
+            : '';
           claimedCount.textContent = `${formatNumber(claimedOnPage, localizer.locale)} / ${formatNumber(page.rewards.length, localizer.locale)}`;
           rewardInputs.forEach(({ rewardId, checkbox }) => {
             checkbox.checked = claimedRewards.has(rewardId);
@@ -1228,6 +1454,7 @@
       refreshRewardRail();
 
       const documentsById = new Map(catalogs.documents.documents.map((document) => [document.id, document]));
+      const documentQuantityViews = [];
       document.querySelectorAll('[data-document-id]').forEach((tile, index) => {
         const documentId = tile.dataset.documentId;
         const documentRecord = documentsById.get(documentId);
@@ -1264,13 +1491,17 @@
         const readQuantity = () => documentRecord.kind === 'classified'
           ? state.classifiedDocuments
           : state.ownedDocuments[documentId] ?? 0;
+        const readMinimumQuantity = () => documentRecord.kind === 'classified'
+          ? getClassifiedDocumentMinimum(state.claimedRewardIds)
+          : 0;
         const setQuantity = (quantity) => {
-          const normalizedQuantity = Math.max(0, Math.trunc(quantity));
+          const normalizedQuantity = Math.max(readMinimumQuantity(), Math.trunc(quantity));
           dispatch(documentRecord.kind === 'classified'
             ? { type: 'set-classified-documents', quantity: normalizedQuantity }
             : { type: 'set-owned-document', documentId, quantity: normalizedQuantity });
           quantityInput.value = String(readQuantity());
         };
+        quantityInput.min = String(readMinimumQuantity());
         quantityInput.value = String(readQuantity());
         decrementButton.addEventListener('click', () => setQuantity(Number(quantityInput.value) - 1));
         incrementButton.addEventListener('click', () => setQuantity(Number(quantityInput.value) + 1));
@@ -1278,7 +1509,16 @@
           const quantity = Number(quantityInput.value);
           setQuantity(Number.isFinite(quantity) ? quantity : 0);
         });
+        documentQuantityViews.push({ quantityInput, readMinimumQuantity, readQuantity });
       });
+
+      refreshDocumentQuantities = () => {
+        documentQuantityViews.forEach(({ quantityInput, readMinimumQuantity, readQuantity }) => {
+          quantityInput.min = String(readMinimumQuantity());
+          quantityInput.value = String(readQuantity());
+        });
+      };
+      refreshDocumentQuantities();
 
       const modeData = [
         ['pvp-seasonal', 'mode.pvpSeasonal'],

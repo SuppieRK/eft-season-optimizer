@@ -2,7 +2,7 @@ import { GAME_DATA_VERSION } from './catalogs';
 import type { Catalogs, GameMode } from './catalogs';
 import { getCompleteLocales } from './localization';
 import type { OptimizationProfile } from './optimizer';
-import { createDefaultState, getDefaultRewardPage, type AppState } from './state';
+import { createDefaultState, getClassifiedDocumentMinimum, getDefaultRewardPage, type AppState } from './state';
 
 export const COOKIE_SCHEMA_VERSION = 1;
 export const MAX_COOKIE_BYTES = 3800;
@@ -125,12 +125,13 @@ function readEnvelope<T>(cookies: CookieAdapter, name: string): T | undefined {
 function sanitizeProgress(payload: ProgressPayload, defaults: AppState, catalogs: Catalogs): Partial<AppState> {
   const rewardIds = new Set(catalogs.battlePass.pages.flatMap((page) => page.rewards.map((reward) => reward.id)));
   const documentIds = new Set(catalogs.documents.documents.map((document) => document.id));
-  const claimedRewardIds = Array.isArray(payload.claimedRewardIds) ? payload.claimedRewardIds.filter((id) => typeof id === 'string' && rewardIds.has(id)) : defaults.claimedRewardIds;
+  const claimedRewardIds = [...new Set(Array.isArray(payload.claimedRewardIds) ? payload.claimedRewardIds.filter((id) => typeof id === 'string' && rewardIds.has(id)) : defaults.claimedRewardIds)].sort();
   const ownedDocuments = Object.fromEntries(Object.entries(payload.ownedDocuments ?? {}).filter(([id, quantity]) => documentIds.has(id) && validQuantity(quantity)));
+  const classifiedDocuments = validQuantity(payload.classifiedDocuments) ? payload.classifiedDocuments : defaults.classifiedDocuments;
   return {
-    claimedRewardIds: [...new Set(claimedRewardIds)].sort(),
+    claimedRewardIds,
     ownedDocuments: { ...defaults.ownedDocuments, ...ownedDocuments },
-    classifiedDocuments: validQuantity(payload.classifiedDocuments) ? payload.classifiedDocuments : defaults.classifiedDocuments,
+    classifiedDocuments: Math.max(getClassifiedDocumentMinimum(claimedRewardIds), classifiedDocuments),
     tarCoins: validQuantity(payload.tarCoins) ? payload.tarCoins : defaults.tarCoins,
     crateCount: validQuantity(payload.crateCount) && payload.crateCount > 0 ? payload.crateCount : defaults.crateCount,
   };

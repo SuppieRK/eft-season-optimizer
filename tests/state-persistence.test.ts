@@ -42,6 +42,7 @@ describe('state and cookie persistence', () => {
     const selected = reduceState(mode, { type: 'set-page', page: 2 }, catalog);
 
     expect(initial.mode).toBe('pvp-seasonal');
+    expect(initial.classifiedDocuments).toBe(1);
     expect(initial.ownedDocuments[documentId]).toBe(0);
     expect(selected.ownedDocuments[documentId]).toBe(1);
     expect(selected.claimedRewardIds).toEqual([rewardId]);
@@ -68,6 +69,43 @@ describe('state and cookie persistence', () => {
     expect(restored.selectedProfile).toBe('safest');
     expect(restored.ownedDocuments).toEqual(state.ownedDocuments);
     expect(restored.selectedPage).toBe(3);
+  });
+
+  it('enforces one Classified Document only while no rewards are claimed', () => {
+    const catalog = catalogs();
+    const cookies = memoryCookies();
+    const initial = createDefaultState(catalog);
+    const floored = reduceState(initial, { type: 'set-classified-documents', quantity: 0 }, catalog);
+    const claimed = reduceState(floored, { type: 'claim-reward', rewardId: 'rewards.dogtag01.name', claimed: true }, catalog);
+    const zeroWithClaim = reduceState(claimed, { type: 'set-classified-documents', quantity: 0 }, catalog);
+    const noClaimsAgain = reduceState(zeroWithClaim, { type: 'claim-reward', rewardId: 'rewards.dogtag01.name', claimed: false }, catalog);
+
+    expect(floored.classifiedDocuments).toBe(1);
+    expect(zeroWithClaim.classifiedDocuments).toBe(0);
+    expect(noClaimsAgain.classifiedDocuments).toBe(1);
+
+    saveState({ ...initial, classifiedDocuments: 0 }, cookies);
+    expect(restoreState(cookies, catalog).classifiedDocuments).toBe(1);
+    saveState(zeroWithClaim, cookies);
+    expect(restoreState(cookies, catalog).classifiedDocuments).toBe(0);
+  });
+
+  it('redeems a reward by subtracting matching regular documents before Classified Documents', () => {
+    const catalog = catalogs();
+    const initial = createDefaultState(catalog);
+    const prepared = reduceState(reduceState(reduceState(initial,
+      { type: 'set-owned-document', documentId: 'documents.project.name', quantity: 1 }, catalog),
+    { type: 'set-owned-document', documentId: 'documents.blueprints.name', quantity: 1 }, catalog),
+    { type: 'set-classified-documents', quantity: 1 }, catalog);
+    const redeemed = reduceState(prepared, { type: 'redeem-reward', rewardId: 'rewards.tarcoins50-01.name' }, catalog);
+
+    expect(redeemed.claimedRewardIds).toContain('rewards.tarcoins50-01.name');
+    expect(redeemed.ownedDocuments['documents.project.name']).toBe(0);
+    expect(redeemed.ownedDocuments['documents.blueprints.name']).toBe(0);
+    expect(redeemed.classifiedDocuments).toBe(0);
+
+    const insufficient = reduceState(initial, { type: 'redeem-reward', rewardId: 'rewards.tarcoins50-01.name' }, catalog);
+    expect(insufficient).toBe(initial);
   });
 
   it('selects the first page with unclaimed rewards and resets there after clearing completion', () => {

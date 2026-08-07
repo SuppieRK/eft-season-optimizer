@@ -23,7 +23,7 @@ The desktop interface SHALL use a header containing global profile, locale, and 
 - **THEN** the live interface uses that value without requiring a duplicate static page or changes to optimizer, state, localization, or visual-state code
 
 ### Requirement: Battle Pass-inspired presentation
-The interface SHALL use the supplied screenshots as the source of truth for a green-toned, dense Battle Pass-inspired visual hierarchy while preserving readable contrast, visible keyboard focus, semantic controls, responsive behavior, and practical touch targets. All five regions SHALL share one continuous stage. Strong framing SHALL be limited to outer regions, selected states, the document ribbon, dialogs, and the toast; regular content rows SHALL use spacing and separators instead of repeated bordered or elevated containers.
+The interface SHALL use the supplied screenshots as the source of truth for a green-toned, dense Battle Pass-inspired visual hierarchy while preserving readable contrast, visible keyboard focus, semantic controls, responsive behavior, and practical touch targets. All five regions SHALL share one continuous stage. Strong framing SHALL be limited to outer regions, selected states, the document ribbon, dialogs, and the toast; unclaimed regular content rows SHALL use spacing and separators instead of repeated bordered or elevated containers, while completed reward and page states MAY use one restrained green gradient.
 
 #### Scenario: Keyboard navigation
 - **WHEN** a player navigates interactive controls using only a keyboard
@@ -55,10 +55,29 @@ While at least one Battle Pass reward remains unclaimed, the left column SHALL d
 - **WHEN** the selected page has no unclaimed rewards and at least one Battle Pass reward remains unclaimed
 - **THEN** the first page containing an unclaimed reward opens
 
+#### Scenario: Show page inventory-redeemable count
+- **WHEN** current matching regular documents and the owned Classified quantity can cover one or more unclaimed rewards on a page individually
+- **THEN** that page heading shows `({count} redeemable)` using the number of individually redeemable reward options
+- **AND** every option is evaluated independently against the same current inventory snapshot, with matching regular documents applied before Classified Documents backfill that reward's shortage
+- **AND** the calculation excludes claimed rewards, page-unlock state, regular-document exchanges, TarCoin purchases, farming, and future reward grants
+
+#### Scenario: Three Classified Documents create four Page 1 options
+- **WHEN** the player owns no regular documents and owns `3` Classified Documents
+- **THEN** Page 1 counts Dogtag, TarCoins, Burn Poster, and Black Division Gear Crate as four individually redeemable options
+- **AND** the count does not imply that all four can be redeemed from those same three Classified Documents
+
+#### Scenario: Hide an empty inventory-redeemable count
+- **WHEN** no unclaimed reward on a page can be covered by current documents
+- **THEN** that page heading shows no redeemable-count label
+
 #### Scenario: Replace the completed accordion with the crate reward
 - **WHEN** all Battle Pass rewards are claimed
 - **THEN** no reward-page accordion is rendered
 - **AND** the rail renders only the localized Black Division Gear Crate reward with a requirement of `10` documents of any non-Classified type
+
+#### Scenario: Complete one reward page
+- **WHEN** every reward on a page is marked claimed while at least one Battle Pass reward remains unclaimed
+- **THEN** that page heading uses the same restrained green completion treatment as a claimed reward row
 
 ### Requirement: Compact reward rows
 A visible left-column reward row SHALL contain only the localized Battle Pass item name, a compact localized list of document requirements, and the control required to mark the reward claimed. It SHALL NOT display reward artwork, long descriptions, stats, target selection, or unrelated metadata.
@@ -68,19 +87,50 @@ A visible left-column reward row SHALL contain only the localized Battle Pass it
 - **THEN** each reward row shows the item name and unambiguous abbreviated document quantities with accessible full text
 
 ### Requirement: Reward claim controls
-The interface SHALL provide one claimed checkbox for each reward and global Claim all and Clear all buttons in the reward-rail heading. Reward page bodies SHALL contain no interactive controls other than the reward checkboxes. These controls SHALL track already-claimed rewards only and SHALL NOT consume or mutate owned document quantities.
+The interface SHALL provide one semantic claimed checkbox for each reward and global Claim all and Clear all buttons in the reward-rail heading. Reward page bodies SHALL contain no interactive controls other than the reward checkboxes. The checkbox SHALL remain keyboard-focusable while its checked state is represented by a restrained green row gradient and a check icon at the inline end. When current matching regular documents plus Classified backfill cover a checked reward, a native redemption dialog SHALL offer Redeem and subtract, Redeem only, and Cancel before state changes. Redeem and subtract SHALL atomically mark the reward claimed, subtract matching regular documents first, and subtract Classified Documents only for the exact remaining shortage. It SHALL receive initial focus and therefore be activated by Enter immediately after the dialog opens. Redeem only SHALL mark the reward claimed without mutating inventory, and Cancel SHALL change neither claims nor inventory. When recorded inventory cannot cover a checked reward, the interface SHALL mark it claimed immediately without opening a warning dialog or changing document counts. Unchecking a claimed reward and global Claim all/Clear all SHALL remain tracking-only and SHALL NOT reconstruct a reward's consumed allocation. Independently, whenever no rewards remain claimed, the season-start Classified Document grant SHALL enforce a minimum inventory of one; zero SHALL remain valid while one or more rewards are claimed.
 
-#### Scenario: Toggle one reward
-- **WHEN** the player changes a reward checkbox
+#### Scenario: Display a claimed reward
+- **WHEN** a reward is marked claimed
+- **THEN** its row uses a restrained green gradient and shows a check icon at the inline end
+- **AND** its semantic checkbox remains keyboard-focusable
+
+#### Scenario: Confirm subtraction with Enter
+- **WHEN** the redemption dialog opens for a reward covered by recorded inventory and the player immediately presses Enter
+- **THEN** Redeem and subtract is activated
+
+#### Scenario: Redeem and subtract matching inventory
+- **WHEN** the player checks an unclaimed reward, recorded inventory covers it, and the player chooses Redeem and subtract
+- **THEN** the reward becomes claimed and the displayed regular/Classified allocation is subtracted atomically
+- **AND** matching regular documents are consumed before Classified Documents
+
+#### Scenario: Redeem without changing inventory
+- **WHEN** the player chooses Redeem only in the redemption dialog
 - **THEN** only that reward's claimed state changes
+
+#### Scenario: Track a redemption with incomplete inventory
+- **WHEN** the player checks an unclaimed reward that current regular and Classified Documents cannot fully cover
+- **THEN** the reward still becomes claimed without a warning dialog
+- **AND** every entered document quantity remains unchanged
+
+#### Scenario: Cancel individual redemption
+- **WHEN** the player cancels the redemption dialog
+- **THEN** neither claimed rewards nor document inventory changes
+
+#### Scenario: Unclaim a reward
+- **WHEN** the player unchecks a claimed reward
+- **THEN** that reward becomes unclaimed and entered document quantities remain unchanged
+- **AND** if no rewards remain claimed, Classified Documents is raised to the season-start minimum of `1`
 
 #### Scenario: Clear all rewards globally
 - **WHEN** the player invokes global Clear all
 - **THEN** every reward is marked unclaimed
+- **AND** entered document quantities remain unchanged
+- **AND** Classified Documents is at least `1`
 
 #### Scenario: Claim all rewards globally
 - **WHEN** the player invokes global Claim all
 - **THEN** every reward is marked claimed and the interface enters the Black Division crate goal state
+- **AND** no document inventory is consumed
 
 ### Requirement: Center-column optimizer output
 The center column SHALL render one flat current-route-day workspace focused on the selected route profile's next farming or claiming action, estimated days, warnings, empty states, and completed states. When farming is next it SHALL present the first schedule day's locations as an ordered selectable stop strip and SHALL show the selected stop's assigned document artwork and quantities on the continuous center surface. The center SHALL NOT duplicate regular-document deficits or the selected mode's daily limit.
@@ -127,8 +177,16 @@ The header SHALL contain a compact setup button labelled with the selected game 
 The header's primary navigation area SHALL present total-based document progress, claimed-reward progress, and one Fastest/Safest toggle. The document total SHALL be derived from every Battle Pass requirement quantity, and the reward total SHALL be derived from every Battle Pass reward. The toggle SHALL default to Safest, persist as a UI preference, and control the focused result, footer deficits, and full schedule. The interface SHALL render only the selected profile at a time and SHALL NOT display the internal abstract profile-cost value.
 
 #### Scenario: Initial progress uses catalog totals
-- **WHEN** no documents are recorded and no rewards are claimed
-- **THEN** the header shows zero against the complete catalog-derived document and reward totals
+- **WHEN** the player opens the planner without valid persisted progress
+- **THEN** Classified Documents defaults to `1`, regular documents and claimed rewards default to zero, and the header reflects those values against the complete catalog-derived totals
+
+#### Scenario: Persist zero with one or more redemptions
+- **WHEN** valid persisted progress contains zero Classified Documents and at least one claimed reward
+- **THEN** the restored Classified Document count remains `0`
+
+#### Scenario: Normalize zero with no redemptions
+- **WHEN** valid persisted progress contains zero Classified Documents and no claimed rewards
+- **THEN** the restored Classified Document count is raised to `1`
 
 #### Scenario: Persisted progress is restored
 - **WHEN** valid cookies contain owned document quantities and claimed rewards
@@ -166,6 +224,14 @@ The footer SHALL provide one contiguous in-game-inspired document ribbon contain
 #### Scenario: Decrement at zero
 - **WHEN** the player decrements a document whose owned quantity is zero
 - **THEN** the quantity remains zero
+
+#### Scenario: Decrement the season-start Classified Document
+- **WHEN** no rewards are claimed and the player decrements or directly enters a Classified Document quantity below `1`
+- **THEN** the Classified Document quantity remains `1`
+
+#### Scenario: Use the season-start Classified Document
+- **WHEN** at least one reward is claimed and its reviewed redemption consumes the final Classified Document
+- **THEN** the Classified Document quantity may become `0`
 
 #### Scenario: Invalid inventory value
 - **WHEN** the player enters a negative, fractional, non-numeric, or out-of-range quantity
@@ -216,7 +282,7 @@ The reset action SHALL require deliberate confirmation, delete all optimizer coo
 
 #### Scenario: Confirm reset
 - **WHEN** the player confirms a complete reset
-- **THEN** inventory, claimed rewards, settings, locale, selected page, route profile, and notice dismissal return to defaults
+- **THEN** inventory returns to one Classified Document and zero regular documents while claimed rewards, settings, locale, selected page, route profile, and notice dismissal return to defaults
 
 #### Scenario: Cancel reset
 - **WHEN** the player cancels reset confirmation

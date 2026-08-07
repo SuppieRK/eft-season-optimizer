@@ -2,7 +2,7 @@ import type { Catalogs } from './catalogs';
 import { buildIssueUrl, composeFeedback, openIssueComposer, validateFeedbackMessage, type FeedbackConfig } from './feedback';
 import { formatAccessibleRequirements, formatCompactRequirements, formatCountdownUnit, formatDateTime, formatLocalPrice, formatNumber, createLocalizer } from './localization';
 import { optimize, type LocationAssignment, type OptimizerResult, type ProfileResult, type ScheduleDay } from './optimizer';
-import type { AppState, StateAction } from './state';
+import { getClassifiedDocumentMinimum, type AppState, type StateAction } from './state';
 
 let countdownTimer: number | undefined;
 let countdownVisibilityHandler: (() => void) | undefined;
@@ -224,11 +224,12 @@ function renderFooter(localizer: ReturnType<typeof createLocalizer>, catalogs: C
   const documents = catalogs.documents.documents.map((document) => {
     const name = localizer.text(document.id);
     const quantity = document.kind === 'classified' ? state.classifiedDocuments : state.ownedDocuments[document.id] ?? 0;
+    const minimum = document.kind === 'classified' ? getClassifiedDocumentMinimum(state.claimedRewardIds) : 0;
     const deficit = document.kind === 'regular' ? deficits[document.id] ?? 0 : 0;
     return `<article class="document-tile ${document.kind}" data-document-card="${escapeHtml(document.id)}">
       <div class="document-artwork"><img src="${escapeHtml(assetUrl(document.imagePath))}" alt="${escapeHtml(localizer.text(document.imageAltId))}" /></div>
       <div class="document-copy"><span class="document-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>${deficit > 0 ? `<span class="document-deficit" data-deficit="${deficit}">${escapeHtml(localizer.text('ui.stillNeed', { count: formatNumber(deficit, localizer.locale) }))}</span>` : ''}</div>
-      <div class="quantity-stepper"><button type="button" data-action="decrement" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" aria-label="${escapeHtml(`${localizer.text('ui.quantity')} − ${name}`)}">−</button><label><span class="sr-only">${escapeHtml(`${localizer.text('ui.quantity')} ${name}`)}</span><input type="number" min="0" step="1" value="${quantity}" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" /></label><button type="button" data-action="increment" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" aria-label="${escapeHtml(`${localizer.text('ui.quantity')} + ${name}`)}">+</button></div>
+      <div class="quantity-stepper"><button type="button" data-action="decrement" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" aria-label="${escapeHtml(`${localizer.text('ui.quantity')} − ${name}`)}">−</button><label><span class="sr-only">${escapeHtml(`${localizer.text('ui.quantity')} ${name}`)}</span><input type="number" min="${minimum}" step="1" value="${quantity}" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" /></label><button type="button" data-action="increment" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" aria-label="${escapeHtml(`${localizer.text('ui.quantity')} + ${name}`)}">+</button></div>
     </article>`;
   }).join('');
   return `<footer class="site-footer" data-region="footer"><div class="section-heading"><h2>${escapeHtml(localizer.text('ui.documentsOwned'))}</h2></div><div class="document-tray">${documents}</div><div class="footer-meta"><p class="disclaimer">${escapeHtml(localizer.text('footer.disclaimer'))}</p><details class="feedback"><summary>${escapeHtml(localizer.text('feedback.button'))}</summary><form class="feedback-form" data-feedback-form><h3>${escapeHtml(localizer.text('feedback.heading'))}</h3><label>${escapeHtml(localizer.text('feedback.message'))}<textarea data-feedback-message maxlength="2000" rows="5"></textarea></label><label class="check-row"><input type="checkbox" data-feedback-context /> ${escapeHtml(localizer.text('feedback.includeContext'))}</label><pre data-feedback-preview></pre><p data-feedback-status>${escapeHtml(localizer.text('feedback.unconfigured'))}</p><button type="submit" data-feedback-open disabled>${escapeHtml(localizer.text('feedback.openGitHub'))}</button></form></details></div></footer>`;

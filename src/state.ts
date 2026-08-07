@@ -1,6 +1,7 @@
 import type { Catalogs, GameMode } from './catalogs';
 import { getCompleteLocales } from './localization';
 import type { OptimizationProfile } from './optimizer';
+import { planRewardRedemption } from './redeemable';
 
 export type { GameMode } from './catalogs';
 
@@ -30,6 +31,7 @@ export type StateAction =
   | { readonly type: 'set-locale'; readonly locale: string }
   | { readonly type: 'set-profile'; readonly profile: OptimizationProfile }
   | { readonly type: 'claim-reward'; readonly rewardId: string; readonly claimed: boolean }
+  | { readonly type: 'redeem-reward'; readonly rewardId: string }
   | { readonly type: 'claim-page'; readonly page: number; readonly claimed: boolean }
   | { readonly type: 'claim-all'; readonly claimed: boolean }
   | { readonly type: 'set-page'; readonly page: number }
@@ -43,7 +45,7 @@ export function createDefaultState(catalogs: Catalogs): AppState {
     mode: 'pvp-seasonal',
     claimedRewardIds: [],
     ownedDocuments: Object.fromEntries(catalogs.documents.documents.map((document) => [document.id, 0])),
-    classifiedDocuments: 0,
+    classifiedDocuments: 1,
     tarCoins: 0,
     spendTarCoinsOnClassifiedDocuments: false,
     crateCount: 1,
@@ -67,7 +69,9 @@ export function reduceState(state: AppState, action: StateAction, catalogs: Cata
     case 'decrement-document':
       return updateDocument(state, action.documentId, (quantity) => Math.max(0, quantity - 1), catalogs);
     case 'set-classified-documents':
-      return validQuantity(action.quantity) ? { ...state, classifiedDocuments: action.quantity } : state;
+      return validQuantity(action.quantity)
+        ? { ...state, classifiedDocuments: Math.max(getClassifiedDocumentMinimum(state.claimedRewardIds), action.quantity) }
+        : state;
     case 'set-tar-coins':
       return validQuantity(action.quantity) ? { ...state, tarCoins: action.quantity } : state;
     case 'set-spending':
@@ -80,6 +84,8 @@ export function reduceState(state: AppState, action: StateAction, catalogs: Cata
       return action.profile === 'fastest' || action.profile === 'safest' ? { ...state, selectedProfile: action.profile } : state;
     case 'claim-reward':
       return updateClaimedRewards(state, catalogs, (rewardId, claimed) => rewardId === action.rewardId ? action.claimed : claimed);
+    case 'redeem-reward':
+      return redeemReward(state, action.rewardId, catalogs);
     case 'claim-page':
       return updateClaimedRewards(state, catalogs, (rewardId, claimed) => {
         const page = catalogs.battlePass.pages.find((candidate) => candidate.page === action.page);
@@ -105,6 +111,24 @@ function updateDocument(state: AppState, documentId: string, update: (quantity: 
   return { ...state, ownedDocuments: { ...state.ownedDocuments, [documentId]: update(state.ownedDocuments[documentId] ?? 0) } };
 }
 
+function redeemReward(state: AppState, rewardId: string, catalogs: Catalogs): AppState {
+  const reward = catalogs.battlePass.pages.flatMap((page) => page.rewards).find((candidate) => candidate.id === rewardId);
+  if (!reward || state.claimedRewardIds.includes(rewardId)) return state;
+  const plan = planRewardRedemption(reward, state.ownedDocuments, state.classifiedDocuments);
+  if (!plan.canRedeem) return state;
+
+  const ownedDocuments = { ...state.ownedDocuments };
+  Object.entries(plan.regularDocuments).forEach(([documentId, quantity]) => {
+    ownedDocuments[documentId] = (ownedDocuments[documentId] ?? 0) - quantity;
+  });
+  const inventoryState = {
+    ...state,
+    ownedDocuments,
+    classifiedDocuments: state.classifiedDocuments - plan.classifiedDocuments,
+  };
+  return updateClaimedRewards(inventoryState, catalogs, (candidateId, claimed) => candidateId === rewardId || claimed);
+}
+
 function updateClaimedRewards(state: AppState, catalogs: Catalogs, update: (rewardId: string, claimed: boolean) => boolean): AppState {
   const claimed = new Set(state.claimedRewardIds);
   for (const reward of catalogs.battlePass.pages.flatMap((page) => page.rewards)) {
@@ -116,7 +140,12 @@ function updateClaimedRewards(state: AppState, catalogs: Catalogs, update: (rewa
   const selectedPage = pageHasUnclaimedReward(catalogs, state.selectedPage, claimed)
     ? state.selectedPage
     : getDefaultRewardPage(catalogs, claimedRewardIds);
-  return { ...state, claimedRewardIds, selectedPage };
+  const classifiedDocuments = Math.max(getClassifiedDocumentMinimum(claimedRewardIds), state.classifiedDocuments);
+  return { ...state, claimedRewardIds, classifiedDocuments, selectedPage };
+}
+
+export function getClassifiedDocumentMinimum(claimedRewardIds: readonly string[]): number {
+  return claimedRewardIds.length === 0 ? 1 : 0;
 }
 
 export function getDefaultRewardPage(catalogs: Catalogs, claimedRewardIds: readonly string[]): number {

@@ -3,7 +3,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['coverage/**', 'dist/**', '.tmp/**', '.vite/**'] },
+  { ignores: ['coverage/**', 'dist/**', '.tmp/**', '.vite/**', 'playwright-report/**', 'test-results/**'] },
   { ...js.configs.recommended, files: ['**/*.{js,cjs,mjs}'] },
   ...tseslint.configs.recommended,
   {
@@ -12,7 +12,7 @@ export default tseslint.config(
     rules: { 'no-console': ['error', { allow: ['warn', 'error'] }] },
   },
   {
-    files: ['tests/**/*.ts', 'vite.config.ts'],
+    files: ['tests/**/*.ts', 'vite.config.ts', 'playwright.config.ts'],
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
   {

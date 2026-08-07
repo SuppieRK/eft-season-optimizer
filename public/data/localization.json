@@ -103,6 +103,36 @@
       }
     },
     {
+      "id": "battlePass.redeemableCount",
+      "localizations": {
+        "en": "({count} redeemable)"
+      }
+    },
+    {
+      "id": "battlePass.redeemRewardTitle",
+      "localizations": {
+        "en": "Redeem {reward}"
+      }
+    },
+    {
+      "id": "battlePass.subtractDocumentsPrompt",
+      "localizations": {
+        "en": "Subtract these documents from your inventory?"
+      }
+    },
+    {
+      "id": "battlePass.redeemAndSubtract",
+      "localizations": {
+        "en": "Redeem and subtract"
+      }
+    },
+    {
+      "id": "battlePass.redeemOnly",
+      "localizations": {
+        "en": "Redeem only"
+      }
+    },
+    {
       "id": "mode.pve",
       "localizations": {
         "en": "PvE"
