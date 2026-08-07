@@ -16,7 +16,7 @@
 - [x] 2.1 Scaffold a framework-free Vite `vanilla-ts` application around the existing `public/data` catalogs without replacing or regenerating them.
 - [x] 2.2 Configure strict TypeScript, semantic HTML entry markup, CSS entry points, and modules for catalogs, localization, optimizer, state, persistence, and rendering.
 - [x] 2.3 Add Vitest, jsdom, and Testing Library DOM with unit, DOM, and production-build test commands.
-- [x] 2.4 Configure Vite's GitHub Pages base path as `/kord-breach-optimizer/` and add an Actions workflow that builds and deploys `dist`.
+- [x] 2.4 Configure Vite's GitHub Pages base path as `/eft-season-optimizer/` and add an Actions workflow that builds and deploys `dist`.
 - [x] 2.5 Add a production-build check proving HTML, scripts, styles, images, and JSON resolve under the repository base path.
 
 ## 3. Validate and Load Catalog Data

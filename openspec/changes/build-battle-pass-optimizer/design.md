@@ -35,7 +35,7 @@ The optimizer must distinguish the selected game mode's daily document limit fro
 
 The website will use semantic HTML, CSS, and TypeScript modules with direct DOM APIs. Vite's `vanilla-ts` setup will provide the development server and compile and bundle TypeScript into browser JavaScript. No UI framework or client runtime is required.
 
-GitHub Pages serves the generated HTML, CSS, JavaScript, and JSON assets. A GitHub Actions workflow will build and deploy Vite's `dist` output. For a repository Pages site, the Vite base path will be configurable and initially set to `/kord-breach-optimizer/`; a future custom-domain deployment can use `/`.
+GitHub Pages serves the generated HTML, CSS, JavaScript, and JSON assets. A GitHub Actions workflow will build and deploy Vite's `dist` output. For a repository Pages site, the Vite base path will be configurable and initially set to `/eft-season-optimizer/`; a future custom-domain deployment can use `/`.
 
 UI state will be coordinated through a small typed store or reducer and focused, idempotent render functions. All canonical game data ships as versioned JSON assets, and all player state stays in the browser.
 

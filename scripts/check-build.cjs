@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const base = '/kord-breach-optimizer/';
+const base = '/eft-season-optimizer/';
 const dist = path.resolve('dist');
 const htmlPath = path.join(dist, 'index.html');
 const html = fs.readFileSync(htmlPath, 'utf8');

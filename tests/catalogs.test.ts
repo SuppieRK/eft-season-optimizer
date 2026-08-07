@@ -94,7 +94,7 @@ describe('catalogs', () => {
   it('loads catalogs through the configured Pages base path', async () => {
     const raw = readCatalogs();
     const requested: string[] = [];
-    const catalogs = await loadCatalogs('/kord-breach-optimizer/', async (url) => {
+    const catalogs = await loadCatalogs('/eft-season-optimizer/', async (url) => {
       requested.push(String(url));
       const key = Object.entries(catalogPaths).find(([, filePath]) => String(url).endsWith(filePath.replace('public/', '')))?.[0] as CatalogKey;
       return { ok: true, status: 200, json: async () => raw[key] } as Response;
@@ -102,11 +102,11 @@ describe('catalogs', () => {
 
     expect(catalogs.documents.documents).toHaveLength(9);
     expect(requested).toEqual([
-      '/kord-breach-optimizer/data/documents.json',
-      '/kord-breach-optimizer/data/locations.json',
-      '/kord-breach-optimizer/data/battle-pass.json',
-      '/kord-breach-optimizer/data/optimizer-rules.json',
-      '/kord-breach-optimizer/data/localization.json',
+      '/eft-season-optimizer/data/documents.json',
+      '/eft-season-optimizer/data/locations.json',
+      '/eft-season-optimizer/data/battle-pass.json',
+      '/eft-season-optimizer/data/optimizer-rules.json',
+      '/eft-season-optimizer/data/localization.json',
     ]);
   });
 
