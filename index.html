@@ -32,6 +32,7 @@
         --label-muted: #a8adb3;
         --document-frame: #4f8175;
         --classified-frame: #8d5155;
+        --reward-opportunity: #c79a45;
         --reward-complete-background:
           linear-gradient(
             90deg,
@@ -1116,6 +1117,10 @@
         letter-spacing: 0.04em;
       }
 
+      .reward-page__redeemable--locked {
+        color: var(--reward-opportunity);
+      }
+
       .reward-page__count {
         color: var(--label-muted);
         font-size: var(--font-size-caption);
@@ -1898,6 +1903,7 @@
       import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatNumber } from './src/localization.ts';
       import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from './src/persistence.ts';
       import { countPageRedeemableRewards, planRewardRedemption } from './src/redeemable.ts';
+      import { isBattlePassPageUnlocked } from './src/page-unlocks.ts';
       import { getClassifiedDocumentMinimum, reduceState } from './src/state.ts';
 
       const initialize = async () => {
@@ -2221,6 +2227,7 @@
         claimAllButton.disabled = allRewardsClaimed;
         pageViews.forEach(({ page, pageSection, trigger, panel, redeemableCount, claimedCount, rewardInputs }) => {
           const selected = page.page === state.selectedPage;
+          const pageUnlocked = isBattlePassPageUnlocked(catalogs.battlePass.pages, page.page, claimedRewards);
           const claimedOnPage = rewardInputs.filter(({ rewardId }) => claimedRewards.has(rewardId)).length;
           const redeemableOnPage = countPageRedeemableRewards({
             page,
@@ -2232,8 +2239,11 @@
           pageSection.classList.toggle('reward-page--complete', claimedOnPage === rewardInputs.length);
           panel.hidden = !selected;
           redeemableCount.textContent = redeemableOnPage > 0
-            ? localizer.text('battlePass.redeemableCount', { count: formatNumber(redeemableOnPage, localizer.locale) })
+            ? localizer.text(pageUnlocked ? 'battlePass.redeemableCount' : 'battlePass.readyWhenUnlockedCount', {
+              count: formatNumber(redeemableOnPage, localizer.locale),
+            })
             : '';
+          redeemableCount.classList.toggle('reward-page__redeemable--locked', redeemableOnPage > 0 && !pageUnlocked);
           claimedCount.textContent = `${formatNumber(claimedOnPage, localizer.locale)} / ${formatNumber(page.rewards.length, localizer.locale)}`;
           rewardInputs.forEach(({ reward, rewardId, checkbox, item }) => {
             const claimed = claimedRewards.has(rewardId);

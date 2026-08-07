@@ -7,6 +7,7 @@ import type {
   LocationRecord,
   RewardRecord,
 } from './catalogs';
+import { countUnlockedPages } from './page-unlocks';
 
 export type OptimizationProfile = 'fastest' | 'safest';
 
@@ -608,8 +609,8 @@ function greedyPageTwelveSequence(
     ]),
   );
   let state: ProgressionSequenceState = { claimed: initiallyClaimed, sequence: [], requirements: {} };
-  while (unlockedPageCount(pages, state.claimed) < pages.length) {
-    const unlocked = unlockedPageCount(pages, state.claimed);
+  while (countUnlockedPages(pages, state.claimed) < pages.length) {
+    const unlocked = countUnlockedPages(pages, state.claimed);
     const frontier = pages[unlocked - 1];
     const claimedOnFrontier = frontier.rewards.filter((reward) => state.claimed.has(reward.id)).length;
     const claimsNeeded = Math.max(0, frontier.rewards.length - 1 - claimedOnFrontier);
@@ -655,10 +656,10 @@ function pageTwelveFirstSequence(
     ]),
   );
   let beam: readonly ProgressionSequenceState[] = [{ claimed: initiallyClaimed, sequence: [], requirements: {} }];
-  while (beam.some((state) => unlockedPageCount(pages, state.claimed) < pages.length)) {
+  while (beam.some((state) => countUnlockedPages(pages, state.claimed) < pages.length)) {
     const expanded = new Map<string, ProgressionSequenceState>();
     for (const state of beam) {
-      const unlocked = unlockedPageCount(pages, state.claimed);
+      const unlocked = countUnlockedPages(pages, state.claimed);
       if (unlocked >= pages.length) {
         expanded.set(sequenceStateKey(state), state);
         continue;
@@ -779,7 +780,7 @@ function rankProgressionStates(
 ): readonly ProgressionSequenceState[] {
   return states.map((state) => ({
     state,
-    unlockedPages: unlockedPageCount(pages, state.claimed),
+    unlockedPages: countUnlockedPages(pages, state.claimed),
     work: progressionWork(state.requirements, available, profile, catalogs),
     stableOrder: state.sequence.join('|'),
   })).sort((left, right) => right.unlockedPages - left.unlockedPages
@@ -891,7 +892,7 @@ function scheduleProgressiveRoute(
   while (sumValues(farmRemaining) > 0) {
     const locations: LocationAssignment[] = [];
     const rewardIdsClaimed: string[] = [];
-    const unlockedBefore = unlockedPageCount(pages, claimed);
+    const unlockedBefore = countUnlockedPages(pages, claimed);
     let documentQuantity = 0;
     while (documentQuantity < dailyLimit) {
       claimAvailableRewards(pages, claimed, available, rewardIdsClaimed, redemptionSequence);
@@ -923,7 +924,7 @@ function scheduleProgressiveRoute(
     }
     claimAvailableRewards(pages, claimed, available, rewardIdsClaimed, redemptionSequence);
     if (documentQuantity === 0) break;
-    const unlockedAfter = unlockedPageCount(pages, claimed);
+    const unlockedAfter = countUnlockedPages(pages, claimed);
     days.push({
       day: days.length + 1,
       expanded: days.length === 0,
@@ -945,21 +946,10 @@ function scheduleProgressiveRoute(
 }
 
 function progressionCandidates(pages: readonly BattlePassPage[], claimed: ReadonlySet<string>): readonly RewardRecord[] {
-  const unlocked = unlockedPageCount(pages, claimed);
+  const unlocked = countUnlockedPages(pages, claimed);
   const frontier = pages[unlocked - 1];
   if (unlocked < pages.length) return frontier.rewards.filter((reward) => !claimed.has(reward.id));
   return pages.slice(0, unlocked).flatMap((page) => page.rewards.filter((reward) => !claimed.has(reward.id)));
-}
-
-function unlockedPageCount(pages: readonly BattlePassPage[], claimed: ReadonlySet<string>): number {
-  let unlocked = Math.min(1, pages.length);
-  while (unlocked < pages.length) {
-    const previous = pages[unlocked - 1];
-    const required = Math.max(0, previous.rewards.length - 1);
-    if (previous.rewards.filter((reward) => claimed.has(reward.id)).length < required) break;
-    unlocked += 1;
-  }
-  return unlocked;
 }
 
 function claimAvailableRewards(

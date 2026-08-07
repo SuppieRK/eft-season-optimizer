@@ -62,11 +62,19 @@ While at least one Battle Pass reward remains unclaimed, the left column SHALL d
 - **WHEN** the selected page has no unclaimed rewards and at least one Battle Pass reward remains unclaimed
 - **THEN** the first page containing an unclaimed reward opens
 
-#### Scenario: Show page inventory-redeemable count
-- **WHEN** current matching regular documents and the owned Classified quantity can cover one or more unclaimed rewards on a page individually
-- **THEN** that page heading shows `({count} redeemable)` using the number of individually redeemable reward options
+#### Scenario: Show covered options on an unlocked page
+- **WHEN** current matching regular documents and the owned Classified quantity can cover one or more unclaimed rewards on an unlocked page individually
+- **THEN** that page heading shows `({count} redeemable)` using the number of individually covered reward options
 - **AND** every option is evaluated independently against the same current inventory snapshot, with matching regular documents applied before Classified Documents backfill that reward's shortage
-- **AND** the calculation excludes claimed rewards, page-unlock state, regular-document exchanges, TarCoin purchases, farming, and future reward grants
+- **AND** each covered reward row receives the existing restrained green document-coverage treatment
+- **AND** the calculation excludes claimed rewards, regular-document exchanges, TarCoin purchases, farming, and future reward grants
+
+#### Scenario: Show covered options on a locked page
+- **WHEN** current matching regular documents and the owned Classified quantity can cover one or more unclaimed rewards on a page whose previous-page unlock threshold is unmet
+- **THEN** that page heading shows `({count} ready when unlocked)` using the same independent-option count
+- **AND** the count receives a restrained amber opportunity treatment while covered reward rows keep their existing green document-coverage treatment
+- **AND** only the count wording and color change to redeemable as soon as the previous page reaches its implicit reward-count-minus-one threshold
+- **AND** the player can still freely mark rewards on the locked page as redeemed or unredeemed
 
 #### Scenario: Three Classified Documents create four Page 1 options
 - **WHEN** the player owns no regular documents and owns `3` Classified Documents
@@ -77,11 +85,10 @@ While at least one Battle Pass reward remains unclaimed, the left column SHALL d
 - **WHEN** no unclaimed reward on a page can be covered by current documents
 - **THEN** that page heading shows no redeemable-count label
 
-#### Scenario: Highlight an inventory-redeemable reward
-- **WHEN** current matching regular documents and Classified backfill can cover an unclaimed reward
-- **THEN** that reward row receives a restrained redeemable background highlight from the same inventory calculation as the page count
-- **AND** the highlight disappears when the reward is no longer redeemable or is marked claimed
-- **AND** the claimed reward treatment remains visually stronger than the redeemable highlight
+#### Scenario: Remove a covered-reward highlight
+- **WHEN** a covered reward is no longer covered by inventory or is marked claimed
+- **THEN** its green document-coverage highlight disappears
+- **AND** the claimed reward treatment remains visually stronger than the covered-reward highlight
 
 #### Scenario: Replace the completed accordion with the crate reward
 - **WHEN** all Battle Pass rewards are claimed

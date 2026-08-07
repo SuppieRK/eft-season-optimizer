@@ -52,6 +52,33 @@ test('uses alternative-option redeemable counts from the same inventory snapshot
   expect(ordinaryBackground).toBe('none');
 });
 
+test('distinguishes document-covered rewards on locked pages from redeemable rewards', async ({ page }) => {
+  await openWireframe(page);
+  await setDocumentQuantity(page, 'documents.classified.name', 3);
+
+  const pageTwoOpportunity = page.locator('#reward-page-trigger-2 .reward-page__redeemable');
+  const pageTwoCrate = rewardRow(page, 'rewards.bd-crate02.name');
+  await expect(pageTwoOpportunity).toHaveText('(3 ready when unlocked)');
+  await expect(pageTwoOpportunity).toHaveClass(/reward-page__redeemable--locked/u);
+  await expect(pageTwoOpportunity).toHaveCSS('color', 'rgb(199, 154, 69)');
+  await expect(pageTwoCrate).toHaveClass(/reward-item--redeemable/u);
+  expect(await pageTwoCrate.evaluate((element) => getComputedStyle(element).backgroundImage)).toContain('linear-gradient');
+  await page.locator('#reward-page-trigger-2').click();
+  await trackRewardWithoutInventoryChange(page, 'rewards.bd-crate02.name');
+  await expect(page.locator('[data-reward-id="rewards.bd-crate02.name"]')).toBeChecked();
+  await pageTwoCrate.locator('label').click();
+  await expect(page.locator('[data-reward-id="rewards.bd-crate02.name"]')).not.toBeChecked();
+
+  await page.locator('#reward-page-trigger-1').click();
+  for (const rewardId of [dogtagReward, tarCoinsReward, burnPosterReward, crateReward]) {
+    await trackRewardWithoutInventoryChange(page, rewardId);
+  }
+
+  await expect(pageTwoOpportunity).toHaveText('(3 redeemable)');
+  await expect(pageTwoOpportunity).not.toHaveClass(/reward-page__redeemable--locked/u);
+  await expect(pageTwoCrate).toHaveClass(/reward-item--redeemable/u);
+});
+
 test('focuses Redeem and subtract so Enter consumes inventory and completes the row', async ({ page }) => {
   await openWireframe(page);
 

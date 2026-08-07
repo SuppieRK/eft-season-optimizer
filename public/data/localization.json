@@ -109,6 +109,12 @@
       }
     },
     {
+      "id": "battlePass.readyWhenUnlockedCount",
+      "localizations": {
+        "en": "({count} ready when unlocked)"
+      }
+    },
+    {
       "id": "battlePass.redeemRewardTitle",
       "localizations": {
         "en": "Redeem {reward}"
