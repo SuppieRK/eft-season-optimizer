@@ -2417,7 +2417,7 @@
           image.alt = localizer.text(documentRecord.imageAltId);
           imageFrame.append(image);
           const caption = document.createElement('figcaption');
-          caption.append(createElement('strong', '', localizer.text(documentRecord.id)));
+          caption.append(createElement('strong', '', documentAbbreviations[documentRecord.id]));
           caption.append(createElement('span', '', recommendation.role === 'priority'
             ? localizer.text('ui.targetQuantity', { count: formatNumber(recommendation.targetQuantity, localizer.locale) })
             : localizer.text(recommendation.role === 'stockpile' ? 'ui.stockpileDocument' : 'ui.optionalDocument')));

@@ -68,6 +68,7 @@ test('shows both location documents with one clear farming priority', async ({ p
   await expect(optional).toHaveCount(1);
   await expect(priority).toContainText('Priority');
   await expect(optional).toContainText('Optional pickup');
+  await expect(documents.locator('figcaption strong')).toHaveText(['Project', 'Blueprints']);
   await expect(page.locator('[data-focus-heading]')).toHaveText(/.+ \((Easy|Normal|Hard|Insane), \d+ min\)/u);
   await expect(page.locator('.detail-rail')).toHaveCount(0);
   await expect(page.locator('.focus-heading__actions [data-view-route-schedule]')).toBeVisible();
