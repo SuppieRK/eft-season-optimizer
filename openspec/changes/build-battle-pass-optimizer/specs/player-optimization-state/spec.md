@@ -14,9 +14,10 @@ The desktop interface SHALL use a header containing global profile, locale, setu
 - **WHEN** the viewport supports the desktop layout
 - **THEN** the left reward column and expanded Focus column appear between the header and footer in that order
 - **AND** the Focus column spans the former center and right-column tracks
+- **AND** shell margins do not create page-level vertical scrolling when the complete desktop layout is shorter than the viewport
 
 #### Scenario: Narrow-screen layout
-- **WHEN** the viewport cannot fit the three columns accessibly
+- **WHEN** the viewport is `1180px` wide or narrower
 - **THEN** the regions stack as header, Focus next raid with its internally scrolling owned-document ribbon, left reward selection, and credits footer without viewport-level horizontal scrolling
 
 #### Scenario: Adjust desktop placement

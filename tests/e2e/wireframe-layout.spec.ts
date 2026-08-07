@@ -50,6 +50,7 @@ test('keeps the header tracks aligned with the reward rail and expanded Focus re
   expect(footer!.y + footer!.height).toBeLessThanOrEqual(900);
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
 });
 
 test('preserves the desktop grid and avoids viewport overflow at the wide review size', async ({ page }) => {
@@ -61,6 +62,25 @@ test('preserves the desktop grid and avoids viewport overflow at the wide review
   await expect(page.locator('.detail-rail')).toHaveCount(0);
   await expect(page.locator('.document-strip')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('switches to the stacked layout at the desktop minimum without viewport overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 1181, height: 900 });
+  await openWireframe(page);
+
+  for (const width of [1181, 1180, 1024, 900, 833]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => ({
+      viewportWidth: window.innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+    }))).toEqual({ viewportWidth: width, documentWidth: width });
+  }
+
+  const stackedRegionY = await Promise.all([
+    page.locator('.focus-stage'),
+    page.locator('.reward-rail'),
+  ].map(async (locator) => (await locator.boundingBox())?.y ?? -1));
+  expect(stackedRegionY[0]).toBeLessThan(stackedRegionY[1]);
 });
 
 test('stacks the always-available raid workspace without mobile viewport overflow', async ({ page }) => {
