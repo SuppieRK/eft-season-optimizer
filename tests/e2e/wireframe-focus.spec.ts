@@ -127,6 +127,19 @@ test('accepts a zero-yield Commit and exposes the projected schedule on demand',
   await expect(dialog).not.toContainText('Plan details');
   await expect(dialog).not.toContainText('Owned Classified Documents consumed');
   await expect(dialog).not.toContainText(/Page \d+ unlocked/iu);
+  const desktopScrollGeometry = await dialog.evaluate((element) => {
+    const dialogBox = element.getBoundingClientRect();
+    const content = element.querySelector<HTMLElement>('[data-route-schedule-content]')!;
+    const contentBox = content.getBoundingClientRect();
+    return {
+      dialogBottom: dialogBox.bottom,
+      contentBottom: contentBox.bottom,
+      contentClientHeight: content.clientHeight,
+      contentScrollHeight: content.scrollHeight,
+    };
+  });
+  expect(desktopScrollGeometry.contentBottom).toBeLessThanOrEqual(desktopScrollGeometry.dialogBottom);
+  expect(desktopScrollGeometry.contentScrollHeight).toBeGreaterThan(desktopScrollGeometry.contentClientHeight);
   await dialog.getByRole('button', { name: 'Close' }).click();
   await expect(dialog).toBeHidden();
 
@@ -139,6 +152,11 @@ test('accepts a zero-yield Commit and exposes the projected schedule on demand',
   expect(raidColumn).not.toBeNull();
   expect(rewardColumn).not.toBeNull();
   expect(rewardColumn!.y).toBeGreaterThanOrEqual(raidColumn!.y + raidColumn!.height);
+  const mobileBounds = await dialog.evaluate((element) => ({
+    dialogBottom: element.getBoundingClientRect().bottom,
+    contentBottom: element.querySelector('[data-route-schedule-content]')!.getBoundingClientRect().bottom,
+  }));
+  expect(mobileBounds.contentBottom).toBeLessThanOrEqual(mobileBounds.dialogBottom);
 });
 
 test('keeps both location documents useful for optional crate stockpiling', async ({ page }) => {

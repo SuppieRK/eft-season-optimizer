@@ -706,13 +706,19 @@
       .route-schedule-dialog,
       .buyout-dialog {
         inline-size: min(900px, calc(100vw - (2 * var(--space-xl))));
-        max-block-size: min(760px, calc(100vh - (2 * var(--space-xl))));
+        max-block-size: min(760px, calc(100dvh - (2 * var(--space-xl))));
         padding: 0;
         overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 0;
         background: var(--surface);
         color: var(--label);
+      }
+
+      .route-schedule-dialog[open],
+      .buyout-dialog[open] {
+        display: flex;
+        flex-direction: column;
       }
 
       .route-schedule-dialog::backdrop,
@@ -756,9 +762,10 @@
 
       [data-route-schedule-content],
       [data-buyout-content] {
-        max-block-size: calc(100vh - 10rem);
+        min-block-size: 0;
         padding: 0 var(--space-m);
         overflow: auto;
+        scrollbar-gutter: stable;
       }
 
       .schedule-plan-actions,

@@ -152,3 +152,4 @@
 - [x] 16.13 Align the stacked responsive breakpoint with the `1180px` desktop minimum and add boundary Playwright coverage proving intermediate viewports never inherit page-level horizontal overflow.
 - [x] 16.14 Prevent the desktop shell's outer margin from collapsing beyond the viewport-height body and add a Playwright regression proving no empty page-level vertical scroll appears when content fits.
 - [x] 16.15 Promote the reviewed Battle Pass workspace to the sole production `index.html`, remove the separate `wireframe.html` page, retarget Playwright and build validation to the repository root, and reject duplicate preview output.
+- [x] 16.16 Keep the full-schedule header and scrolling content inside one dynamic-viewport-bounded modal frame, prevent the vertical scrollbar from crossing its border, and add desktop/mobile Playwright geometry regressions.
