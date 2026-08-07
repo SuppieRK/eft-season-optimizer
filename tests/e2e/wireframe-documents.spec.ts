@@ -22,7 +22,17 @@ test('renders the square document artwork in source-of-truth order', async ({ pa
     expect(Math.abs(frame!.width - frame!.height)).toBeLessThanOrEqual(1);
     expect(title!.y + title!.height).toBeLessThanOrEqual(frame!.y);
     expect(frame!.y + frame!.height).toBeLessThanOrEqual(quantity!.y);
-    await expect(tile.locator('img')).toHaveAttribute('alt', /\S+/u);
+    const image = tile.locator('img');
+    await expect(image).toHaveAttribute('alt', /\S+/u);
+    await expect(image).toHaveAttribute('width', '1254');
+    await expect(image).toHaveAttribute('height', '1254');
+    const targetSizes = await tile.locator('.document-strip__quantity > *').evaluateAll((elements) =>
+      elements.map((element) => {
+        const box = element.getBoundingClientRect();
+        return { width: box.width, height: box.height };
+      }),
+    );
+    expect(targetSizes.every(({ width, height }) => width >= 24 && height >= 24)).toBe(true);
   }
 
   const geometries = await page.locator('[data-document-id]').evaluateAll((tiles) => tiles.map((tile) => {

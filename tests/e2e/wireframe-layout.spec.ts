@@ -137,6 +137,44 @@ test('keeps season proportions and existing header controls on the shared type s
   expect(new Set(controlFontSizes).size).toBe(1);
 });
 
+test('keeps body section headings at a fixed size across viewport widths', async ({ page }) => {
+  await openWireframe(page);
+
+  const fontSizes = new Set<string>();
+  for (const width of [390, 1180, 1440, 2560]) {
+    await page.setViewportSize({ width, height: 900 });
+    const sizes = await Promise.all([
+      page.locator('#reward-rail-heading'),
+      page.locator('#focus-stage-heading'),
+    ].map((locator) => locator.evaluate((element) => getComputedStyle(element).fontSize)));
+    sizes.forEach((size) => fontSizes.add(size));
+  }
+
+  expect([...fontSizes]).toEqual(['16px']);
+});
+
+test('reveals the initialized interface without a startup layout shift', async ({ page }) => {
+  await page.addInitScript(() => {
+    const shifts: number[] = [];
+    Object.defineProperty(window, '__layoutShiftValues', { value: shifts });
+    new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
+        const shift = entry as PerformanceEntry & { hadRecentInput: boolean; value: number };
+        if (!shift.hadRecentInput) shifts.push(shift.value);
+      });
+    }).observe({ type: 'layout-shift', buffered: true });
+  });
+
+  await openWireframe(page);
+  await expect(page.locator('.wireframe-shell')).not.toHaveAttribute('data-app-pending');
+  await page.waitForTimeout(100);
+  const cumulativeLayoutShift = await page.evaluate(() =>
+    ((window as typeof window & { __layoutShiftValues: number[] }).__layoutShiftValues)
+      .reduce((total, value) => total + value, 0),
+  );
+  expect(cumulativeLayoutShift).toBe(0);
+});
+
 test('uses the screenshot palette without framed header slots', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWireframe(page);

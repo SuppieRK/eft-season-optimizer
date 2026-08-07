@@ -120,7 +120,7 @@ test('shows both location documents with one clear farming priority', async ({ p
   await expect(priority).toHaveCount(1);
   await expect(optional).toHaveCount(1);
   await expect(priority).toContainText('Priority');
-  await expect(optional).toContainText('Optional pickup');
+  await expect(optional.locator('.focus-document__status')).toHaveText('Optional');
   await expect(documents.locator('figcaption strong')).toHaveText(['Project', 'Blueprints']);
   await expect(documents.locator('figcaption')).toHaveText(['Project', 'Blueprints']);
   await expect(documents.locator('figcaption span')).toHaveCount(0);

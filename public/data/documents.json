@@ -6,7 +6,7 @@
       "kind": "regular",
       "descriptionId": "documents.medical.description",
       "imageAltId": "documents.medical.alt",
-      "imagePath": "/assets/documents/medical.png",
+      "imagePath": "/assets/documents/medical.webp",
       "sourceLocationIds": [
         "locations.lab.name",
         "locations.groundZero.name",
@@ -18,7 +18,7 @@
       "kind": "regular",
       "descriptionId": "documents.financial.description",
       "imageAltId": "documents.financial.alt",
-      "imagePath": "/assets/documents/financial.png",
+      "imagePath": "/assets/documents/financial.webp",
       "sourceLocationIds": [
         "locations.customs.name",
         "locations.streets.name",
@@ -30,7 +30,7 @@
       "kind": "regular",
       "descriptionId": "documents.user.description",
       "imageAltId": "documents.user.alt",
-      "imagePath": "/assets/documents/user.png",
+      "imagePath": "/assets/documents/user.webp",
       "sourceLocationIds": [
         "locations.groundZero.name",
         "locations.streets.name",
@@ -42,7 +42,7 @@
       "kind": "regular",
       "descriptionId": "documents.test.description",
       "imageAltId": "documents.test.alt",
-      "imagePath": "/assets/documents/test.png",
+      "imagePath": "/assets/documents/test.webp",
       "sourceLocationIds": [
         "locations.shoreline.name",
         "locations.woods.name",
@@ -54,7 +54,7 @@
       "kind": "regular",
       "descriptionId": "documents.technical.description",
       "imageAltId": "documents.technical.alt",
-      "imagePath": "/assets/documents/technical.png",
+      "imagePath": "/assets/documents/technical.webp",
       "sourceLocationIds": [
         "locations.shoreline.name",
         "locations.woods.name",
@@ -66,7 +66,7 @@
       "kind": "regular",
       "descriptionId": "documents.project.description",
       "imageAltId": "documents.project.alt",
-      "imagePath": "/assets/documents/project.png",
+      "imagePath": "/assets/documents/project.webp",
       "sourceLocationIds": [
         "locations.factory.name",
         "locations.reserve.name",
@@ -78,7 +78,7 @@
       "kind": "regular",
       "descriptionId": "documents.pmc.description",
       "imageAltId": "documents.pmc.alt",
-      "imagePath": "/assets/documents/pmc.png",
+      "imagePath": "/assets/documents/pmc.webp",
       "sourceLocationIds": [
         "locations.reserve.name",
         "locations.lighthouse.name",
@@ -90,7 +90,7 @@
       "kind": "regular",
       "descriptionId": "documents.blueprints.description",
       "imageAltId": "documents.blueprints.alt",
-      "imagePath": "/assets/documents/blueprints.png",
+      "imagePath": "/assets/documents/blueprints.webp",
       "sourceLocationIds": [
         "locations.interchange.name",
         "locations.factory.name",
@@ -102,7 +102,7 @@
       "kind": "classified",
       "descriptionId": "documents.classified.description",
       "imageAltId": "documents.classified.alt",
-      "imagePath": "/assets/documents/classified.png",
+      "imagePath": "/assets/documents/classified.webp",
       "sourceLocationIds": [],
       "sourceDescriptionId": "battlePass.classifiedDocuments",
       "redemptionRule": "backfill-missing-only"

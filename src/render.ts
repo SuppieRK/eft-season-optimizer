@@ -151,7 +151,7 @@ function renderAssignedDocumentArtwork(localizer: ReturnType<typeof createLocali
   return `<div class="route-documents">${location.documents.map((assignment) => {
     const document = catalogs.documents.documents.find((candidate) => candidate.id === assignment.documentId);
     if (!document) return '';
-    return `<article class="route-document"><img src="${escapeHtml(assetUrl(document.imagePath))}" alt="${escapeHtml(localizer.text(document.imageAltId))}" /><div><strong>${escapeHtml(localizer.text(document.id))}</strong><span>× ${formatNumber(assignment.quantity, localizer.locale)}</span></div></article>`;
+    return `<article class="route-document"><img src="${escapeHtml(assetUrl(document.imagePath))}" alt="${escapeHtml(localizer.text(document.imageAltId))}" width="1254" height="1254" /><div><strong>${escapeHtml(localizer.text(document.id))}</strong><span>× ${formatNumber(assignment.quantity, localizer.locale)}</span></div></article>`;
   }).join('')}</div>`;
 }
 
@@ -159,7 +159,7 @@ function renderStockpileRaid(localizer: ReturnType<typeof createLocalizer>, cata
   const documents = raid.documents.map((recommendation) => {
     const document = catalogs.documents.documents.find((candidate) => candidate.id === recommendation.documentId);
     if (!document) return '';
-    return `<article class="route-document" data-document-role="${recommendation.role}"><img src="${escapeHtml(assetUrl(document.imagePath))}" alt="${escapeHtml(localizer.text(document.imageAltId))}" /><div><strong>${escapeHtml(localizer.text(document.id))}</strong><span>${escapeHtml(localizer.text('ui.stockpileDocument'))}</span></div></article>`;
+    return `<article class="route-document" data-document-role="${recommendation.role}"><img src="${escapeHtml(assetUrl(document.imagePath))}" alt="${escapeHtml(localizer.text(document.imageAltId))}" width="1254" height="1254" /><div><strong>${escapeHtml(localizer.text(document.id))}</strong><span>${escapeHtml(localizer.text('ui.stockpileDocument'))}</span></div></article>`;
   }).join('');
   return `<section class="current-route-day route-stockpile"><header><p class="eyebrow">${escapeHtml(localizer.text('ui.crateStockpileRaid'))}</p><h3>${escapeHtml(localizer.text(raid.locationId))}</h3></header><div class="route-stop-stage"><div class="route-documents">${documents}</div></div></section>`;
 }
@@ -237,7 +237,7 @@ function renderFooter(localizer: ReturnType<typeof createLocalizer>, catalogs: C
     const minimum = document.kind === 'classified' ? getClassifiedDocumentMinimum(state.claimedRewardIds) : 0;
     const deficit = document.kind === 'regular' ? deficits[document.id] ?? 0 : 0;
     return `<article class="document-tile ${document.kind}" data-document-card="${escapeHtml(document.id)}">
-      <div class="document-artwork"><img src="${escapeHtml(assetUrl(document.imagePath))}" alt="${escapeHtml(localizer.text(document.imageAltId))}" /></div>
+      <div class="document-artwork"><img src="${escapeHtml(assetUrl(document.imagePath))}" alt="${escapeHtml(localizer.text(document.imageAltId))}" width="1254" height="1254" /></div>
       <div class="document-copy"><span class="document-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>${deficit > 0 ? `<span class="document-deficit" data-deficit="${deficit}">${escapeHtml(localizer.text('ui.stillNeed', { count: formatNumber(deficit, localizer.locale) }))}</span>` : ''}</div>
       <div class="quantity-stepper"><button type="button" data-action="decrement" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" aria-label="${escapeHtml(`${localizer.text('ui.quantity')} − ${name}`)}">−</button><label><span class="sr-only">${escapeHtml(`${localizer.text('ui.quantity')} ${name}`)}</span><input type="number" min="${minimum}" step="1" value="${quantity}" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" /></label><button type="button" data-action="increment" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" aria-label="${escapeHtml(`${localizer.text('ui.quantity')} + ${name}`)}">+</button></div>
     </article>`;
