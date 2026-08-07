@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "flag-icons": "^7.5.0",
+    "lucide": "^1.27.0",
     "slim-select": "^4.0.7"
   }
 }

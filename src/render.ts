@@ -223,8 +223,8 @@ function renderScheduleDialog(localizer: ReturnType<typeof createLocalizer>, pro
 
 function renderBuyout(localizer: ReturnType<typeof createLocalizer>, result: OptimizerResult): string {
   const buyout = result.buyout;
-  const localPrice = buyout.localEstimate && buyout.localEstimate.costMinor > 0 && buyout.localEstimate.currency
-    ? formatLocalPrice({ amountMinor: buyout.localEstimate.costMinor, currency: buyout.localEstimate.currency, display: buyout.localEstimate.display }, localizer.locale)
+  const localPrice = buyout.localEstimate && buyout.localEstimate.price > 0 && buyout.localEstimate.currency
+    ? formatLocalPrice({ price: buyout.localEstimate.price, currency: buyout.localEstimate.currency }, localizer.locale)
     : undefined;
   return `<details class="buyout"><summary>${escapeHtml(localizer.text('ui.buyout'))}</summary><div><p>${escapeHtml(localizer.text('ui.buyoutGrossTarCoins', { count: formatNumber(buyout.grossTarCoinsSpent, localizer.locale) }))}</p>${localPrice ? `<p>${escapeHtml(localizer.text('ui.tarCoinPackageCost', { price: localPrice }))}</p>` : ''}</div></details>`;
 }

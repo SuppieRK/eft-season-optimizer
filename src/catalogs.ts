@@ -23,9 +23,8 @@ export interface LocalizationEntry {
 }
 
 export interface LocalPrice {
-  readonly amountMinor: number;
+  readonly price: number;
   readonly currency: string;
-  readonly display: string;
 }
 
 export interface PriceEntry {
@@ -191,6 +190,20 @@ function asInteger(value: unknown, label: string, issues: string[], minimum = 0)
   return value;
 }
 
+function asNumber(value: unknown, label: string, issues: string[], minimum = 0): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < minimum) {
+    issues.push(`${label} must be a finite number >= ${minimum}`);
+    return minimum;
+  }
+  return value;
+}
+
+function asCurrencyCode(value: unknown, label: string, issues: string[]): string {
+  const currency = asString(value, label, issues);
+  if (currency && !/^[A-Z]{3}$/u.test(currency)) issues.push(`${label} must be a three-letter uppercase ISO currency code`);
+  return currency;
+}
+
 function asBoolean(value: unknown, label: string, issues: string[]): boolean {
   if (typeof value !== 'boolean') {
     issues.push(`${label} must be a boolean`);
@@ -247,9 +260,8 @@ function parseLocalization(raw: unknown, issues: string[]): LocalizationCatalog 
     for (const [locale, valueForLocale] of Object.entries(localizations)) {
       const price = asObject(valueForLocale, `localization.priceEntries[${index}].localizations.${locale}`, issues);
       prices[locale] = {
-        amountMinor: asInteger(price.amountMinor, `localization.priceEntries[${index}].${locale}.amountMinor`, issues),
-        currency: asString(price.currency, `localization.priceEntries[${index}].${locale}.currency`, issues),
-        display: asString(price.display, `localization.priceEntries[${index}].${locale}.display`, issues),
+        price: asNumber(price.price, `localization.priceEntries[${index}].${locale}.price`, issues),
+        currency: asCurrencyCode(price.currency, `localization.priceEntries[${index}].${locale}.currency`, issues),
       };
     }
     return { id: requireId(entry.id, `localization.priceEntries[${index}].id`, issues), localizations: prices };

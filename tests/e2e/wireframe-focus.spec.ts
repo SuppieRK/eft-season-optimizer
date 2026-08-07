@@ -227,7 +227,16 @@ test('accepts a zero-yield Commit and exposes the projected schedule on demand',
   });
   expect(desktopScrollGeometry.contentBottom).toBeLessThanOrEqual(desktopScrollGeometry.dialogBottom);
   expect(desktopScrollGeometry.contentScrollHeight).toBeGreaterThan(desktopScrollGeometry.contentClientHeight);
-  await dialog.getByRole('button', { name: 'Close' }).click();
+  const scheduleClose = dialog.getByRole('button', { name: 'Close' });
+  await expect(scheduleClose).toHaveText('');
+  await expect(scheduleClose.locator('svg.dialog-close__icon')).toHaveCount(1);
+  const scheduleCloseBox = await scheduleClose.boundingBox();
+  const scheduleCloseIconBox = await scheduleClose.locator('svg.dialog-close__icon').boundingBox();
+  expect(scheduleCloseBox).not.toBeNull();
+  expect(scheduleCloseIconBox).not.toBeNull();
+  expect(Math.abs(scheduleCloseBox!.width - scheduleCloseBox!.height)).toBeLessThanOrEqual(1);
+  expect(scheduleCloseIconBox!.width).toBeGreaterThanOrEqual(20);
+  await scheduleClose.click();
   await expect(dialog).toBeHidden();
 
   await page.setViewportSize({ width: 390, height: 844 });
@@ -300,6 +309,12 @@ test('opens a detailed buyout from the approximate Documents price', async ({ pa
   const dialog = page.locator('[data-buyout-dialog]');
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole('heading', { name: 'Battle Pass buyout' })).toBeVisible();
+  const buyoutClose = dialog.getByRole('button', { name: 'Close' });
+  await expect(buyoutClose).toHaveText('');
+  await expect(buyoutClose.locator('svg.dialog-close__icon')).toHaveCount(1);
+  const buyoutCloseBox = await buyoutClose.boundingBox();
+  expect(buyoutCloseBox).not.toBeNull();
+  expect(Math.abs(buyoutCloseBox!.width - buyoutCloseBox!.height)).toBeLessThanOrEqual(1);
   const scenarios = dialog.locator('[data-buyout-scenario]');
   await expect(scenarios).toHaveCount(2);
   expect(await scenarios.evaluateAll((elements) => elements.map((element) => (element as HTMLElement).dataset.buyoutScenario))).toEqual([
@@ -310,6 +325,15 @@ test('opens a detailed buyout from the approximate Documents price', async ({ pa
   const keep = scenarios.nth(1);
   await expect(spend.getByRole('heading', { name: 'Spend Battle Pass TarCoins' })).toBeVisible();
   await expect(keep.getByRole('heading', { name: 'Keep Battle Pass TarCoins' })).toBeVisible();
+  await expect(spend.getByRole('heading', { name: 'Spend Battle Pass TarCoins' })).toHaveCSS('color', 'rgb(66, 140, 115)');
+  await expect(keep.getByRole('heading', { name: 'Keep Battle Pass TarCoins' })).toHaveCSS('color', 'rgb(66, 140, 115)');
+  const scenarioSeparation = await scenarios.evaluateAll((elements) => {
+    const spendBox = elements[0]!.getBoundingClientRect();
+    const keepBox = elements[1]!.getBoundingClientRect();
+    const expectedGap = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--space-l'));
+    return { actual: keepBox.top - spendBox.bottom, expected: expectedGap };
+  });
+  expect(scenarioSeparation.actual).toBeGreaterThanOrEqual(scenarioSeparation.expected - 1);
   for (const scenario of [spend, keep]) {
     const tables = scenario.locator('[data-buyout-table]');
     await expect(tables).toHaveCount(2);
@@ -323,8 +347,9 @@ test('opens a detailed buyout from the approximate Documents price', async ({ pa
   }
   await expect(spend.locator('[data-buyout-battle-pass-tar-coins]')).toHaveCount(1);
   await expect(keep.locator('[data-buyout-battle-pass-tar-coins]')).toHaveCount(0);
-  await expect(spend.locator('[data-buyout-table="tar-coin-packages"]')).toContainText('FROM $');
-  await expect(keep.locator('[data-buyout-table="tar-coin-packages"]')).toContainText('FROM $');
+  await expect(spend.locator('[data-buyout-table="tar-coin-packages"]')).toContainText('$');
+  await expect(keep.locator('[data-buyout-table="tar-coin-packages"]')).toContainText('$');
+  await expect(dialog).not.toContainText('FROM $');
   expect(await spend.locator('[data-buyout-table="classified-bundles"] tbody').innerText())
     .toBe(await keep.locator('[data-buyout-table="classified-bundles"] tbody').innerText());
   await expect(dialog).not.toContainText('TarCoin funding');

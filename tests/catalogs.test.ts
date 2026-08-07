@@ -69,13 +69,14 @@ describe('catalogs', () => {
       [12500, 2500],
       [20250, 5250],
     ]);
+    expect(catalogs.localization.schemaVersion).toBe(2);
     expect(catalogs.localization.priceEntries.map((entry) => entry.localizations.en)).toEqual([
-      { amountMinor: 499, currency: 'USD', display: 'FROM $ 4.99' },
-      { amountMinor: 999, currency: 'USD', display: 'FROM $ 9.99' },
-      { amountMinor: 1999, currency: 'USD', display: 'FROM $ 19.99' },
-      { amountMinor: 4999, currency: 'USD', display: 'FROM $ 49.99' },
-      { amountMinor: 9999, currency: 'USD', display: 'FROM $ 99.99' },
-      { amountMinor: 14999, currency: 'USD', display: 'FROM $ 149.99' },
+      { price: 4.99, currency: 'USD' },
+      { price: 9.99, currency: 'USD' },
+      { price: 19.99, currency: 'USD' },
+      { price: 49.99, currency: 'USD' },
+      { price: 99.99, currency: 'USD' },
+      { price: 149.99, currency: 'USD' },
     ]);
 
     const tarCoinRewards = catalogs.battlePass.pages.flatMap((page) => page.rewards)
@@ -123,5 +124,9 @@ describe('catalogs', () => {
     const battlePass = structuredClone(raw.battlePass) as { pages: Array<{ rewards: Array<{ requirements: Array<Record<string, unknown>> }> }> };
     battlePass.pages[0].rewards[0].requirements[0].documentId = 'documents.missing.name';
     expect(() => parseCatalogs({ ...raw, battlePass })).toThrow(/unknown document/);
+
+    const localization = structuredClone(raw.localization) as { priceEntries: Array<{ localizations: { en: Record<string, unknown> } }> };
+    localization.priceEntries[0].localizations.en.currency = 'US';
+    expect(() => parseCatalogs({ ...raw, localization })).toThrow(/three-letter uppercase ISO currency code/);
   });
 });

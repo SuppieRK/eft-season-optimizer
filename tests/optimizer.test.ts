@@ -254,6 +254,7 @@ describe('optimizer', () => {
     expect(staged.buyout.localEstimate?.excessTarCoins).toBe(50);
     expect(staged.buyout.keepBattlePassTarCoinsLocalEstimate?.packageCounts[0]).toBe(1);
     expect(staged.buyout.keepBattlePassTarCoinsLocalEstimate?.excessTarCoins).toBe(0);
+    expect(staged.buyout.localEstimate?.price).toBe(4.99);
     expect(staged.buyout.localEstimate?.currency).toBe('USD');
     expect(disabled.buyout.localEstimate?.tarCoinsPurchased).toBe(0);
     expect(disabled.buyout.keepBattlePassTarCoinsLocalEstimate?.tarCoinsPurchased).toBe(500);

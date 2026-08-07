@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "defaultLocale": "en",
   "supportedLocales": [
     "en"
@@ -519,7 +519,7 @@
     {
       "id": "footer.disclaimer",
       "localizations": {
-        "en": "Escape from Tarkov and all game image assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool."
+        "en": "Escape from Tarkov and all game assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool."
       }
     },
     {
@@ -783,7 +783,7 @@
     {
       "id": "rewards.silver.name",
       "localizations": {
-        "en": "Серебряная"
+        "en": "Server Room"
       }
     },
     {
@@ -946,6 +946,24 @@
       "id": "ui.documentsOwned",
       "localizations": {
         "en": "Documents owned"
+      }
+    },
+    {
+      "id": "ui.documentCounterDisclaimer",
+      "localizations": {
+        "en": "Document counts are independent from reward claims and must be adjusted separately."
+      }
+    },
+    {
+      "id": "ui.optimizerHelpLabel",
+      "localizations": {
+        "en": "How to use the optimizer"
+      }
+    },
+    {
+      "id": "ui.optimizerHelp",
+      "localizations": {
+        "en": "Select the rewards you already claimed and enter the documents you own.\n\nFollow Next Raid, enter the documents you extracted, then select Commit to update the plan."
       }
     },
     {
@@ -1542,9 +1560,8 @@
       "id": "tarCoinBundles.500.localPrice",
       "localizations": {
         "en": {
-          "amountMinor": 499,
-          "currency": "USD",
-          "display": "FROM $ 4.99"
+          "price": 4.99,
+          "currency": "USD"
         }
       }
     },
@@ -1552,9 +1569,8 @@
       "id": "tarCoinBundles.1100.localPrice",
       "localizations": {
         "en": {
-          "amountMinor": 999,
-          "currency": "USD",
-          "display": "FROM $ 9.99"
+          "price": 9.99,
+          "currency": "USD"
         }
       }
     },
@@ -1562,9 +1578,8 @@
       "id": "tarCoinBundles.2300.localPrice",
       "localizations": {
         "en": {
-          "amountMinor": 1999,
-          "currency": "USD",
-          "display": "FROM $ 19.99"
+          "price": 19.99,
+          "currency": "USD"
         }
       }
     },
@@ -1572,9 +1587,8 @@
       "id": "tarCoinBundles.6000.localPrice",
       "localizations": {
         "en": {
-          "amountMinor": 4999,
-          "currency": "USD",
-          "display": "FROM $ 49.99"
+          "price": 49.99,
+          "currency": "USD"
         }
       }
     },
@@ -1582,9 +1596,8 @@
       "id": "tarCoinBundles.12500.localPrice",
       "localizations": {
         "en": {
-          "amountMinor": 9999,
-          "currency": "USD",
-          "display": "FROM $ 99.99"
+          "price": 99.99,
+          "currency": "USD"
         }
       }
     },
@@ -1592,9 +1605,8 @@
       "id": "tarCoinBundles.20250.localPrice",
       "localizations": {
         "en": {
-          "amountMinor": 14999,
-          "currency": "USD",
-          "display": "FROM $ 149.99"
+          "price": 149.99,
+          "currency": "USD"
         }
       }
     }

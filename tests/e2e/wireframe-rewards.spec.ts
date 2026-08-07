@@ -60,7 +60,7 @@ test('distinguishes document-covered rewards on locked pages from redeemable rew
   const pageTwoCrate = rewardRow(page, 'rewards.bd-crate02.name');
   await expect(pageTwoOpportunity).toHaveText('(3 ready when unlocked)');
   await expect(pageTwoOpportunity).toHaveClass(/reward-page__redeemable--locked/u);
-  await expect(pageTwoOpportunity).toHaveCSS('color', 'rgb(199, 154, 69)');
+  await expect(pageTwoOpportunity).toHaveCSS('color', 'rgb(175, 138, 69)');
   await expect(pageTwoCrate).toHaveClass(/reward-item--redeemable/u);
   expect(await pageTwoCrate.evaluate((element) => getComputedStyle(element).backgroundImage)).toContain('linear-gradient');
   await page.locator('#reward-page-trigger-2').click();

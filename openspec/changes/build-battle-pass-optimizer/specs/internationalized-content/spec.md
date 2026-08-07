@@ -15,11 +15,11 @@ Names, textual descriptions, requirement abbreviations, image alternatives, disp
 - **THEN** its name, description, abbreviation, and image alternative resolve through their respective IDs in `localization.json`
 
 ### Requirement: Structured locale-dependent prices
-Real-money TarCoin package prices SHALL use independent entries in `localization.json` whose value for each locale contains integer `amountMinor`, ISO `currency`, and localized `display` fields. Optimizer rules SHALL reference these entries by ID. Code SHALL use `amountMinor` for cost comparison and SHALL NOT parse the localized display string or infer a price for another locale.
+Real-money TarCoin package prices SHALL use independent entries in `localization.json` whose value for each locale contains only a finite non-negative numeric `price` in major currency units and a three-letter uppercase ISO `currency` code. Optimizer rules SHALL reference these entries by ID. Code SHALL normalize `price` to the ISO currency's fraction digits for exact cost comparison, format it at runtime for the active locale, and SHALL NOT infer a price for another locale.
 
 #### Scenario: Local package price is loaded
 - **WHEN** a TarCoin package references `tarCoinBundles.500.localPrice` under English
-- **THEN** its localized value contains `amountMinor: 499`, `currency: "USD"`, and `display: "FROM $ 4.99"`
+- **THEN** its localized value is `{ "price": 4.99, "currency": "USD" }`
 
 #### Scenario: Local package price is unavailable
 - **WHEN** the active locale lacks a structured price for a TarCoin package
@@ -90,8 +90,8 @@ The application SHALL use locale-aware number, date, time, plural, and message f
 
 #### Scenario: Render a local real-money estimate
 - **WHEN** a complete same-currency TarCoin package estimate is available for the active locale
-- **THEN** its summed integer minor-unit amount is formatted for that locale and currency in the table total
-- **AND** individual package rows preserve their exact localized storefront `display` values, including screenshot-backed `FROM` text
+- **THEN** its normalized numeric amount is formatted for that locale and currency in the table total
+- **AND** individual package rows format the same structured numeric data without stored display text or a `FROM` prefix
 
 ### Requirement: Localized compact requirement text
 The shortened document requirements in the left reward column SHALL use dedicated localized abbreviations and SHALL expose unabridged localized text to assistive technology.

@@ -20,6 +20,25 @@ test('shows the season identity, relative countdown, totals, and default route p
   await expect(page.locator('[data-reward-progress]')).toHaveJSProperty('value', 0);
   await expect(page.locator('input[name="route-profile"][value="safest"]')).toBeChecked();
   await expect(page.locator('input[name="route-profile"][value="fastest"]')).not.toBeChecked();
+
+  const helpTrigger = page.locator('[data-season-help-trigger]');
+  const helpTooltip = page.locator('[data-season-help-tooltip]');
+  await expect(helpTrigger.locator('svg.season-help__icon')).toHaveCount(1);
+  await expect(helpTrigger).toHaveAttribute('aria-label', 'How to use the optimizer');
+  const helpGeometry = await Promise.all([
+    helpTrigger.boundingBox(),
+    helpTrigger.locator('svg.season-help__icon').boundingBox(),
+  ]);
+  expect(helpGeometry.every(Boolean)).toBe(true);
+  helpGeometry.forEach((box) => expect(Math.abs(box!.width - box!.height)).toBeLessThanOrEqual(1));
+  await expect(helpTooltip).toHaveCSS('opacity', '0');
+  await helpTrigger.hover();
+  await expect(helpTooltip).toHaveCSS('opacity', '1');
+  await expect(helpTooltip).toContainText('Follow Next Raid');
+  expect(await helpTooltip.textContent()).toContain('\n\nFollow Next Raid');
+  await page.mouse.move(1000, 800);
+  await helpTrigger.focus();
+  await expect(helpTooltip).toHaveCSS('opacity', '1');
 });
 
 test('persists the Fastest route selection', async ({ page }) => {

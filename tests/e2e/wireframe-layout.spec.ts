@@ -8,7 +8,7 @@ function gapBetween(left: Box, right: Box): number {
   return right.x - (left.x + left.width);
 }
 
-test('keeps the header tracks aligned with the reward rail and expanded Focus region', async ({ page }) => {
+test('groups the header into summary and control sections across the workspace', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWireframe(page);
 
@@ -19,23 +19,21 @@ test('keeps the header tracks aligned with the reward rail and expanded Focus re
     page.locator('.reward-rail').boundingBox(),
     page.locator('.focus-stage').boundingBox(),
   ]);
-  expect(headerBoxes).toHaveLength(3);
+  expect(headerBoxes).toHaveLength(2);
   expect(workspaceBoxes.every(Boolean)).toBe(true);
   await expect(page.locator('.detail-rail')).toHaveCount(0);
   await expect(page.locator('.lower-band')).toHaveCount(0);
 
   expect(Math.abs(headerBoxes[0]!.x - workspaceBoxes[0]!.x)).toBeLessThanOrEqual(1);
-  expect(Math.abs(headerBoxes[0]!.width - workspaceBoxes[0]!.width)).toBeLessThanOrEqual(1);
-  expect(Math.abs(headerBoxes[1]!.x - workspaceBoxes[1]!.x)).toBeLessThanOrEqual(1);
   expect(Math.abs(
-    headerBoxes[2]!.x + headerBoxes[2]!.width
+    headerBoxes[1]!.x + headerBoxes[1]!.width
     - (workspaceBoxes[1]!.x + workspaceBoxes[1]!.width),
   )).toBeLessThanOrEqual(1);
-
-  const horizontalGap = gapBetween(headerBoxes[0]!, headerBoxes[1]!);
-  expect(horizontalGap).toBeGreaterThan(0);
-  expect(Math.abs(horizontalGap - gapBetween(headerBoxes[1]!, headerBoxes[2]!))).toBeLessThanOrEqual(1);
-  expect(Math.abs(horizontalGap - gapBetween(workspaceBoxes[0]!, workspaceBoxes[1]!))).toBeLessThanOrEqual(1);
+  expect(gapBetween(headerBoxes[0]!, headerBoxes[1]!)).toBeGreaterThan(0);
+  await expect(page.locator('.header-summary .season-slot')).toHaveCount(1);
+  await expect(page.locator('.header-summary .primary-navigation-slot .navigation-progress')).toHaveCount(2);
+  await expect(page.locator('.header-controls .route-profile-toggle')).toHaveCount(1);
+  await expect(page.locator('.header-controls .account-slot')).toHaveCount(1);
 
   const focus = page.locator('.focus-stage');
   const documentStrip = await focus.locator('.document-strip').boundingBox();
@@ -101,6 +99,14 @@ test('stacks the always-available raid workspace without mobile viewport overflo
     scrollWidth: element.scrollWidth,
   }));
   expect(ribbonOverflow.scrollWidth).toBeGreaterThan(ribbonOverflow.clientWidth);
+  const mobileNoteGeometry = await Promise.all([
+    page.locator('.document-strip'),
+    page.locator('[data-document-counter-note]'),
+  ].map((locator) => locator.boundingBox()));
+  expect(mobileNoteGeometry.every(Boolean)).toBe(true);
+  expect(mobileNoteGeometry[1]!.x).toBeGreaterThanOrEqual(mobileNoteGeometry[0]!.x);
+  expect(mobileNoteGeometry[1]!.x + mobileNoteGeometry[1]!.width)
+    .toBeLessThanOrEqual(mobileNoteGeometry[0]!.x + mobileNoteGeometry[0]!.width);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
@@ -129,4 +135,51 @@ test('keeps season proportions and existing header controls on the shared type s
     page.locator('.ss-main.language-select'),
   ].map((locator) => locator.evaluate((element) => getComputedStyle(element).fontSize)));
   expect(new Set(controlFontSizes).size).toBe(1);
+});
+
+test('uses the screenshot palette without framed header slots', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openWireframe(page);
+
+  const palette = await page.locator(':root').evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      season: style.getPropertyValue('--season-accent').trim(),
+      document: style.getPropertyValue('--document-border').trim(),
+      action: style.getPropertyValue('--action-surface').trim(),
+      purchase: style.getPropertyValue('--purchase-accent').trim(),
+    };
+  });
+  expect(palette).toEqual({
+    season: '#428c73',
+    document: '#95d6bc',
+    action: '#3f5960',
+    purchase: '#af8a45',
+  });
+
+  const headerChrome = await page.locator('.wireframe-header > .header-slot').evaluateAll((elements) =>
+    elements.map((element) => {
+      const style = getComputedStyle(element);
+      return { background: style.backgroundColor, border: style.borderWidth };
+    }),
+  );
+  expect(headerChrome).toEqual(Array.from({ length: 2 }, () => ({
+    background: 'rgba(0, 0, 0, 0)',
+    border: '0px',
+  })));
+
+  await expect(page.locator('.season-number')).toHaveCSS('color', 'rgb(66, 140, 115)');
+  await expect(page.locator('[data-reward-claim-all]')).toHaveCSS('background-color', 'rgb(63, 89, 96)');
+  await expect(page.locator('[data-commit-raid]')).toBeEnabled({ timeout: 10_000 });
+  await expect(page.locator('[data-commit-raid]')).toHaveCSS('background-color', 'rgb(63, 89, 96)');
+  const actionHeights = await Promise.all([
+    '[data-reward-claim-all]',
+    '[data-reward-clear-all]',
+    '[data-view-route-schedule]',
+    '[data-commit-raid]',
+  ].map(async (selector) => (await page.locator(selector).boundingBox())?.height));
+  expect(actionHeights.every(Boolean)).toBe(true);
+  expect(Math.max(...actionHeights as number[]) - Math.min(...actionHeights as number[])).toBeLessThanOrEqual(1);
+  await expect(page.locator('[data-buyout-link]')).toHaveCSS('color', 'rgb(175, 138, 69)');
+  await expect(page.locator('.document-strip__image-frame').first()).toHaveCSS('border-color', 'rgb(149, 214, 188)');
 });

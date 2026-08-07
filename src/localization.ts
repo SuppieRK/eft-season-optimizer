@@ -68,7 +68,7 @@ export function formatTarCoins(value: number, locale: string): string {
 }
 
 export function formatLocalPrice(price: LocalPrice, locale: string): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: price.currency }).format(price.amountMinor / 100);
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: price.currency }).format(price.price);
 }
 
 export function formatDateTime(timestampSeconds: number, locale: string): string {

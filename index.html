@@ -24,26 +24,30 @@
         --header-control-padding-inline: calc(var(--space-s) + var(--space-xxs));
         --header-control-chevron-gap: var(--header-control-padding-inline);
         --header-control-chevron-correction: 0.125em;
+        --section-action-height: 2.618em;
         --line: #697078;
         --line-muted: #41464d;
         --surface: #17191c;
         --surface-alt: #1d2024;
         --label: #d7d9dc;
         --label-muted: #a8adb3;
-        --document-frame: #4f8175;
+        --season-accent: #428c73;
+        --document-border: #95d6bc;
+        --action-surface: #3f5960;
+        --purchase-accent: #af8a45;
         --classified-frame: #8d5155;
-        --reward-opportunity: #c79a45;
+        --reward-opportunity: var(--purchase-accent);
         --reward-complete-background:
           linear-gradient(
             90deg,
-            color-mix(in srgb, var(--document-frame) 10%, transparent),
-            color-mix(in srgb, var(--document-frame) 30%, transparent)
+            color-mix(in srgb, var(--season-accent) 10%, transparent),
+            color-mix(in srgb, var(--season-accent) 30%, transparent)
           );
         --reward-redeemable-background:
           linear-gradient(
             90deg,
-            color-mix(in srgb, var(--document-frame) 6%, transparent),
-            color-mix(in srgb, var(--document-frame) 16%, transparent)
+            color-mix(in srgb, var(--season-accent) 6%, transparent),
+            color-mix(in srgb, var(--season-accent) 16%, transparent)
           );
         --tooltip-surface: #050607;
         --tooltip-line: #777e84;
@@ -81,7 +85,15 @@
         margin: 3vh auto;
       }
 
-      .wireframe-header,
+      .wireframe-header {
+        position: relative;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: var(--grid-gap);
+        min-block-size: 0;
+      }
+
       .wireframe-workspace {
         display: grid;
         grid-template-columns:
@@ -145,11 +157,27 @@
       }
 
       .header-slot {
-        border: 1px solid var(--line);
-        background: var(--surface-alt);
+        border: 0;
+        background: transparent;
+      }
+
+      .header-summary {
+        display: grid;
+        grid-template-columns: minmax(220px, 0.7fr) minmax(350px, 1fr);
+        align-items: center;
+        gap: var(--grid-gap);
+      }
+
+      .header-controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-s);
+        padding: var(--space-s);
       }
 
       .season-slot {
+        position: relative;
         display: flex;
         align-items: center;
         gap: var(--space-m);
@@ -159,7 +187,7 @@
       .season-number {
         padding-inline-end: var(--space-m);
         border-inline-end: 1px solid var(--line-muted);
-        color: var(--label-muted);
+        color: var(--season-accent);
         font-size: var(--font-size-display);
         font-weight: 700;
         line-height: 0.81;
@@ -190,9 +218,65 @@
         letter-spacing: 0.05em;
       }
 
+      .season-help__trigger {
+        display: grid;
+        flex: 0 0 auto;
+        place-items: center;
+        inline-size: 1.618em;
+        block-size: 1.618em;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--label-muted);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        line-height: 1;
+        cursor: help;
+      }
+
+      .season-help__trigger:hover,
+      .season-help__trigger:focus-visible {
+        color: var(--document-border);
+        outline: 0;
+      }
+
+      .season-help__icon {
+        display: block;
+        inline-size: 100%;
+        block-size: 100%;
+      }
+
+      .season-help__tooltip {
+        position: absolute;
+        z-index: 20;
+        inset-block-start: calc(100% + var(--space-xs));
+        inset-inline-start: var(--space-m);
+        inline-size: min(22rem, calc(100vw - (4 * var(--space-m))));
+        padding: var(--space-s);
+        border: 1px solid var(--tooltip-line);
+        background: var(--tooltip-surface);
+        color: var(--label-muted);
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-body);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(calc(-1 * var(--space-xs)));
+        white-space: pre-line;
+        transition:
+          opacity 120ms ease-out,
+          transform 120ms ease-out;
+      }
+
+      .season-help:hover .season-help__tooltip,
+      .season-help:focus-within .season-help__tooltip {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
       .primary-navigation-slot {
         display: grid;
-        grid-template-columns: minmax(120px, 1fr) minmax(110px, 0.85fr) auto;
+        grid-template-columns: minmax(120px, 1fr) minmax(110px, 0.85fr);
         align-items: center;
         gap: var(--space-l);
         padding: var(--space-m);
@@ -230,7 +314,7 @@
         padding: 0;
         border: 0;
         background: transparent;
-        color: var(--document-frame);
+        color: var(--purchase-accent);
         font: inherit;
         font-size: var(--font-size-label);
         font-weight: 700;
@@ -325,8 +409,8 @@
       }
 
       .route-profile-option input:checked + span {
-        background: var(--label);
-        color: var(--surface);
+        background: var(--action-surface);
+        color: var(--label);
       }
 
       .route-profile-option input:focus-visible + span {
@@ -349,7 +433,7 @@
         align-items: center;
         justify-content: flex-end;
         gap: var(--space-s);
-        padding: var(--space-s);
+        padding: 0;
       }
 
       .header-select-shell,
@@ -426,7 +510,7 @@
       .ss-content.header-select .ss-list .ss-option.ss-highlighted,
       .ss-content.header-select .ss-list .ss-option:not(.ss-disabled).ss-selected {
         border-inline-start: 0;
-        background: var(--line-muted);
+        background: var(--action-surface);
         color: var(--label);
       }
 
@@ -527,8 +611,8 @@
       }
 
       .focus-heading__actions button {
-        min-block-size: 2.618em;
-        padding: var(--space-xs) var(--space-m);
+        block-size: var(--section-action-height);
+        padding: 0 var(--space-m);
         border: 1px solid var(--line-muted);
         border-radius: 0;
         background: transparent;
@@ -544,8 +628,8 @@
       }
 
       .focus-heading__actions [data-commit-raid] {
-        border-color: var(--document-frame);
-        background: color-mix(in srgb, var(--document-frame) 24%, var(--surface));
+        border-color: var(--action-surface);
+        background: var(--action-surface);
       }
 
       .focus-heading__actions button:hover,
@@ -557,7 +641,7 @@
 
       .focus-heading__actions [data-commit-raid]:hover,
       .focus-heading__actions [data-commit-raid]:focus-visible {
-        background: color-mix(in srgb, var(--document-frame) 42%, var(--surface));
+        background: color-mix(in srgb, var(--action-surface) 82%, var(--label));
       }
 
       .focus-heading__actions button:disabled {
@@ -607,7 +691,7 @@
         padding: 0;
         border: 0;
         background: transparent;
-        color: var(--document-frame);
+        color: var(--season-accent);
         font: inherit;
         font-weight: 700;
         text-decoration: underline;
@@ -641,7 +725,7 @@
 
       .focus-document__status {
         min-block-size: 1lh;
-        color: var(--document-frame);
+        color: var(--season-accent);
         font-size: var(--font-size-caption);
         font-weight: 700;
         line-height: var(--line-height-ui);
@@ -658,7 +742,7 @@
         position: relative;
         aspect-ratio: 1;
         overflow: hidden;
-        border: 2px solid var(--document-frame);
+        border: 2px solid var(--document-border);
         background: var(--surface-alt);
         transition:
           filter 120ms ease-out,
@@ -780,19 +864,32 @@
       .route-schedule-dialog header strong {
         display: block;
         margin-block-start: var(--space-xxs);
-        color: var(--document-frame);
+        color: var(--season-accent);
         font-size: var(--font-size-label);
       }
 
       .route-schedule-dialog header button,
       .buyout-dialog header button {
-        padding: var(--space-xs) var(--space-s);
+        display: grid;
+        place-items: center;
+        inline-size: var(--section-action-height);
+        block-size: var(--section-action-height);
+        padding: 0;
         border: 1px solid var(--line-muted);
         border-radius: 0;
         background: transparent;
         color: var(--label);
         font: inherit;
+        font-size: var(--font-size-caption);
+        line-height: 1;
         cursor: pointer;
+      }
+
+      .dialog-close__icon {
+        display: block;
+        inline-size: 20px;
+        block-size: 20px;
+        transform: translateX(-0.5px);
       }
 
       [data-route-schedule-content],
@@ -882,7 +979,7 @@
         align-items: center;
         gap: var(--space-s);
         margin: 0;
-        color: var(--document-frame);
+        color: var(--season-accent);
         font-size: var(--font-size-label);
         letter-spacing: 0.06em;
         line-height: var(--line-height-ui);
@@ -943,8 +1040,13 @@
         gap: var(--space-m);
       }
 
+      .buyout-scenario + .buyout-scenario {
+        margin-block-start: var(--space-l);
+      }
+
       .buyout-scenario h3 {
         margin: 0;
+        color: var(--season-accent);
       }
 
       .buyout-table {
@@ -1050,8 +1152,10 @@
       }
 
       .reward-heading__actions button {
-        padding: var(--space-xs) var(--space-s);
-        border: 1px solid var(--line-muted);
+        block-size: var(--section-action-height);
+        padding: 0 var(--space-s);
+        border: 1px solid var(--action-surface);
+        background: var(--action-surface);
         font-size: var(--font-size-caption);
         font-weight: 700;
         line-height: var(--line-height-ui);
@@ -1063,7 +1167,7 @@
       .reward-heading__actions button:hover,
       .reward-heading__actions button:focus-visible {
         border-color: var(--label-muted);
-        background: var(--line-muted);
+        background: color-mix(in srgb, var(--action-surface) 82%, var(--label));
       }
 
       .reward-heading__actions button:disabled {
@@ -1104,7 +1208,7 @@
       }
 
       .reward-page__trigger[aria-expanded="true"] {
-        background: var(--line-muted);
+        background: color-mix(in srgb, var(--action-surface) 62%, transparent);
       }
 
       .reward-page--complete .reward-page__trigger,
@@ -1125,7 +1229,7 @@
       }
 
       .reward-page__redeemable {
-        color: var(--document-frame);
+        color: var(--season-accent);
         font-size: var(--font-size-caption);
         letter-spacing: 0.04em;
       }
@@ -1166,8 +1270,8 @@
         inset-inline-end: var(--space-l);
         inline-size: 0.55rem;
         block-size: 1rem;
-        border-right: 0.15rem solid var(--document-frame);
-        border-bottom: 0.15rem solid var(--document-frame);
+        border-right: 0.15rem solid var(--document-border);
+        border-bottom: 0.15rem solid var(--document-border);
         content: "";
         opacity: 0;
         pointer-events: none;
@@ -1237,11 +1341,11 @@
       }
 
       .reward-item:has(input:checked) .reward-item__name {
-        color: color-mix(in srgb, var(--label) 78%, var(--document-frame));
+        color: color-mix(in srgb, var(--label) 78%, var(--season-accent));
       }
 
       .reward-item:has(input:checked) .reward-item__requirements {
-        color: color-mix(in srgb, var(--label-muted) 72%, var(--document-frame));
+        color: color-mix(in srgb, var(--label-muted) 72%, var(--season-accent));
       }
 
       .reward-crate {
@@ -1319,18 +1423,28 @@
       }
 
       .redemption-dialog__actions [data-redemption-subtract] {
-        border-color: var(--document-frame);
-        color: var(--document-frame);
+        border-color: var(--document-border);
+        color: var(--document-border);
       }
 
       .document-strip {
         display: grid;
         align-content: center;
         justify-items: center;
+        gap: var(--space-s);
         padding: var(--space-s) var(--space-m);
         overflow: visible;
         border-block-start: 1px solid var(--line-muted);
         background: color-mix(in srgb, var(--surface-alt) 82%, transparent);
+      }
+
+      .document-strip__notice {
+        inline-size: 100%;
+        margin: 0;
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-ui);
+        text-align: center;
       }
 
       .document-strip__images {
@@ -1366,8 +1480,8 @@
       }
 
       .document-strip__image-frame {
-        border: 1px solid var(--document-frame);
-        background: color-mix(in srgb, var(--document-frame) 10%, var(--surface));
+        border: 1px solid var(--document-border);
+        background: color-mix(in srgb, var(--season-accent) 10%, var(--surface));
       }
 
       .document-strip__item--classified .document-strip__image-frame {
@@ -1384,7 +1498,7 @@
 
       .document-strip__item:hover .document-strip__image-frame,
       .document-strip__item:focus-within .document-strip__image-frame {
-        border-color: color-mix(in srgb, var(--document-frame) 55%, var(--label));
+        border-color: color-mix(in srgb, var(--document-border) 55%, var(--label));
       }
 
       .document-strip__item--classified:hover .document-strip__image-frame,
@@ -1527,7 +1641,7 @@
         padding: 0;
         border: 0;
         background: transparent;
-        color: var(--document-frame);
+        color: var(--season-accent);
         font: inherit;
         font-size: var(--font-size-caption);
         font-weight: 700;
@@ -1580,6 +1694,17 @@
           row-gap: var(--grid-gap);
         }
 
+        .header-summary {
+          grid-template-columns: minmax(0, 1fr);
+          row-gap: var(--grid-gap);
+        }
+
+        .header-controls {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          padding: 0;
+        }
+
         .wireframe-workspace {
           grid-template-areas:
             "focus"
@@ -1607,7 +1732,7 @@
         }
 
         .route-profile-toggle {
-          grid-column: 1 / -1;
+          inline-size: 100%;
         }
 
         .account-slot {
@@ -1655,6 +1780,14 @@
           overflow-x: auto;
         }
 
+        .document-strip__notice {
+          position: sticky;
+          inset-inline-start: 0;
+          inline-size: calc(var(--canvas-width) - (2 * var(--space-m)));
+          max-inline-size: calc(100vw - (4 * var(--space-m)));
+          white-space: normal;
+        }
+
         .document-strip__images {
           justify-content: flex-start;
           min-inline-size: max-content;
@@ -1689,31 +1822,39 @@
   <body>
     <div class="wireframe-shell">
       <header class="wireframe-header" aria-label="Header">
-        <section class="slot header-slot season-slot" aria-label="Season identity">
-          <span class="season-number" aria-label="Season 1">S1</span>
-          <div class="season-details">
-            <strong class="season-name" data-season-name>…</strong>
-            <time class="season-timer" data-season-timer>…</time>
+        <section class="slot header-slot header-summary" aria-label="Season and progress">
+          <div class="season-slot" aria-label="Season identity">
+            <span class="season-number" aria-label="Season 1">S1</span>
+            <div class="season-details">
+              <strong class="season-name" data-season-name>…</strong>
+              <time class="season-timer" data-season-timer>…</time>
+            </div>
+            <div class="season-help">
+              <button class="season-help__trigger" type="button" aria-describedby="season-help-tooltip" data-season-help-trigger></button>
+              <div class="season-help__tooltip" id="season-help-tooltip" role="tooltip" data-season-help-tooltip></div>
+            </div>
+          </div>
+          <div class="primary-navigation-slot" aria-label="Battle Pass progress">
+            <div class="navigation-progress">
+              <div class="navigation-progress__label-line">
+                <span class="navigation-progress__label" data-document-progress-label>…</span>
+                <button class="navigation-progress__buyout" type="button" data-buyout-link hidden></button>
+              </div>
+              <strong class="navigation-progress__value">
+                <span data-document-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-document-progress-total>…</span>
+              </strong>
+              <progress data-document-progress value="0" max="1"></progress>
+            </div>
+            <div class="navigation-progress">
+              <span class="navigation-progress__label" data-reward-progress-label>…</span>
+              <strong class="navigation-progress__value">
+                <span data-reward-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-reward-progress-total>…</span>
+              </strong>
+              <progress data-reward-progress value="0" max="1"></progress>
+            </div>
           </div>
         </section>
-        <section class="slot header-slot primary-navigation-slot" aria-label="Primary navigation">
-          <div class="navigation-progress">
-            <div class="navigation-progress__label-line">
-              <span class="navigation-progress__label" data-document-progress-label>…</span>
-              <button class="navigation-progress__buyout" type="button" data-buyout-link hidden></button>
-            </div>
-            <strong class="navigation-progress__value">
-              <span data-document-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-document-progress-total>…</span>
-            </strong>
-            <progress data-document-progress value="0" max="1"></progress>
-          </div>
-          <div class="navigation-progress">
-            <span class="navigation-progress__label" data-reward-progress-label>…</span>
-            <strong class="navigation-progress__value">
-              <span data-reward-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-reward-progress-total>…</span>
-            </strong>
-            <progress data-reward-progress value="0" max="1"></progress>
-          </div>
+        <section class="slot header-slot header-controls" aria-label="Planning controls">
           <fieldset class="route-profile-toggle">
             <legend class="visually-hidden" data-route-profile-label>…</legend>
             <label class="route-profile-option">
@@ -1725,13 +1866,13 @@
               <span data-safest-label>…</span>
             </label>
           </fieldset>
-        </section>
-        <section class="slot header-slot account-slot" aria-label="Back and account utilities">
-          <div class="header-select-shell mode-select-shell">
-            <select class="header-select mode-select" data-mode-select></select>
-          </div>
-          <div class="header-select-shell language-select-shell">
-            <select class="header-select language-select" data-language-select></select>
+          <div class="account-slot">
+            <div class="header-select-shell mode-select-shell">
+              <select class="header-select mode-select" data-mode-select></select>
+            </div>
+            <div class="header-select-shell language-select-shell">
+              <select class="header-select language-select" data-language-select></select>
+            </div>
           </div>
         </section>
       </header>
@@ -1763,6 +1904,7 @@
             <p class="focus-loading">…</p>
           </div>
           <section class="document-strip" aria-label="Document strip">
+            <p class="document-strip__notice" data-document-counter-note></p>
             <div class="document-strip__images">
             <figure class="document-strip__item" data-document-id="documents.financial.name">
               <figcaption class="document-strip__title" data-document-title></figcaption>
@@ -1912,8 +2054,9 @@
       import SlimSelect from 'slim-select';
       import 'slim-select/styles';
       import englishFlagUrl from 'flag-icons/flags/4x3/gb.svg?no-inline';
+      import { CircleHelp, X, createElement as createIconElement } from 'lucide';
       import { loadCatalogs } from './src/catalogs.ts';
-      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatNumber } from './src/localization.ts';
+      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber } from './src/localization.ts';
       import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from './src/persistence.ts';
       import { countPageRedeemableRewards, planRewardRedemption } from './src/redeemable.ts';
       import { isBattlePassPageUnlocked } from './src/page-unlocks.ts';
@@ -1969,6 +2112,21 @@
 
       name.textContent = localizer.text(catalogs.battlePass.id);
       timer.dateTime = new Date(endsAt * 1000).toISOString();
+      const createUiIcon = (icon, className) => createIconElement(icon, {
+        'aria-hidden': 'true',
+        class: [className],
+        focusable: 'false',
+        'stroke-width': 2,
+      });
+      document.querySelector('[data-season-help-trigger]').replaceChildren(createUiIcon(CircleHelp, 'season-help__icon'));
+      [closeRouteScheduleButton, closeBuyoutButton].forEach((button) => {
+        button.replaceChildren(createUiIcon(X, 'dialog-close__icon'));
+        button.setAttribute('aria-label', localizer.text('ui.close'));
+        button.title = localizer.text('ui.close');
+      });
+      document.querySelector('[data-season-help-trigger]').setAttribute('aria-label', localizer.text('ui.optimizerHelpLabel'));
+      document.querySelector('[data-season-help-tooltip]').textContent = localizer.text('ui.optimizerHelp');
+      document.querySelector('[data-document-counter-note]').textContent = localizer.text('ui.documentCounterDisclaimer');
       document.querySelector('[data-asset-disclaimer]').textContent = localizer.text('footer.disclaimer');
       resetCookieState.textContent = localizer.text('ui.resetCookieStorage');
       resetCookieState.addEventListener('click', () => {
@@ -2382,7 +2540,6 @@
         routeScheduleEstimate.textContent = localizer.text('ui.estimatedDays', {
           count: formatNumber(profile.schedule.length, localizer.locale),
         });
-        closeRouteScheduleButton.textContent = localizer.text('ui.close');
         routeScheduleContent.replaceChildren();
         routeScheduleContent.append(createElement('p', 'schedule-estimate-note', localizer.text('ui.planEstimate')));
 
@@ -2498,7 +2655,6 @@
       const renderBuyout = (result) => {
         const estimate = result.buyout;
         buyoutTitle.textContent = localizer.text('ui.buyout');
-        closeBuyoutButton.textContent = localizer.text('ui.close');
         buyoutContent.replaceChildren();
 
         const createTable = (captionId, columnIds) => {
@@ -2557,7 +2713,7 @@
                 count: formatNumber(count, localizer.locale),
               }),
               formatNumber(bundle.tarCoins * count, localizer.locale),
-              price?.display ?? localizer.text('ui.localPriceUnavailable'),
+              price ? formatLocalPrice(price, localizer.locale) : localizer.text('ui.localPriceUnavailable'),
             ]);
           });
           if (body.childElementCount === 0) appendEmptyRow(body, localizer.text('ui.noTarCoinPackagesRequired'));
@@ -2565,7 +2721,9 @@
             appendRow(foot, [
               localizer.text('ui.total'),
               formatNumber(battlePassTarCoinsUsed + localEstimate.tarCoinsPurchased, localizer.locale),
-              localEstimate.costMinor > 0 ? localEstimate.display : localizer.text('ui.zeroLocalPrice'),
+              localEstimate.price > 0
+                ? formatLocalPrice({ price: localEstimate.price, currency: localEstimate.currency }, localizer.locale)
+                : localizer.text('ui.zeroLocalPrice'),
             ]);
           } else appendEmptyRow(foot, localizer.text('ui.localPriceUnavailable'));
           return table;
@@ -2618,7 +2776,9 @@
         const estimate = result.buyout.localEstimate;
         const label = estimate
           ? localizer.text('ui.approximateBuyoutPrice', {
-              price: estimate.costMinor > 0 ? estimate.display : localizer.text('ui.zeroLocalPrice'),
+              price: estimate.price > 0
+                ? formatLocalPrice({ price: estimate.price, currency: estimate.currency }, localizer.locale)
+                : localizer.text('ui.zeroLocalPrice'),
             })
           : localizer.text('ui.buyoutLink');
         buyoutLink.hidden = false;

@@ -56,7 +56,7 @@ describe('localization', () => {
     expect(formatAccessibleRequirements(requirements, names, localizer.locale)).toBe('Financial documents: 2');
     expect(formatCountdownUnit(2, 'en', 'day')).toBe('2 days');
     expect(formatDateTime(1796637600, 'en-US')).toContain('Dec 7, 2026');
-    expect(formatLocalPrice(localizer.price('tarCoinBundles.500.localPrice')!, 'en-US')).toContain('4.99');
+    expect(formatLocalPrice(localizer.price('tarCoinBundles.500.localPrice')!, 'en-US')).toBe('$4.99');
     expect(pluralCategory(1, 'en')).toBe('one');
     expect(pluralCategory(2, 'en')).toBe('other');
     expect(getTextDirection('ar')).toBe('rtl');

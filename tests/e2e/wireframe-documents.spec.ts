@@ -45,8 +45,13 @@ test('renders the square document artwork in source-of-truth order', async ({ pa
 
   const ribbon = await page.locator('.document-strip__images').boundingBox();
   const strip = await page.locator('.document-strip').boundingBox();
+  const counterNote = page.locator('[data-document-counter-note]');
+  const counterNoteBox = await counterNote.boundingBox();
   expect(ribbon).not.toBeNull();
   expect(strip).not.toBeNull();
+  expect(counterNoteBox).not.toBeNull();
+  await expect(counterNote).toHaveText('Document counts are independent from reward claims and must be adjusted separately.');
+  expect(counterNoteBox!.y + counterNoteBox!.height).toBeLessThanOrEqual(ribbon!.y);
   expect(Math.abs(ribbon!.x + ribbon!.width / 2 - (strip!.x + strip!.width / 2))).toBeLessThanOrEqual(1);
 });
 
@@ -108,7 +113,7 @@ test('shows the centered asset disclaimer and resets cookie-backed state', async
   const disclaimer = page.locator('[data-asset-disclaimer]');
   const reset = page.locator('[data-reset-cookie-state]');
 
-  await expect(disclaimer).toHaveText('Escape from Tarkov and all game image assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool.');
+  await expect(disclaimer).toHaveText('Escape from Tarkov and all game assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool.');
   await expect(reset).toHaveText('Reset cookie storage');
   await expect(reset).toHaveJSProperty('tagName', 'BUTTON');
   await expect(reset).toHaveCSS('text-decoration-line', 'underline');
