@@ -14,7 +14,7 @@ void loadCatalogs()
     const dispatch = (action: Parameters<typeof reduceState>[1]): void => {
       state = reduceState(state, action, catalogs);
       try {
-        saveState(state, browserCookieAdapter);
+        saveState(state, browserCookieAdapter, catalogs);
       } catch (error) {
         console.error(error);
       }

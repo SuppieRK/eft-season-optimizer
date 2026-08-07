@@ -60,7 +60,7 @@ describe('state and cookie persistence', () => {
     const initial = createDefaultState(catalog);
     const state = reduceState(reduceState(reduceState(reduceState(reduceState(reduceState(initial, { type: 'set-mode', mode: 'pvp' }, catalog), { type: 'set-owned-document', documentId: 'documents.financial.name', quantity: 3 }, catalog), { type: 'set-classified-documents', quantity: 12 }, catalog), { type: 'set-profile', profile: 'safest' }, catalog), { type: 'set-page', page: 3 }, catalog), { type: 'dismiss-cookie-notice' }, catalog);
 
-    saveState(state, cookies);
+    saveState(state, cookies, catalog);
     const restored = restoreState(cookies, catalog);
     expect(restored.mode).toBe('pvp');
     expect(restored.ownedDocuments['documents.financial.name']).toBe(3);
@@ -89,7 +89,7 @@ describe('state and cookie persistence', () => {
     const localizedCatalog = { ...catalog, localization };
 
     expect(restoreState(cookies, localizedCatalog, ['fr-FR']).locale).toBe('fr-FR');
-    saveState({ ...createDefaultState(localizedCatalog), locale: 'en-GB' }, cookies);
+    saveState({ ...createDefaultState(localizedCatalog), locale: 'en-GB' }, cookies, localizedCatalog);
     expect(restoreState(cookies, localizedCatalog, ['fr-FR']).locale).toBe('en-GB');
   });
 
@@ -106,9 +106,9 @@ describe('state and cookie persistence', () => {
     expect(zeroWithClaim.classifiedDocuments).toBe(0);
     expect(noClaimsAgain.classifiedDocuments).toBe(1);
 
-    saveState({ ...initial, classifiedDocuments: 0 }, cookies);
+    saveState({ ...initial, classifiedDocuments: 0 }, cookies, catalog);
     expect(restoreState(cookies, catalog).classifiedDocuments).toBe(1);
-    saveState(zeroWithClaim, cookies);
+    saveState(zeroWithClaim, cookies, catalog);
     expect(restoreState(cookies, catalog).classifiedDocuments).toBe(0);
   });
 
@@ -142,16 +142,16 @@ describe('state and cookie persistence', () => {
     expect(cleared.selectedPage).toBe(1);
 
     const cookies = memoryCookies();
-    saveState({ ...afterPageOne, selectedPage: 1 }, cookies);
+    saveState({ ...afterPageOne, selectedPage: 1 }, cookies, catalog);
     expect(restoreState(cookies, catalog).selectedPage).toBe(2);
   });
 
   it('migrates the previously expanded reward page without invalidating the UI cookie', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
-    saveState(createDefaultState(catalog), cookies);
+    saveState(createDefaultState(catalog), cookies, catalog);
     cookies.values['kord-breach-ui'] = encodeURIComponent(JSON.stringify({
-      gameDataVersion: '1.1.0.0.46657.8.6.2026',
+      gameDataVersion: catalog.battlePass.gameDataVersion,
       schemaVersion: 1,
       payload: { collapsedPages: { '1': true, '2': false }, selectedProfile: 'safest', cookieNoticeDismissed: true },
     }));
@@ -166,19 +166,19 @@ describe('state and cookie persistence', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
     const defaults = createDefaultState(catalog);
-    saveState({ ...defaults, mode: 'pvp', tarCoins: 3 }, cookies);
+    saveState({ ...defaults, mode: 'pvp', tarCoins: 3 }, cookies, catalog);
     cookies.values['kord-breach-settings'] = encodeURIComponent(JSON.stringify({ gameDataVersion: 'old', schemaVersion: 1, payload: { mode: 'pvp-seasonal' } }));
     const restored = restoreState(cookies, catalog);
     expect(restored.mode).toBe('pvp-seasonal');
     expect(restored.tarCoins).toBe(3);
 
-    expect(() => saveState({ ...defaults, claimedRewardIds: Array.from({ length: 1000 }, (_, index) => `unknown-${index}`) }, cookies)).toThrow(/cookie size limit/);
+    expect(() => saveState({ ...defaults, claimedRewardIds: Array.from({ length: 1000 }, (_, index) => `unknown-${index}`) }, cookies, catalog)).toThrow(/cookie size limit/);
   });
 
   it('requires deliberate reset confirmation and clears every optimizer cookie', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
-    saveState(createDefaultState(catalog), cookies);
+    saveState(createDefaultState(catalog), cookies, catalog);
     expect(resetPersistedState(cookies, catalog, false)).toBeUndefined();
     expect(Object.keys(cookies.values)).toHaveLength(3);
     const reset = resetPersistedState(cookies, catalog, true);

@@ -932,6 +932,8 @@
         min-block-size: 0;
         padding: 0 var(--space-m);
         overflow: auto;
+        scrollbar-color: var(--line) var(--surface);
+        scrollbar-width: thin;
         scrollbar-gutter: stable;
       }
 
@@ -2247,7 +2249,7 @@
       const dispatch = (action) => {
         state = reduceState(state, action, catalogs);
         try {
-          saveState(state, browserCookieAdapter);
+          saveState(state, browserCookieAdapter, catalogs);
         } catch (error) {
           console.error(error);
         }
@@ -3024,7 +3026,7 @@
         });
         state = nextState;
         try {
-          saveState(state, browserCookieAdapter);
+          saveState(state, browserCookieAdapter, catalogs);
         } catch (error) {
           console.error(error);
         }
@@ -3123,7 +3125,7 @@
             const locale = selection[0]?.value;
             if (!locale || locale === state.locale) return;
             state = reduceState(state, { type: 'set-locale', locale }, catalogs);
-            saveState(state, browserCookieAdapter);
+            saveState(state, browserCookieAdapter, catalogs);
             window.location.reload();
           },
         },

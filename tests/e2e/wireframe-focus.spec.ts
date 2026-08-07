@@ -3,7 +3,6 @@ import { expect, test } from '@playwright/test';
 import { documentQuantity, openWireframe, setDocumentQuantity } from './wireframe-helpers';
 
 const dogtagReward = 'rewards.dogtag01.name';
-const gameDataVersion = '1.1.0.0.46657.8.6.2026';
 
 async function seedOptimizerState(
   page: Parameters<typeof openWireframe>[0],
@@ -15,6 +14,10 @@ async function seedOptimizerState(
     spendTarCoinsOnClassifiedDocuments?: boolean;
   },
 ): Promise<void> {
+  const gameDataVersion = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/battle-pass.json', document.baseURI));
+    return ((await response.json()) as { gameDataVersion: string }).gameDataVersion;
+  });
   const envelope = (payload: object) => encodeURIComponent(JSON.stringify({
     gameDataVersion,
     schemaVersion: 1,
@@ -227,6 +230,11 @@ test('accepts a zero-yield Commit and exposes the projected schedule on demand',
   });
   expect(desktopScrollGeometry.contentBottom).toBeLessThanOrEqual(desktopScrollGeometry.dialogBottom);
   expect(desktopScrollGeometry.contentScrollHeight).toBeGreaterThan(desktopScrollGeometry.contentClientHeight);
+  const [rewardScrollbar, scheduleScrollbar] = await Promise.all([
+    page.locator('[data-reward-pages]').evaluate((element) => getComputedStyle(element).scrollbarColor),
+    dialog.locator('[data-route-schedule-content]').evaluate((element) => getComputedStyle(element).scrollbarColor),
+  ]);
+  expect(scheduleScrollbar).toBe(rewardScrollbar);
   const scheduleClose = dialog.getByRole('button', { name: 'Close' });
   await expect(scheduleClose).toHaveText('');
   await expect(scheduleClose.locator('svg.dialog-close__icon')).toHaveCount(1);
@@ -308,6 +316,11 @@ test('opens a detailed buyout from the approximate Documents price', async ({ pa
 
   const dialog = page.locator('[data-buyout-dialog]');
   await expect(dialog).toBeVisible();
+  const [rewardScrollbar, buyoutScrollbar] = await Promise.all([
+    page.locator('[data-reward-pages]').evaluate((element) => getComputedStyle(element).scrollbarColor),
+    dialog.locator('[data-buyout-content]').evaluate((element) => getComputedStyle(element).scrollbarColor),
+  ]);
+  expect(buyoutScrollbar).toBe(rewardScrollbar);
   await expect(dialog.getByRole('heading', { name: 'Battle Pass buyout' })).toBeVisible();
   const buyoutClose = dialog.getByRole('button', { name: 'Close' });
   await expect(buyoutClose).toHaveText('');

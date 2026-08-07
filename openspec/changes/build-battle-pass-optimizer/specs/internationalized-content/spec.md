@@ -81,7 +81,7 @@ The application SHALL use locale-aware number, date, time, plural, and message f
 
 #### Scenario: Render countdown in selected locale
 - **WHEN** the countdown is active under a selected locale
-- **THEN** unit labels and plural forms use that locale while the underlying deadline remains Unix timestamp `1796637600`
+- **THEN** unit labels and plural forms use that locale while the underlying deadline remains Unix timestamp `1796634000`
 
 #### Scenario: Render numeric document quantity
 - **WHEN** a document quantity is displayed

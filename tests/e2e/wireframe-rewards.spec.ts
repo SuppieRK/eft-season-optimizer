@@ -181,7 +181,9 @@ test('keeps bulk actions tracking-only and replaces full completion with the cra
   await expect(page.locator('[data-reward-pages]')).toContainText('Black Division Gear Crate');
   await expect(page.locator('[data-reward-pages]')).toContainText('Any non-Classified documents (10)');
   await expect(page.locator('[data-reward-claim-all]')).toBeDisabled();
-  await expect(page.locator('[data-reward-progress-current]')).toHaveText('53');
+  await expect(page.locator('[data-reward-progress-current]')).toHaveText(
+    await page.locator('[data-reward-progress-total]').innerText(),
+  );
   await expect(documentQuantity(page, 'documents.financial.name')).toHaveValue('2');
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
 

@@ -2,7 +2,7 @@
 
 - [x] 1.1 Create `public/data/documents.json` with every regular and Classified Document using its name localization ID as the single canonical ID, plus descriptions, image references, source locations, and `kind`; derive farmability, crate-exchange eligibility, and Classified-backfill eligibility from `kind` without storing redundant flags.
 - [x] 1.2 Create `public/data/locations.json` with every location using its name localization ID as the single canonical ID, plus `difficultyId`, matching `difficultyRating`, and `maxRaidTimeMin` shared across game modes.
-- [x] 1.3 Create `public/data/battle-pass.json` with game-data version `1.1.0.0.46657.8.6.2026`, top-level season `id` and `endsAt: 1796637600`, pages, rewards, prerequisites, document requirements, and TarCoin grants.
+- [x] 1.3 Create `public/data/battle-pass.json` with game-data version `1.1.0.0.46657.8.6.2026`, top-level season `id` and `endsAt: 1796634000`, pages, rewards, prerequisites, document requirements, and TarCoin grants.
 - [x] 1.4 Create `public/data/optimizer-rules.json` with `dailyDocumentLimits` of `10`/`15`/`25` for PvE/PvP/PvP Seasonal, the regular-document `5:1` and Black Division `10:1` exchanges, the complete Classified Document bundles, the six screenshot-priced purchasable TarCoin packages and their local-price IDs, and deterministic tie-break ordering; exclude the unpriced `2,000` TarCoin “RECEIVED” offer from purchase calculations.
 - [x] 1.5 Create `public/data/localization.json` with locale metadata and ID-centered `{ id, localizations }` text and structured local-price entries for the default development locale, including every ID referenced by the other four catalogs and screenshot-backed English numeric prices plus ISO currency codes for the six TarCoin packages.
 - [x] 1.6 Use the supplied Battle Pass page, reward, exchange, main/guide, and dedicated definition screenshots as authoring evidence for each document icon; keep screenshot evidence outside the runtime catalogs.
@@ -24,8 +24,8 @@
 - [x] 3.1 Define TypeScript types and runtime parsers for all five JSON catalogs, including localization-backed canonical entity IDs, rejection of parallel `nameId` fields, kind-derived document behavior without redundant boolean flags, and location `difficultyId`, `difficultyRating`, and `maxRaidTimeMin` records.
 - [x] 3.2 Implement catalog loading that returns normalized immutable domain data and actionable validation failures before optimizer startup.
 - [x] 3.3 Validate duplicate IDs, numeric ranges, text and structured-price localization references, document/location references, kind-derived document behavior and source invariants, absence of redundant behavior flags, ordered pages and the implicit previous-page-minus-one unlock rule, reward prerequisites, dependency cycles, redeemability, exchange ratios, bundle and TarCoin package values, asset paths, and season metadata.
-- [x] 3.4 Add catalog tests for game version `1.1.0.0.46657.8.6.2026`, timestamp `1796637600`, difficulty ID/rating mappings, maximum raid times, mode limits, `5:1` regular-document and `10:1` Black Division exchange ratios, six purchasable TarCoin packages, and their exact English local prices.
-- [x] 3.5 Add screenshot-ground-truth tests for every reconstructed page, reward, prerequisite, document total, and TarCoin grant without requiring screenshot paths in runtime JSON; use the manually verified `tests/documents.csv` as the authoritative document-requirement fixture and treat blank cells as zero.
+- [x] 3.4 Add catalog tests for game version `1.1.0.0.46657.8.6.2026`, timestamp `1796634000`, difficulty ID/rating mappings, maximum raid times, mode limits, `5:1` regular-document and `10:1` Black Division exchange ratios, six purchasable TarCoin packages, and their exact English local prices.
+- [x] 3.5 Retain the manually verified `tests/documents.csv` as an authoring review fixture with blank cells interpreted as zero, without using it to reject later reviewed Battle Pass item or quantity adjustments at runtime or in automated tests.
 
 ## 4. Build the Localization Foundation
 
@@ -77,7 +77,7 @@
 
 - [x] 9.1 Implement the semantic header, left rewards column, center results column, right controls column, and footer document/disclaimer regions in stable source order.
 - [x] 9.2 Implement the green-toned Battle Pass-inspired CSS system, dense panels, restrained texture, visible focus, readable contrast, touch targets, and unofficial-tool presentation.
-- [x] 9.3 Implement the header's localized locale selector and countdown to `2026-12-07 10:00:00 UTC`, including visibility-aware ticking, zero clamping, stable assistive text, and `Season ended` state.
+- [x] 9.3 Implement the header's localized locale selector and countdown to `2026-12-07 09:00:00 UTC`, including visibility-aware ticking, zero clamping, stable assistive text, and `Season ended` state.
 - [x] 9.4 Implement independently collapsible reward pages whose visible rows contain only item name, compact accessible document requirements, and claimed controls, without target selection.
 - [x] 9.5 Implement per-reward, per-page, and global Claim all/Clear all behavior, including transition to Black Division crate controls when all rewards are claimed.
 - [x] 9.6 Implement right-column one global PvE/PvP/PvP Seasonal selector, effective daily-limit, TarCoin, and reset controls, with no reward-goal selector.
@@ -172,3 +172,5 @@
 - [x] 16.32 Add the maintained tree-shakable Lucide vanilla package and replace font-dependent close/help glyphs with consistently sized X and CircleHelp vectors, with Chromium SVG size and aspect-ratio regressions.
 - [x] 16.33 Replace the hard-coded `en` to `gb.svg` selector mapping with regional BCP 47 catalog keys, generate a Vite flag module containing only declared 4:3 `flag-icons` images, select an exact or unambiguous browser-preferred locale only when no valid cookie exists, format local prices with narrow currency symbols, and add catalog, persistence, localization, and Chromium regressions.
 - [x] 16.34 Add concise localized Fastest and Safest tooltips that explain lower-max-time or easier-difficulty priority on hover and keyboard focus, with Chromium interaction regressions.
+- [x] 16.35 Update the season deadline to `1796634000`, remove the duplicate runtime timestamp constant and equality rejection, retain positive-integer catalog validation, and update countdown and OpenSpec regressions.
+- [x] 16.36 Apply the reward accordion's thin black scrollbar styling to schedule and buyout modal content, remove hard-coded runtime season ID and game-version equality checks, derive cookie versioning from the loaded catalog, and replace fixed reward/document total regressions with catalog-derived expectations.

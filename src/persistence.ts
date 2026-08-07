@@ -1,4 +1,3 @@
-import { GAME_DATA_VERSION } from './catalogs';
 import type { Catalogs, GameMode } from './catalogs';
 import { getCompleteLocales, resolvePreferredLocale } from './localization';
 import type { OptimizationProfile } from './optimizer';
@@ -56,24 +55,25 @@ const COOKIE_NAMES = {
   ui: 'kord-breach-ui',
 } as const;
 
-export function saveState(state: AppState, cookies: CookieAdapter): void {
+export function saveState(state: AppState, cookies: CookieAdapter, catalogs: Catalogs): void {
+  const gameDataVersion = catalogs.battlePass.gameDataVersion;
   writeEnvelope(cookies, COOKIE_NAMES.progress, {
     claimedRewardIds: state.claimedRewardIds,
     ownedDocuments: state.ownedDocuments,
     classifiedDocuments: state.classifiedDocuments,
     tarCoins: state.tarCoins,
     crateCount: state.crateCount,
-  });
+  }, gameDataVersion);
   writeEnvelope(cookies, COOKIE_NAMES.settings, {
     mode: state.mode,
     spendTarCoinsOnClassifiedDocuments: state.spendTarCoinsOnClassifiedDocuments,
     locale: state.locale,
-  });
+  }, gameDataVersion);
   writeEnvelope(cookies, COOKIE_NAMES.ui, {
     selectedPage: state.selectedPage,
     selectedProfile: state.selectedProfile,
     cookieNoticeDismissed: state.cookieNoticeDismissed,
-  });
+  }, gameDataVersion);
 }
 
 export function restoreState(
@@ -90,9 +90,10 @@ export function restoreState(
       catalogDefaults.locale,
     ),
   };
-  const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress);
-  const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings);
-  const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui);
+  const gameDataVersion = catalogs.battlePass.gameDataVersion;
+  const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress, gameDataVersion);
+  const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings, gameDataVersion);
+  const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui, gameDataVersion);
   const restored = {
     ...defaults,
     ...(progress ? sanitizeProgress(progress, defaults, catalogs) : {}),
@@ -117,18 +118,18 @@ export function clearPersistedState(cookies: CookieAdapter): void {
   Object.values(COOKIE_NAMES).forEach((name) => cookies.remove(name));
 }
 
-function writeEnvelope<T>(cookies: CookieAdapter, name: string, payload: T): void {
-  const value = JSON.stringify({ gameDataVersion: GAME_DATA_VERSION, schemaVersion: COOKIE_SCHEMA_VERSION, payload } satisfies Envelope<T>);
+function writeEnvelope<T>(cookies: CookieAdapter, name: string, payload: T, gameDataVersion: string): void {
+  const value = JSON.stringify({ gameDataVersion, schemaVersion: COOKIE_SCHEMA_VERSION, payload } satisfies Envelope<T>);
   if (encodeURIComponent(value).length > MAX_COOKIE_BYTES) throw new RangeError(`${name} exceeds the cookie size limit`);
   cookies.write(name, value, 60 * 60 * 24 * 365);
 }
 
-function readEnvelope<T>(cookies: CookieAdapter, name: string): T | undefined {
+function readEnvelope<T>(cookies: CookieAdapter, name: string, gameDataVersion: string): T | undefined {
   const raw = cookies.read(name);
   if (!raw) return undefined;
   try {
     const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<T>>;
-    return envelope.gameDataVersion === GAME_DATA_VERSION && envelope.schemaVersion === COOKIE_SCHEMA_VERSION ? envelope.payload : undefined;
+    return envelope.gameDataVersion === gameDataVersion && envelope.schemaVersion === COOKIE_SCHEMA_VERSION ? envelope.payload : undefined;
   } catch {
     return undefined;
   }

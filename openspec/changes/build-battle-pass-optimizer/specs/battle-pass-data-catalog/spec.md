@@ -12,11 +12,15 @@ The system SHALL load canonical optimizer data from `documents.json`, `locations
 - **THEN** the production build and catalog validation tests fail with the catalog and offending identifier
 
 ### Requirement: Versioned season metadata
-The Battle Pass catalog SHALL identify the initial game data as `1.1.0.0.46657.8.6.2026`, SHALL store the season identifier as top-level `id: "season.one"`, and SHALL store the season deadline as top-level `endsAt: 1796637600`. The catalog SHALL NOT nest these season fields under a `season` object or use `seasonEndsAtUnixSeconds`.
+The Battle Pass catalog SHALL identify the initial game data as `1.1.0.0.46657.8.6.2026`, SHALL store the season identifier as top-level `id: "season.one"`, and SHALL store the season deadline as top-level `endsAt: 1796634000`. The catalog SHALL NOT nest these season fields under a `season` object or use `seasonEndsAtUnixSeconds`. Runtime validation SHALL require `endsAt` to be a positive integer but SHALL NOT compare it with a separately hard-coded timestamp; `battle-pass.json` is the runtime source of truth.
 
 #### Scenario: Initial metadata is loaded
 - **WHEN** the initial Battle Pass data is validated
-- **THEN** its game-data version equals `1.1.0.0.46657.8.6.2026`, its top-level `id` equals `season.one`, and its `endsAt` resolves to `2026-12-07 10:00:00 UTC`
+- **THEN** its game-data version equals `1.1.0.0.46657.8.6.2026`, its top-level `id` equals `season.one`, and its `endsAt` resolves to `2026-12-07 09:00:00 UTC`
+
+#### Scenario: Season deadline data is corrected
+- **WHEN** `endsAt` is changed to another positive Unix timestamp in `battle-pass.json`
+- **THEN** catalog loading succeeds without a matching runtime-code change
 
 ### Requirement: Document catalog
 The document catalog SHALL define every regular and Classified Document with one canonical `id` equal to its name localization ID, a `kind` of `regular` or `classified`, localization IDs for its description, abbreviation and image alternative, source-location identifiers, and cleaned image path. Farmability, Black Division crate-exchange eligibility, and eligibility for a regular requirement to be backfilled by Classified Documents SHALL be derived from `kind`. The catalog SHALL NOT define `farmable`, `exchangeEligible`, or `classifiedBackfillEligible`, and SHALL NOT define a parallel short identifier or `nameId` field. Screenshot evidence used to create the assets is authoring-only and SHALL NOT be required by the runtime catalog.
@@ -114,7 +118,7 @@ The optimizer rules catalog SHALL define mode daily document limits under `daily
 - **THEN** Fastest selects `maxRaidTimeMin` and Safest selects `difficultyRating` as their factor fields
 
 ### Requirement: Cross-catalog integrity
-Catalog validation SHALL reject duplicate identifiers, unknown references, redundant document behavior flags, invalid kind-specific source data, negative quantities, non-positive exchange ratios or maximum raid times, difficulty ratings outside the declared scale or inconsistent with their difficulty IDs, empty required text or price localization references, invalid reward dependencies, and document requirements whose document kind is not `regular`.
+Catalog validation SHALL reject duplicate identifiers, unknown references, redundant document behavior flags, invalid kind-specific source data, negative quantities, non-positive exchange ratios or maximum raid times, difficulty ratings outside the declared scale or inconsistent with their difficulty IDs, empty required text or price localization references, invalid reward dependencies, and document requirements whose document kind is not `regular`. Runtime validation SHALL NOT compare the season ID, game-data version, reward list, reward count, requirement quantities, or aggregate document totals with separately hard-coded content. Behavior and interface totals SHALL derive from the loaded catalogs.
 
 #### Scenario: Unknown identifier is rejected
 - **WHEN** a reward requirement references a document identifier absent from `documents.json`
@@ -123,3 +127,7 @@ Catalog validation SHALL reject duplicate identifiers, unknown references, redun
 #### Scenario: Invalid numeric value is rejected
 - **WHEN** a requirement, bundle value, or daily limit is negative, an exchange ratio or maximum raid time is non-positive, or a difficulty rating is outside its declared scale
 - **THEN** validation fails and identifies the invalid field
+
+#### Scenario: Reviewed Battle Pass content is adjusted
+- **WHEN** rewards are added or removed, positive requirement quantities are corrected, or version and season localization IDs are updated with valid references
+- **THEN** runtime catalog validation accepts the new content and derived totals update without matching TypeScript constants

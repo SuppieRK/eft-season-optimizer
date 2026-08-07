@@ -98,7 +98,7 @@ A naturally quantity-free occurrence is preferred. If quantity text such as `x0`
 
 ### 3. Drive the season countdown from canonical Unix metadata
 
-`battle-pass.json` stores the season identifier as top-level `id: "season.one"` and the Unix deadline as top-level `endsAt: 1796637600`, which is `2026-12-07 10:00:00 UTC`. Runtime code converts `endsAt` from seconds to milliseconds once and calculates `max(0, endTime - Date.now())`; the value is not persisted in cookies.
+`battle-pass.json` stores the season identifier as top-level `id: "season.one"` and the Unix deadline as top-level `endsAt: 1796634000`, which is `2026-12-07 09:00:00 UTC`. Runtime code treats this catalog field as the sole deadline source, validates only that it is a positive integer, converts it from seconds to milliseconds once, and calculates `max(0, endTime - Date.now())`; the value is not duplicated in runtime code or persisted in cookies.
 
 The header displays days, hours, minutes, and seconds and refreshes at most once per second while the page is visible. At zero it stops its timer and displays “Season ended.” A details label exposes the absolute UTC end time so users can distinguish the canonical deadline from a countdown affected by an incorrect device clock. Frequent tick updates are not announced through an ARIA live region; assistive text provides a stable summary instead.
 

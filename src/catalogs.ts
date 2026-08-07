@@ -5,8 +5,6 @@ export type CatalogKey =
   | 'optimizerRules'
   | 'localization';
 
-export const GAME_DATA_VERSION = '1.1.0.0.46657.8.6.2026';
-export const SEASON_ENDS_AT = 1_796_637_600;
 
 export type DocumentKind = 'regular' | 'classified';
 export type RewardKind = 'cosmetic' | 'gear' | 'crate' | 'tarcoins';
@@ -421,10 +419,12 @@ function parseBattlePass(raw: unknown, documents: DocumentsCatalog, localization
   if ('requiresPreviousPage' in object) issues.push('battlePass must derive page unlocks and cannot store requiresPreviousPage');
   if ('season' in object) issues.push('battlePass must keep season metadata at the top level');
   if ('seasonEndsAtUnixSeconds' in object) issues.push('battlePass must use endsAt');
+  const id = asString(object.id, 'battlePass.id', issues);
+  requireTextId(id, textIds, 'battlePass.id', issues);
   return {
     schemaVersion: asInteger(object.schemaVersion, 'battlePass.schemaVersion', issues, 1),
     gameDataVersion: asString(object.gameDataVersion, 'battlePass.gameDataVersion', issues),
-    id: asString(object.id, 'battlePass.id', issues),
+    id,
     endsAt: asInteger(object.endsAt, 'battlePass.endsAt', issues, 1),
     pages,
   };
@@ -511,9 +511,6 @@ export function parseCatalogs(raw: Readonly<Record<CatalogKey, unknown>>): Catal
   const documents = parseDocuments(raw.documents, locations, localization, issues);
   const battlePass = parseBattlePass(raw.battlePass, documents, localization, issues);
   const optimizerRules = parseRules(raw.optimizerRules, localization, issues);
-  if (battlePass.gameDataVersion !== GAME_DATA_VERSION) issues.push(`battlePass.gameDataVersion must equal ${GAME_DATA_VERSION}`);
-  if (battlePass.id !== 'season.one') issues.push('battlePass.id must equal season.one');
-  if (battlePass.endsAt !== SEASON_ENDS_AT) issues.push(`battlePass.endsAt must equal ${SEASON_ENDS_AT}`);
   if (issues.length > 0) throw new CatalogValidationError(issues);
   return deepFreeze({ documents, locations, battlePass, optimizerRules, localization });
 }

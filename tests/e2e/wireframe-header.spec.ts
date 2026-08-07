@@ -5,17 +5,28 @@ import { openWireframe } from './wireframe-helpers';
 test('shows the season identity, relative countdown, totals, and default route profile', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-08-07T09:58:30.000Z') });
   await openWireframe(page);
+  const battlePassTotals = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/battle-pass.json', document.baseURI));
+    const battlePass = await response.json() as {
+      pages: Array<{ rewards: Array<{ requirements: Array<{ quantity: number }> }> }>;
+    };
+    const rewards = battlePass.pages.flatMap((battlePassPage) => battlePassPage.rewards);
+    return {
+      documents: rewards.flatMap((reward) => reward.requirements).reduce((sum, requirement) => sum + requirement.quantity, 0),
+      rewards: rewards.length,
+    };
+  });
 
   await expect(page.locator('.season-number')).toHaveText('S1');
   await expect(page.locator('.season-number')).toHaveAttribute('aria-label', 'Season 1');
-  await expect(page.locator('[data-season-timer]')).toHaveText('122d 0h 1m');
-  await expect(page.locator('[data-season-timer]')).toHaveAttribute('datetime', '2026-12-07T10:00:00.000Z');
-  await expect(page.locator('[data-season-timer]')).toHaveAttribute('aria-label', /122 days, 0 hours, 1 minute/);
+  await expect(page.locator('[data-season-timer]')).toHaveText('121d 23h 1m');
+  await expect(page.locator('[data-season-timer]')).toHaveAttribute('datetime', '2026-12-07T09:00:00.000Z');
+  await expect(page.locator('[data-season-timer]')).toHaveAttribute('aria-label', /121 days, 23 hours, 1 minute/);
 
   await expect(page.locator('[data-document-progress-current]')).toHaveText('1');
-  await expect(page.locator('[data-document-progress-total]')).toHaveText('501');
+  await expect(page.locator('[data-document-progress-total]')).toHaveText(String(battlePassTotals.documents));
   await expect(page.locator('[data-reward-progress-current]')).toHaveText('0');
-  await expect(page.locator('[data-reward-progress-total]')).toHaveText('53');
+  await expect(page.locator('[data-reward-progress-total]')).toHaveText(String(battlePassTotals.rewards));
   await expect(page.locator('[data-document-progress]')).toHaveJSProperty('value', 1);
   await expect(page.locator('[data-reward-progress]')).toHaveJSProperty('value', 0);
   await expect(page.locator('input[name="route-profile"][value="safest"]')).toBeChecked();

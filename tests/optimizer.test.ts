@@ -72,7 +72,7 @@ describe('optimizer', () => {
     const result = optimize(input(catalogs));
 
     expect(result.goal).toBe('all-unclaimed-rewards');
-    expect(result.unclaimedRewardIds).toHaveLength(53);
+    expect(result.unclaimedRewardIds).toHaveLength(allRewardIds(catalogs).length);
     expect(result.redemptionSequence).toHaveLength(result.unclaimedRewardIds.length);
     expect(new Set(result.redemptionSequence)).toEqual(new Set(result.unclaimedRewardIds));
     const pageByReward = new Map(catalogs.battlePass.pages.flatMap((page) => page.rewards.map((reward) => [reward.id, page.page] as const)));
@@ -84,7 +84,11 @@ describe('optimizer', () => {
       sequenceOffset += requiredClaims;
     }
     expect(pageByReward.get(result.redemptionSequence[sequenceOffset])).toBe(12);
-    expect(Object.values(result.initialDeficits).reduce((sum, quantity) => sum + quantity, 0)).toBe(501);
+    const expectedDocumentTotal = catalogs.battlePass.pages
+      .flatMap((page) => page.rewards)
+      .flatMap((reward) => reward.requirements)
+      .reduce((sum, requirement) => sum + requirement.quantity, 0);
+    expect(Object.values(result.initialDeficits).reduce((sum, quantity) => sum + quantity, 0)).toBe(expectedDocumentTotal);
     expect(result.profiles.fastest.route.available).toBe(true);
     expect(result.profiles.safest.route.available).toBe(true);
     expect(result.profiles.fastest.schedule.every((day) => day.documentQuantity <= 10)).toBe(true);
