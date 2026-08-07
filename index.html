@@ -790,7 +790,6 @@
       }
 
       .schedule-plan-actions,
-      .schedule-immediate,
       .buyout-section {
         padding-block: var(--space-m);
         border-block-end: 1px solid var(--line-muted);
@@ -806,7 +805,6 @@
       }
 
       .schedule-plan-actions h3,
-      .schedule-immediate h3,
       .buyout-section h3 {
         margin: 0 0 var(--space-s);
         font-size: var(--font-size-label);
@@ -825,7 +823,6 @@
       }
 
       .schedule-plan-actions ul,
-      .schedule-immediate ul,
       .schedule-day-column ul,
       .buyout-section ul {
         display: grid;
@@ -835,7 +832,6 @@
       }
 
       .schedule-plan-actions li,
-      .schedule-immediate li,
       .schedule-day-column li,
       .buyout-section li,
       .buyout-section p {
@@ -1932,6 +1928,8 @@
       const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
       const rewardPageById = new Map(catalogs.battlePass.pages.flatMap((page) =>
         page.rewards.map((reward) => [reward.id, page.page])));
+      const rewardOrderById = new Map(catalogs.battlePass.pages.flatMap((page) =>
+        page.rewards.map((reward, rewardIndex) => [reward.id, rewardIndex])));
       const documentTotal = rewards.reduce(
         (total, reward) => total + reward.requirements.reduce((rewardTotal, requirement) => rewardTotal + requirement.quantity, 0),
         0,
@@ -2383,16 +2381,10 @@
           routeScheduleContent.append(actions);
         }
 
-        if (profile.projectedImmediateRewardIds.length > 0) {
-          const immediate = createElement('section', 'schedule-immediate');
-          const list = document.createElement('ul');
-          immediate.append(createElement('h3', '', localizer.text('ui.rewardsAvailableNow')));
-          profile.projectedImmediateRewardIds.forEach((rewardId) => list.append(createElement('li', '', localizer.text(rewardId))));
-          immediate.append(list);
-          routeScheduleContent.append(immediate);
-        }
-
-        profile.schedule.forEach((day) => {
+        profile.schedule.forEach((day, dayIndex) => {
+          const rewardIdsToClaim = dayIndex === 0
+            ? [...profile.projectedImmediateRewardIds, ...day.rewardIdsClaimed]
+            : day.rewardIdsClaimed;
           const daySection = createElement('section', 'schedule-projection-day');
           const columns = createElement('div', 'schedule-projection-day__columns');
           const raids = createElement('section', 'schedule-day-column schedule-day-column--raids');
@@ -2420,10 +2412,10 @@
           });
           raids.append(raidList);
           rewardClaims.append(createElement('h4', '', localizer.text('ui.rewardsToRedeem')));
-          if (day.rewardIdsClaimed.length > 0) {
+          if (rewardIdsToClaim.length > 0) {
             const rewardPages = createElement('div', 'schedule-reward-pages');
             const pageGroups = [];
-            day.rewardIdsClaimed.forEach((rewardId) => {
+            rewardIdsToClaim.forEach((rewardId) => {
               const page = rewardPageById.get(rewardId);
               const currentGroup = pageGroups.at(-1);
               if (currentGroup?.page === page) currentGroup.rewardIds.push(rewardId);
@@ -2438,7 +2430,14 @@
                 'schedule-reward-page__heading',
                 `${localizer.text('battlePass.page')} ${String(page).padStart(2, '0')}`,
               ));
-              rewardIds.forEach((rewardId) => rewardList.append(createElement('li', '', localizer.text(rewardId))));
+              [...rewardIds]
+                .sort((left, right) => (rewardOrderById.get(left) ?? Number.MAX_SAFE_INTEGER)
+                  - (rewardOrderById.get(right) ?? Number.MAX_SAFE_INTEGER))
+                .forEach((rewardId) => {
+                const rewardItem = createElement('li', '', localizer.text(rewardId));
+                rewardItem.dataset.scheduleRewardId = rewardId;
+                rewardList.append(rewardItem);
+                });
               pageSection.append(rewardList);
               rewardPages.append(pageSection);
             });

@@ -27,6 +27,32 @@ function allRewardIds(catalogs: Catalogs): string[] {
   return catalogs.battlePass.pages.flatMap((page) => page.rewards.map((reward) => reward.id));
 }
 
+function expectLegalPageUnlockOrder(
+  catalogs: Catalogs,
+  initialClaimedRewardIds: readonly string[],
+  sequence: readonly string[],
+): void {
+  const claimed = new Set(initialClaimedRewardIds);
+  const pageIndexByReward = new Map(catalogs.battlePass.pages.flatMap((page, pageIndex) => (
+    page.rewards.map((reward) => [reward.id, pageIndex] as const)
+  )));
+
+  for (const rewardId of sequence) {
+    const pageIndex = pageIndexByReward.get(rewardId);
+    expect(pageIndex, `Unknown reward ${rewardId}`).toBeDefined();
+    if (pageIndex === undefined) continue;
+    if (pageIndex > 0) {
+      const previousPage = catalogs.battlePass.pages[pageIndex - 1];
+      const claimedOnPreviousPage = previousPage.rewards.filter((reward) => claimed.has(reward.id)).length;
+      expect(
+        claimedOnPreviousPage,
+        `Page ${catalogs.battlePass.pages[pageIndex].page} reward ${rewardId} was planned before Page ${previousPage.page} met its unlock threshold`,
+      ).toBeGreaterThanOrEqual(previousPage.rewards.length - 1);
+    }
+    claimed.add(rewardId);
+  }
+}
+
 function input(catalogs: Catalogs, overrides: Partial<Parameters<typeof optimize>[0]> = {}): Parameters<typeof optimize>[0] {
   return {
     catalogs,
@@ -66,10 +92,32 @@ describe('optimizer', () => {
     expect(result.profiles.fastest.schedule[0].rewardIdsClaimed.length).toBeGreaterThan(0);
     expect(result.profiles.fastest.schedule[0].unlockedPage).toBe(2);
     expect(result.profiles.fastest.schedule.slice(1).every((day) => !day.expanded)).toBe(true);
-    expect([
+    const fastestProjectedClaims = [
       ...result.profiles.fastest.projectedImmediateRewardIds,
       ...result.profiles.fastest.schedule.flatMap((day) => day.rewardIdsClaimed),
-    ].sort()).toEqual([...result.unclaimedRewardIds].sort());
+    ];
+    expect([...fastestProjectedClaims].sort()).toEqual([...result.unclaimedRewardIds].sort());
+    expectLegalPageUnlockOrder(catalogs, [], result.redemptionSequence);
+    expectLegalPageUnlockOrder(catalogs, [], result.profiles.fastest.redemptionSequence);
+    expectLegalPageUnlockOrder(catalogs, [], result.profiles.safest.redemptionSequence);
+    expectLegalPageUnlockOrder(catalogs, [], fastestProjectedClaims);
+  });
+
+  it('does not recommend a reward from the next page before the previous page has N minus 1 claims', () => {
+    const catalogs = loadCatalogs();
+    const firstPage = catalogs.battlePass.pages[0];
+    const claimedRewardIds = firstPage.rewards.slice(0, firstPage.rewards.length - 2).map((reward) => reward.id);
+    const result = optimize(input(catalogs, { claimedRewardIds }));
+
+    for (const profile of [result.profiles.fastest, result.profiles.safest]) {
+      const projectedClaims = [
+        ...profile.projectedImmediateRewardIds,
+        ...profile.schedule.flatMap((day) => day.rewardIdsClaimed),
+      ];
+      expectLegalPageUnlockOrder(catalogs, claimedRewardIds, profile.redemptionSequence);
+      expectLegalPageUnlockOrder(catalogs, claimedRewardIds, projectedClaims);
+      expect(firstPage.rewards.some((reward) => reward.id === profile.redemptionSequence[0])).toBe(true);
+    }
   });
 
   it('uses the season-start Classified Document on the Page 12 rush path', () => {

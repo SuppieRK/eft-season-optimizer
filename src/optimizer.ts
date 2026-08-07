@@ -699,8 +699,10 @@ function pageTwelveFirstSequence(
   const sequence = [...best.sequence];
   const accumulated = { ...best.requirements };
   while (claimed.size < initiallyClaimed.size + unclaimed.length) {
-    const finalPageCandidates = pages[pages.length - 1].rewards.filter((reward) => !claimed.has(reward.id));
-    const candidates = finalPageCandidates.length > 0 ? finalPageCandidates : progressionCandidates(pages, claimed);
+    const legalCandidates = progressionCandidates(pages, claimed);
+    const finalPageIds = new Set(pages[pages.length - 1].rewards.map((reward) => reward.id));
+    const finalPageCandidates = legalCandidates.filter((reward) => finalPageIds.has(reward.id));
+    const candidates = finalPageCandidates.length > 0 ? finalPageCandidates : legalCandidates;
     const reward = [...candidates]
       .sort((left, right) => compareCleanupRewards(left, right, accumulated, available, profile, catalogs))[0];
     if (!reward) break;
@@ -1269,9 +1271,10 @@ function calculateBuyout(input: OptimizerInput, rewards: readonly RewardRecord[]
   let earnedAwarded = 0;
   const bundleCounts = input.catalogs.optimizerRules.classifiedDocuments.bundles.map(() => 0);
   const rewardsById = new Map(rewards.map((reward) => [reward.id, reward]));
+  const simulatedClaimed = new Set(input.claimedRewardIds);
   for (const rewardId of sequence) {
     const reward = rewardsById.get(rewardId);
-    if (!reward) continue;
+    if (!reward || !progressionCandidates(input.catalogs.battlePass.pages, simulatedClaimed).some((candidate) => candidate.id === rewardId)) continue;
     let missing = 0;
     for (const requirement of reward.requirements) {
       const available = regularInventory[requirement.documentId] ?? 0;
@@ -1307,6 +1310,7 @@ function calculateBuyout(input: OptimizerInput, rewards: readonly RewardRecord[]
       earnedBalance += reward.tarCoinsAwarded;
       earnedAwarded += reward.tarCoinsAwarded;
     }
+    simulatedClaimed.add(reward.id);
   }
   const locale = input.locale ?? input.catalogs.localization.defaultLocale;
   const localEstimate = estimateLocalTarCoins(additional, input.catalogs, locale);

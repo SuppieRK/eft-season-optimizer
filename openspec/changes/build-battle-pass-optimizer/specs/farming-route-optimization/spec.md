@@ -18,6 +18,10 @@ While any Battle Pass reward remains unclaimed, the optimizer SHALL include ever
 - **WHEN** an unclaimed reward cannot yet be redeemed because of reward prerequisites or the previous-page unlock threshold
 - **THEN** the recommended sequence places enough legal prerequisite rewards before it
 
+#### Scenario: All optimizer projections respect page access
+- **WHEN** the optimizer creates a redemption sequence, immediate claim projection, daily claim projection, staged purchase plan, or buyout simulation
+- **THEN** it does not process a reward from Page X until at least one fewer reward than the total on Page X - 1 has been claimed in that simulation
+
 #### Scenario: Page 12 is not unlocked
 - **WHEN** several legal reward combinations can advance the pass
 - **THEN** the optimizer prefers the combination with the lower selected-profile farming work to unlock Page 12 before clearing optional rewards on earlier pages
@@ -192,7 +196,7 @@ The optimizer SHALL accept exactly one selected game mode for the complete calcu
 - **AND** all three calculations retain identical document deficits, location assignments, and route objective values
 
 ### Requirement: Daily planning estimate
-The optimizer SHALL partition remaining farming quantities into ordered projected plan days that do not exceed the effective daily document limit. It SHALL prioritize the Page-12 unlock path, claim rewards as soon as their requirements are available, then clear every remaining reward. The daily limit SHALL only partition the projection; the optimizer SHALL NOT track documents collected today, remaining daily allowance, game-day resets, or raid history. It SHALL preserve location grouping where possible after the route is selected.
+The optimizer SHALL partition remaining farming quantities into ordered projected plan days that do not exceed the effective daily document limit. It SHALL prioritize the Page-12 unlock path, claim rewards as soon as their requirements and previous-page unlock threshold are satisfied, then clear every remaining reward. The daily limit SHALL only partition the projection; the optimizer SHALL NOT track documents collected today, remaining daily allowance, game-day resets, or raid history. It SHALL preserve location grouping where possible after the route is selected.
 
 #### Scenario: Quantity exceeds daily limit
 - **WHEN** a route requires more documents than the effective daily limit

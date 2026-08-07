@@ -131,6 +131,35 @@ test('accepts a zero-yield Commit and exposes the projected schedule on demand',
   await expect(rewardPageGroups).not.toHaveCount(0);
   await expect(rewardPageGroups.first().locator('.schedule-reward-page__heading')).toHaveText(/^Page \d{2}$/u);
   await expect(rewardPageGroups.first().locator('li')).not.toHaveCount(0);
+  await expect(dialog.locator('.schedule-immediate')).toHaveCount(0);
+  const pageRewardOrder = new Map(await page.evaluate(async () => {
+    const response = await fetch('./data/battle-pass.json');
+    const catalog = await response.json() as { pages: Array<{ page: number; rewards: Array<{ id: string }> }> };
+    return catalog.pages.map((battlePassPage) => [battlePassPage.page, battlePassPage.rewards.map((reward) => reward.id)] as const);
+  }));
+  const renderedClaimPages = await rewardPageGroups.evaluateAll((groups) => groups.flatMap((group) => (
+    Array.from({ length: group.querySelectorAll('[data-schedule-reward-id]').length }, () => Number((group as HTMLElement).dataset.scheduleRewardPage))
+  )));
+  const renderedClaimsByPage = new Map<number, number>();
+  renderedClaimPages.forEach((pageNumber) => {
+    if (pageNumber > 1) {
+      expect(renderedClaimsByPage.get(pageNumber - 1) ?? 0).toBeGreaterThanOrEqual((pageRewardOrder.get(pageNumber - 1)?.length ?? 0) - 1);
+    }
+    renderedClaimsByPage.set(pageNumber, (renderedClaimsByPage.get(pageNumber) ?? 0) + 1);
+  });
+  expect(renderedClaimPages.slice(0, 4)).toEqual([1, 1, 1, 1]);
+  expect(renderedClaimPages[4]).toBe(2);
+  const renderedRewardGroups = await rewardPageGroups.evaluateAll((groups) => groups.map((group) => ({
+    page: Number((group as HTMLElement).dataset.scheduleRewardPage),
+    rewardIds: [...group.querySelectorAll<HTMLElement>('[data-schedule-reward-id]')].map((item) => item.dataset.scheduleRewardId ?? ''),
+  })));
+  renderedRewardGroups.forEach(({ page: pageNumber, rewardIds }) => {
+    const accordionOrder = pageRewardOrder.get(pageNumber) ?? [];
+    expect(rewardIds.map((rewardId) => accordionOrder.indexOf(rewardId))).toEqual(
+      [...rewardIds].sort((left, right) => accordionOrder.indexOf(left) - accordionOrder.indexOf(right))
+        .map((rewardId) => accordionOrder.indexOf(rewardId)),
+    );
+  });
   await expect(dialog.locator('.schedule-day-column--rewards > ul')).toHaveCount(0);
   await expect(dialog).not.toContainText('Plan details');
   await expect(dialog).not.toContainText('Owned Classified Documents consumed');

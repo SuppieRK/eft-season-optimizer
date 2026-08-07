@@ -109,6 +109,7 @@
 - [x] 12.3 Rework the five-region layout against the in-game screenshots; show Fastest and Safest side by side, move deficits to a shared comparison, hide internal profile cost, and verify desktop and narrow responsive presentations in Chromium.
 - [x] 12.4 Add current flat-config ESLint and Stylelint checks, integrate them into the repository check command, and pass lint, tests, catalog validation, and the production build.
 - [x] 12.5 Remove the editable daily-limit override and implement fixed mode-derived limits plus a daily reward progression that prioritizes page unlocks and accounts for every unclaimed reward.
+- [x] 12.6 Apply the implicit previous-page reward-count-minus-one gate to every optimizer sequence, projection, purchase, and buyout path, with step-by-step regression coverage.
 
 ## 13. Focus the Route Planner UI
 
@@ -157,3 +158,5 @@
 - [x] 16.18 Render the localized raid-result instruction's Commit term as a keyboard-operable inline link-styled action that delegates to the Focus-header Commit operation, and add a Playwright regression proving identical inventory persistence.
 - [x] 16.19 Constrain every persistent document-ribbon tile, artwork frame, and quantity control to the same shared dimensions regardless of intrinsic title width, and add a Chromium geometry regression covering every document type.
 - [x] 16.20 Replace the Battle Pass buyout prose with ordered Spend Battle Pass TarCoins and Keep Battle Pass TarCoins comparisons, calculate a separate keep-TarCoins local package estimate against gross bundle spend, render TarCoin packages before Classified Document bundles as concise tables, and add optimizer and Chromium regressions.
+- [x] 16.21 Merge projected immediate rewards into Day 1's ordered full-schedule reward manifest so every displayed later-page claim visibly follows the previous page's reward-count-minus-one threshold, and add a Chromium regression that audits all rendered page transitions.
+- [x] 16.22 Render rewards within every full-schedule page group in the same relative catalog order as the corresponding rewards accordion, and extend the Chromium schedule audit across all groups.
