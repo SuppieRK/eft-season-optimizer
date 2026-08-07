@@ -54,6 +54,22 @@ test('preserves the desktop grid and avoids viewport overflow at the wide review
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
+test('stacks the always-available raid workspace without mobile viewport overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openWireframe(page);
+
+  await expect(page.locator('[data-raid-result]')).toHaveCount(2, { timeout: 10_000 });
+  await expect(page.locator('[data-commit-raid]')).toBeVisible();
+  const regionY = await Promise.all([
+    page.locator('.focus-stage'),
+    page.locator('.detail-rail'),
+    page.locator('.reward-rail'),
+    page.locator('.document-strip'),
+  ].map(async (locator) => (await locator.boundingBox())?.y ?? -1));
+  expect(regionY).toEqual([...regionY].sort((left, right) => left - right));
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
 test('keeps season proportions and existing header controls on the shared type scale', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWireframe(page);

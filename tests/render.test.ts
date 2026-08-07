@@ -28,10 +28,15 @@ afterEach(() => {
 });
 
 describe('Battle Pass interface', () => {
-  it('renders the selected-page, current-day, route-context, and inventory regions', () => {
+  it('renders the selected-page, next-raid, route-context, and inventory regions', () => {
     const catalog = catalogs();
+    const routeState = {
+      ...createDefaultState(catalog),
+      claimedRewardIds: ['rewards.dogtag01.name'],
+      classifiedDocuments: 0,
+    };
     document.body.innerHTML = '<div id="app"></div>';
-    renderApp(document, catalog, createDefaultState(catalog), () => undefined);
+    renderApp(document, catalog, routeState, () => undefined);
 
     expect([...document.querySelectorAll('[data-region]')].map((node) => node.getAttribute('data-region'))).toEqual(['header', 'workspace', 'rewards', 'results', 'route-context', 'footer']);
     expect(document.querySelectorAll('.reward-page')).toHaveLength(1);
@@ -187,14 +192,15 @@ describe('Battle Pass interface', () => {
     expect(document.querySelector('[data-field="crate-count"]')).toBeTruthy();
   });
 
-  it('uses the same flat manifest for an immediate-claim plan', () => {
+  it('keeps a stockpile raid visible when every remaining reward is covered', () => {
     const catalog = catalogs();
     const ownedDocuments = Object.fromEntries(catalog.documents.documents.map((document) => [document.id, document.kind === 'regular' ? 999 : 0]));
     document.body.innerHTML = '<div id="app"></div>';
     renderApp(document, catalog, { ...createDefaultState(catalog), ownedDocuments }, () => undefined);
 
-    expect(document.querySelector('.claim-stage')).toBeTruthy();
+    expect(document.querySelector('.route-stockpile')).toBeTruthy();
     expect(document.querySelector('.route-stop-tabs')).toBeNull();
-    expect(document.querySelector('.route-context .claim-list')).toBeTruthy();
+    expect(document.querySelector('[data-stockpile-context]')).toBeTruthy();
+    expect(document.querySelectorAll('[data-document-role="stockpile"]')).toHaveLength(2);
   });
 });

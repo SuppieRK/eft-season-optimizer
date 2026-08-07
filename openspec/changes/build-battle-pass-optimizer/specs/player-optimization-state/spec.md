@@ -133,7 +133,7 @@ The interface SHALL provide one semantic claimed checkbox for each reward and gl
 - **AND** no document inventory is consumed
 
 ### Requirement: Center-column optimizer output
-The center column SHALL render one flat current-route-day workspace focused on the selected route profile's next farming or claiming action, estimated days, warnings, empty states, and completed states. When farming is next it SHALL present the first schedule day's locations as an ordered selectable stop strip and SHALL show the selected stop's assigned document artwork and quantities on the continuous center surface. The center SHALL NOT duplicate regular-document deficits or the selected mode's daily limit.
+The center column SHALL render one flat next-raid workspace focused on the selected route profile's next raid, estimated days, warnings, empty states, and completed states. A projected immediately redeemable reward SHALL NOT replace, hide, or disable the next-raid workspace. Reward checkboxes SHALL remain the only confirmed progression state, and projected claims SHALL NOT mutate inventory. When Battle Pass farming remains, the center SHALL show one recommended location and exactly the regular document types available there. Priority documents assigned by the optimizer SHALL remain fully emphasized; available documents that do not advance the current recommendation SHALL be dimmed. When every remaining reward requirement is already covered, the center SHALL show an optional crate-stockpile raid and SHALL keep both location documents fully emphasized. Each displayed document SHALL have a transient non-negative raid-result input. The center SHALL NOT duplicate regular-document deficits or the selected mode's daily limit.
 
 #### Scenario: Inputs change
 - **WHEN** a player changes any optimizer input
@@ -141,8 +141,31 @@ The center column SHALL render one flat current-route-day workspace focused on t
 
 #### Scenario: Farming is required next
 - **WHEN** the selected profile's next schedule day contains one or more locations
-- **THEN** the center shows its day and document total, ordered selectable location stops, and the selected stop's assigned document artwork and quantities
-- **AND** no focused-route card, next-action card, location card, or nested Farm Locations disclosure is rendered
+- **THEN** the center shows the first recommended location, both document types available there, their priority or optional state, and separate raid-result inputs
+- **AND** no focused-route card, nested location card, collected-today control, or game-day reset control is rendered
+
+#### Scenario: A reward is immediately redeemable
+- **WHEN** one or more unchecked rewards are covered by current inventory or Classified backfill
+- **THEN** the center still shows the next recommended raid with both raid-result inputs and Commit
+- **AND** the reward rail remains the only place that offers the optional redemption controls
+
+#### Scenario: Current page is covered but unchecked
+- **WHEN** the current page has no ordinary-document farming deficit but its progression rewards remain unchecked
+- **THEN** the center pre-farms the next ordinary-document deficit on the projected Page-12-first path without marking a reward or page completed
+
+#### Scenario: Remaining pass is fully covered
+- **WHEN** current resources cover every remaining reward requirement
+- **THEN** the center shows an optional crate-stockpile raid with both location documents presented as useful pickups
+
+#### Scenario: Commit a farming result
+- **WHEN** the player activates Commit after entering non-negative whole-number quantities
+- **THEN** the quantities are added to the existing document inventory controls in one update
+- **AND** the persisted inventory, header progress, deficits, reward recommendations, and next raid are refreshed
+- **AND** the transient raid-result inputs return to zero
+
+#### Scenario: Change a farming draft
+- **WHEN** the player edits a raid-result quantity without activating Commit
+- **THEN** the document inventory, cookie state, and optimizer recommendation do not change
 
 #### Scenario: Buyout estimate is presented
 - **WHEN** unclaimed rewards have deficits that can be covered by configured Classified Document bundles
@@ -158,7 +181,7 @@ The center column SHALL render one flat current-route-day workspace focused on t
 - **THEN** the right context column reports that the Classified quantity remains unchanged and shows no Classified redemption or purchase action
 
 ### Requirement: Header setup and right-column route context
-The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal, optional TarCoin spending, TarCoin balance, and conditional crate count. The right column SHALL instead show the selected route stop's location, assigned documents, official difficulty, maximum raid time, complete-day claim outcome, full-schedule access, and flat plan and buyout disclosures. The optimizer objective SHALL always be all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, or a separate daily-limit readout.
+The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal, optional TarCoin spending, TarCoin balance, and conditional crate count. The right column SHALL instead show the recommended location, official difficulty, maximum raid time, priority- or stockpile-document summary, Commit action, projected reward outcome, full-schedule access, and flat non-mutating exchange, purchase, plan, and buyout guidance. The optimizer objective SHALL always rush Page 12 and then complete all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, a separate daily-limit readout, or controls that mutate inventory for suggested exchanges or purchases.
 
 #### Scenario: Mode selection applies its default
 - **WHEN** the player selects PvE, PvP, or PvP Seasonal
@@ -245,7 +268,7 @@ The separate credits footer SHALL persistently state that Escape from Tarkov and
 - **THEN** the disclaimer remains available without opening a modal and cannot be dismissed with the cookie notice
 
 ### Requirement: Focused daily-plan disclosure
-The center column SHALL present the selected profile's next action as a flat planning estimate. A `View full schedule` action SHALL open a native dialog containing every estimated day as rule-separated manifest rows with farming targets, locations, routing factors, and rewards to claim. The schedule SHALL NOT render day cards or page-unlocked labels.
+The center column SHALL present the selected profile's next raid as a flat planning estimate. A `View full schedule` action SHALL open a native dialog containing every projected day as rule-separated manifest rows with farming targets, locations, routing factors, and rewards to claim. The schedule SHALL NOT render day cards or page-unlocked labels and SHALL NOT create daily farming state.
 
 #### Scenario: Multi-day estimate
 - **WHEN** the remaining farming quantity spans multiple daily limits
@@ -260,7 +283,7 @@ Each selected reward page after Page 1 SHALL show how many more rewards must be 
 - **THEN** the `Claim N more from Page X` hint disappears immediately
 
 ### Requirement: Versioned cookie persistence
-The application SHALL persist player-controlled progress, optimizer settings, locale, the selected reward page, and the selected route profile in bounded first-party cookies carrying both game-data version `1.1.0.0.46657.8.6.2026` and an independent cookie-schema version. The selected route stop and native-dialog states SHALL NOT be persisted.
+The application SHALL persist player-controlled progress, optimizer settings, locale, the selected reward page, and the selected route profile in bounded first-party cookies carrying both game-data version `1.1.0.0.46657.8.6.2026` and an independent cookie-schema version. Uncommitted raid-result inputs, the next recommended location, projected daily state, raid history, event history, and native-dialog states SHALL NOT be persisted.
 
 #### Scenario: Restore valid state
 - **WHEN** the player returns with valid supported cookies

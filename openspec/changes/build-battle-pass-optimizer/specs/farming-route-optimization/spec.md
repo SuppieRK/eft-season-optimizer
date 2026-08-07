@@ -7,16 +7,24 @@ The optimizer SHALL accept normalized immutable data and player inputs and SHALL
 - **WHEN** the optimizer receives the same catalog and player input twice
 - **THEN** both results are structurally identical and use the same deterministic ordering
 
-### Requirement: Global all-rewards objective
-While any Battle Pass reward remains unclaimed, the optimizer SHALL include every unclaimed reward, exclude already claimed rewards, and return a recommended legal redemption sequence satisfying reward prerequisites and implicit page-unlock thresholds. The player SHALL NOT need to select an individual reward or partial-pass goal. Black Division crate planning SHALL become available only after every reward is claimed.
+### Requirement: Page-12-first complete-pass objective
+While any Battle Pass reward remains unclaimed, the optimizer SHALL include every unclaimed reward, exclude already claimed rewards, and return a recommended legal redemption sequence satisfying implicit page-unlock thresholds. The sequence SHALL first minimize the selected profile's farming work needed to unlock Page 12, then minimize the work needed to claim every remaining reward. The player SHALL NOT need to select an individual reward or partial-pass goal. Black Division crate planning SHALL become available only after every reward is claimed.
 
 #### Scenario: Rewards remain unclaimed
 - **WHEN** one or more Battle Pass rewards are unclaimed
-- **THEN** the plan includes all of them and recommends a deterministic legal order in which to redeem them
+- **THEN** the plan includes all of them and recommends a deterministic Page-12-first legal order in which to redeem them
 
 #### Scenario: Prerequisites constrain the recommendation
 - **WHEN** an unclaimed reward cannot yet be redeemed because of reward prerequisites or the previous-page unlock threshold
 - **THEN** the recommended sequence places enough legal prerequisite rewards before it
+
+#### Scenario: Page 12 is not unlocked
+- **WHEN** several legal reward combinations can advance the pass
+- **THEN** the optimizer prefers the combination with the lower selected-profile farming work to unlock Page 12 before clearing optional rewards on earlier pages
+
+#### Scenario: Page 12 is unlocked
+- **WHEN** Page 12 is already available and ordinary rewards remain
+- **THEN** the optimizer continues with the lower-work legal sequence that completes all remaining rewards
 
 ### Requirement: Ordinary document consumption
 The optimizer SHALL aggregate required regular documents and consume matching owned regular documents before allocating Classified Documents or recommending farming.
@@ -184,7 +192,7 @@ The optimizer SHALL accept exactly one selected game mode for the complete calcu
 - **AND** all three calculations retain identical document deficits, location assignments, and route objective values
 
 ### Requirement: Daily planning estimate
-The optimizer SHALL partition remaining farming quantities into ordered plan days that do not exceed the effective daily document limit. It SHALL prioritize rewards that advance the current page-unlock frontier, claim rewards as soon as their requirements are available, record rewards claimed and pages unlocked on each day, then clear every remaining reward after the final page unlocks. It SHALL preserve location grouping where possible after the route is selected.
+The optimizer SHALL partition remaining farming quantities into ordered projected plan days that do not exceed the effective daily document limit. It SHALL prioritize the Page-12 unlock path, claim rewards as soon as their requirements are available, then clear every remaining reward. The daily limit SHALL only partition the projection; the optimizer SHALL NOT track documents collected today, remaining daily allowance, game-day resets, or raid history. It SHALL preserve location grouping where possible after the route is selected.
 
 #### Scenario: Quantity exceeds daily limit
 - **WHEN** a route requires more documents than the effective daily limit
@@ -196,11 +204,43 @@ The optimizer SHALL partition remaining farming quantities into ordered plan day
 
 #### Scenario: Schedule covers the fixed objective
 - **WHEN** all Battle Pass rewards begin unclaimed
-- **THEN** the immediate claims and daily claims together contain every unclaimed reward exactly once
+- **THEN** the projected immediate claims and daily claims together contain every unclaimed reward exactly once
 
 #### Scenario: Route comparison is independent of scheduling
 - **WHEN** profile routes require the same farming quantities under different daily limits
 - **THEN** changing the daily limit changes each profile schedule but not its route objective values
+
+### Requirement: Rolling next-raid recommendation
+For an available selected profile, the optimizer SHALL expose a next-raid recommendation whenever an eligible regular-document location exists. Projected immediately redeemable rewards SHALL remain advisory schedule metadata and SHALL NOT suppress the recommendation. The projection SHALL start from confirmed checked rewards and current inventory, MAY reserve covered rewards without mutating that state, and SHALL look ahead along the Page-12-first sequence to pre-farm the next ordinary-document deficit. The recommendation SHALL be recalculated from the player's current inventory after each committed raid result. Every regular document available at that location SHALL remain identifiable with an explicit `priority`, `optional`, or `stockpile` role.
+
+#### Scenario: Recommend the next raid
+- **WHEN** farming is required
+- **THEN** the result identifies one next location and the document types that advance the Page-12-first complete-pass objective there
+
+#### Scenario: Recommend a raid beside a projected claim
+- **WHEN** a reward is projected to be immediately redeemable and later farming work remains
+- **THEN** the result returns both the projected claim metadata and the next Battle Pass raid
+
+#### Scenario: Pre-farm after a covered unchecked page
+- **WHEN** every progression reward on the current page is covered but remains unchecked
+- **THEN** the result recommends the next location needed by the projected Page-12-first sequence without adding any reward to the confirmed claimed set
+
+#### Scenario: Stockpile after covering the pass
+- **WHEN** every remaining reward requirement is covered but one or more rewards remain unchecked
+- **THEN** the result keeps the all-unclaimed-rewards goal and returns an optional crate-stockpile raid
+- **AND** Fastest orders eligible locations by maximum raid time, Safest orders them by difficulty rating, and both use the other factor then stable location ID as tie-breakers
+
+#### Scenario: Commit raid results
+- **WHEN** the player commits non-negative quantities obtained for either document available at the recommended location
+- **THEN** those quantities are added to the ordinary inventory counters and the next recommendation is recalculated from the updated inventory
+
+#### Scenario: Commit no documents
+- **WHEN** the player commits zero for both document types
+- **THEN** inventory remains unchanged and the optimizer may return the same recommendation
+
+#### Scenario: Draft raid results
+- **WHEN** the player changes a next-raid quantity but has not committed it
+- **THEN** the optimizer result and persisted player inventory remain unchanged
 
 ### Requirement: Black Division crate fallback
 When every Battle Pass reward is claimed, the optimizer SHALL switch to a Black Division crate-count goal, default to one crate, apply inventory whose document has `kind: "regular"` at `10` documents per crate, and exclude documents with `kind: "classified"` and Classified purchases.
@@ -211,14 +251,14 @@ When every Battle Pass reward is claimed, the optimizer SHALL switch to a Black 
 
 #### Scenario: Enough documents for immediate exchange
 - **WHEN** the player owns enough documents whose kind is `regular` for the requested crate count
-- **THEN** the result recommends immediate exchange and no farming
+- **THEN** the result reports no crate shortage and still returns an optional stockpile raid for another crate
 
 #### Scenario: Classified Documents owned in crate mode
 - **WHEN** the player owns Classified Documents while planning Black Division crates
 - **THEN** those documents remain unchanged, do not reduce the crate shortage, and no TarCoin bundle is purchased
 
 ### Requirement: Structured optimizer result
-The optimizer result SHALL report all included unclaimed rewards and their recommended legal sequence, ordinary consumption, profile-specific regular-document exchanges, Classified allocation and TarCoin purchases, the independent remaining-pass buyout and local TarCoin-package estimates, deficits, location assignments and routing factors, Fastest or Safest objective values, daily estimates, unused resources, coincidence or unavailability state, and applicable warnings.
+The optimizer result SHALL report all included unclaimed rewards and their Page-12-first legal sequence, ordinary consumption, profile-specific regular-document exchanges, Classified allocation and TarCoin purchases, the independent remaining-pass buyout and local TarCoin-package estimates, deficits, location assignments and routing factors, the next recommended raid, Fastest or Safest objective values, projected daily estimates, unused resources, coincidence or unavailability state, and applicable warnings. It SHALL NOT require a persisted farming session, raid history, or event timeline.
 
 #### Scenario: Result is rendered
 - **WHEN** optimization completes successfully

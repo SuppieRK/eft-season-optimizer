@@ -455,6 +455,389 @@
         grid-area: detail;
       }
 
+      .focus-heading,
+      .detail-heading {
+        padding: var(--space-s) var(--space-m);
+        border-block-end-style: solid;
+      }
+
+      .focus-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-m);
+      }
+
+      .focus-heading h2,
+      .detail-heading h2 {
+        margin: 0;
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .focus-heading__eyebrow,
+      .detail-heading__eyebrow {
+        display: block;
+        margin-block-end: var(--space-xxs);
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .focus-heading__summary {
+        color: var(--document-frame);
+        font-size: var(--font-size-label);
+        font-variant-numeric: tabular-nums;
+        line-height: var(--line-height-ui);
+        white-space: nowrap;
+      }
+
+      .focus-content {
+        display: grid;
+        align-content: center;
+        gap: var(--space-l);
+        padding: var(--space-l);
+        overflow: auto;
+        border-block-end: 0;
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+      }
+
+      .focus-loading,
+      .focus-message {
+        margin: 0;
+        color: var(--label-muted);
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-body);
+        text-align: center;
+      }
+
+      .focus-message strong {
+        display: block;
+        margin-block-end: var(--space-xs);
+        color: var(--label);
+        font-size: var(--font-size-heading);
+        line-height: var(--line-height-ui);
+      }
+
+      .focus-instruction {
+        margin: 0;
+        color: var(--label-muted);
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-body);
+        text-align: center;
+      }
+
+      .focus-documents {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(118px, 176px));
+        justify-content: center;
+        gap: var(--space-xl);
+      }
+
+      .focus-document {
+        display: grid;
+        align-content: start;
+        gap: var(--space-s);
+        min-inline-size: 0;
+        margin: 0;
+      }
+
+      .focus-document__status {
+        min-block-size: 1lh;
+        color: var(--document-frame);
+        font-size: var(--font-size-caption);
+        font-weight: 700;
+        line-height: var(--line-height-ui);
+        letter-spacing: 0.08em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .focus-document--optional .focus-document__status {
+        color: var(--label-muted);
+      }
+
+      .focus-document__image-frame {
+        position: relative;
+        aspect-ratio: 1;
+        overflow: hidden;
+        border: 2px solid var(--document-frame);
+        background: var(--surface-alt);
+        transition:
+          filter 120ms ease-out,
+          opacity 120ms ease-out;
+      }
+
+      .focus-document--optional .focus-document__image-frame {
+        border-color: var(--line-muted);
+        filter: grayscale(0.88);
+        opacity: 0.34;
+      }
+
+      .focus-document__image-frame img {
+        display: block;
+        inline-size: 100%;
+        block-size: 100%;
+        object-fit: cover;
+      }
+
+      .focus-document figcaption {
+        display: grid;
+        gap: var(--space-xxs);
+        min-block-size: 2.618em;
+        text-align: center;
+      }
+
+      .focus-document figcaption strong {
+        overflow-wrap: anywhere;
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-ui);
+      }
+
+      .focus-document figcaption span {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-ui);
+      }
+
+      .raid-result-stepper {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        border: 1px solid var(--line-muted);
+        background: var(--surface-alt);
+      }
+
+      .raid-result-stepper button,
+      .raid-result-stepper input {
+        min-inline-size: 0;
+        block-size: 2.618em;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        text-align: center;
+      }
+
+      .raid-result-stepper button {
+        inline-size: 2.618em;
+        cursor: pointer;
+      }
+
+      .raid-result-stepper button:hover {
+        background: var(--line-muted);
+      }
+
+      .raid-result-stepper input {
+        inline-size: 100%;
+        border-inline: 1px solid var(--line-muted);
+        appearance: textfield;
+      }
+
+      .raid-result-stepper input::-webkit-inner-spin-button,
+      .raid-result-stepper input::-webkit-outer-spin-button {
+        appearance: none;
+      }
+
+      .raid-result-stepper button:focus-visible,
+      .raid-result-stepper input:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: 2px;
+      }
+
+      .detail-heading {
+        display: grid;
+        align-content: center;
+      }
+
+      .route-detail-content {
+        display: grid;
+        align-content: start;
+        gap: var(--space-s);
+        padding: var(--space-m);
+        overflow: auto;
+      }
+
+      .route-facts {
+        display: grid;
+        gap: var(--space-s);
+        margin: 0;
+      }
+
+      .route-facts > div {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: var(--space-s);
+        padding-block-end: var(--space-xs);
+        border-block-end: 1px solid var(--line-muted);
+      }
+
+      .route-facts dt,
+      .route-facts dd {
+        margin: 0;
+        font-size: var(--font-size-label);
+        line-height: var(--line-height-ui);
+      }
+
+      .route-facts dt {
+        color: var(--label-muted);
+      }
+
+      .route-facts dd {
+        font-weight: 700;
+        text-align: end;
+      }
+
+      .route-primary-action {
+        display: grid;
+        padding: var(--space-s) var(--space-m);
+        border-block-end-style: solid;
+      }
+
+      .route-primary-action button {
+        border: 1px solid var(--document-frame);
+        border-radius: 0;
+        background: color-mix(in srgb, var(--document-frame) 24%, var(--surface));
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .route-primary-action button:hover,
+      .route-primary-action button:focus-visible {
+        background: color-mix(in srgb, var(--document-frame) 42%, var(--surface));
+        outline: 0;
+      }
+
+      .route-primary-action button:disabled {
+        border-color: var(--line-muted);
+        background: transparent;
+        color: var(--label-muted);
+        cursor: default;
+        opacity: 0.55;
+      }
+
+      .detail-secondary {
+        min-block-size: 0;
+        padding: var(--space-s) var(--space-m);
+        overflow: auto;
+      }
+
+      .detail-secondary > button {
+        inline-size: 100%;
+        padding: var(--space-s);
+        border: 1px solid var(--line-muted);
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .detail-secondary details {
+        border-block-end: 1px solid var(--line-muted);
+      }
+
+      .detail-secondary summary {
+        padding-block: var(--space-s);
+        color: var(--label);
+        font-size: var(--font-size-label);
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .detail-secondary details p,
+      .detail-secondary details ul {
+        margin: 0 0 var(--space-s);
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
+      .route-schedule-dialog {
+        inline-size: min(760px, calc(100vw - (2 * var(--space-xl))));
+        max-block-size: min(760px, calc(100vh - (2 * var(--space-xl))));
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--surface);
+        color: var(--label);
+      }
+
+      .route-schedule-dialog::backdrop {
+        background: rgb(0 0 0 / 72%);
+      }
+
+      .route-schedule-dialog > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-m);
+        padding: var(--space-m);
+        border-block-end: 1px solid var(--line-muted);
+      }
+
+      .route-schedule-dialog h2 {
+        margin: 0;
+        font-size: var(--font-size-heading);
+      }
+
+      .route-schedule-dialog header button {
+        padding: var(--space-xs) var(--space-s);
+        border: 1px solid var(--line-muted);
+        border-radius: 0;
+        background: transparent;
+        color: var(--label);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      [data-route-schedule-content] {
+        max-block-size: calc(100vh - 10rem);
+        padding: 0 var(--space-m);
+        overflow: auto;
+      }
+
+      .schedule-projection-day {
+        display: grid;
+        gap: var(--space-xs);
+        padding-block: var(--space-m);
+        border-block-end: 1px solid var(--line-muted);
+      }
+
+      .schedule-projection-day h3,
+      .schedule-projection-day p,
+      .schedule-projection-day ul {
+        margin: 0;
+      }
+
+      .schedule-projection-day h3 {
+        font-size: var(--font-size-label);
+      }
+
+      .schedule-projection-day p,
+      .schedule-projection-day li {
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
       .section-heading,
       .detail-content,
       .primary-action {
@@ -986,6 +1369,110 @@
       }
 
       @media (max-width: 52rem) {
+        :root {
+          --canvas-width: calc(100vw - (2 * var(--space-m)));
+          --canvas-height: auto;
+          --canvas-min-width: 320px;
+          --canvas-min-height: 0px;
+          --header-height: auto;
+          --lower-band-height: auto;
+        }
+
+        html,
+        body {
+          min-width: 320px;
+          min-height: 0;
+        }
+
+        .wireframe-shell {
+          grid-template-rows: auto auto;
+          inline-size: var(--canvas-width);
+          min-inline-size: 0;
+          block-size: auto;
+          min-block-size: 0;
+          margin: var(--space-m) auto;
+        }
+
+        .wireframe-header {
+          grid-template-columns: minmax(0, 1fr);
+          row-gap: var(--grid-gap);
+        }
+
+        .wireframe-workspace {
+          grid-template-areas:
+            "focus"
+            "detail"
+            "reward"
+            "documents";
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto;
+          row-gap: var(--grid-gap);
+        }
+
+        .primary-navigation-slot {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .route-profile-toggle {
+          grid-column: 1 / -1;
+        }
+
+        .account-slot {
+          justify-content: space-between;
+        }
+
+        .reward-rail,
+        .focus-stage {
+          grid-template-rows: var(--section-heading-height) auto;
+        }
+
+        .detail-rail {
+          grid-template-rows:
+            var(--section-heading-height)
+            auto
+            var(--primary-action-height)
+            auto;
+        }
+
+        .route-facts > div {
+          grid-template-columns: minmax(0, 1fr);
+          gap: var(--space-xs);
+        }
+
+        .route-facts dd {
+          overflow-wrap: anywhere;
+          text-align: start;
+        }
+
+        .focus-content {
+          overflow: visible;
+        }
+
+        .focus-documents {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: var(--space-m);
+        }
+
+        .reward-content {
+          overflow: visible;
+        }
+
+        .lower-band {
+          grid-template-rows: auto auto;
+          min-inline-size: 0;
+        }
+
+        .document-strip {
+          justify-items: start;
+          max-inline-size: 100%;
+          overflow-x: auto;
+        }
+
+        .document-strip__images {
+          justify-content: flex-start;
+          min-inline-size: max-content;
+        }
+
         .wireframe-footer {
           flex-direction: column;
           gap: var(--space-xs);
@@ -1060,27 +1547,31 @@
           <div class="slot detail-content reward-content" data-reward-pages></div>
         </section>
 
-        <section class="region focus-stage" aria-label="Focus stage">
-          <span class="region-label">Focus stage</span>
-          <div class="slot section-heading" aria-label="Focus heading">
-            <span class="slot-label">Focus heading slot</span>
+        <section class="region focus-stage" aria-labelledby="focus-stage-heading">
+          <div class="slot section-heading focus-heading">
+            <div>
+              <span class="focus-heading__eyebrow" data-focus-eyebrow></span>
+              <h2 id="focus-stage-heading" data-focus-heading></h2>
+            </div>
+            <strong class="focus-heading__summary" data-focus-summary></strong>
           </div>
-          <div class="slot primary-content" aria-label="Primary content">
-            <span class="slot-label">Primary content slot</span>
+          <div class="slot primary-content focus-content" data-focus-content aria-live="polite">
+            <p class="focus-loading">…</p>
           </div>
         </section>
 
-        <aside class="region detail-rail" aria-label="Detail rail">
-          <span class="region-label">Detail rail</span>
-          <div class="slot section-heading" aria-label="Detail heading">
-            <span class="slot-label">Detail heading slot</span>
+        <aside class="region detail-rail" aria-labelledby="detail-rail-heading">
+          <div class="slot section-heading detail-heading">
+            <span class="detail-heading__eyebrow" data-detail-eyebrow></span>
+            <h2 id="detail-rail-heading" data-detail-heading></h2>
           </div>
-          <div class="slot detail-content" aria-label="Detail content">
-            <span class="slot-label">Detail content slot</span>
+          <div class="slot detail-content route-detail-content" data-detail-content>
+            <p class="focus-loading">…</p>
           </div>
-          <div class="slot primary-action" aria-label="Primary action">
-            <span class="slot-label">Primary action slot</span>
+          <div class="slot primary-action route-primary-action">
+            <button type="button" data-commit-raid disabled></button>
           </div>
+          <div class="slot detail-secondary" data-detail-secondary></div>
         </aside>
 
         <div class="region lower-band">
@@ -1213,6 +1704,13 @@
         </div>
       </main>
     </div>
+    <dialog class="route-schedule-dialog" data-route-schedule-dialog aria-labelledby="route-schedule-title">
+      <header>
+        <h2 id="route-schedule-title"></h2>
+        <button type="button" data-close-route-schedule></button>
+      </header>
+      <div data-route-schedule-content></div>
+    </dialog>
     <script type="module">
       import SlimSelect from 'slim-select';
       import 'slim-select/styles';
@@ -1231,6 +1729,19 @@
       const modeSelect = document.querySelector('[data-mode-select]');
       const resetCookieState = document.querySelector('[data-reset-cookie-state]');
       const languageSelect = document.querySelector('[data-language-select]');
+      const focusEyebrow = document.querySelector('[data-focus-eyebrow]');
+      const focusHeading = document.querySelector('[data-focus-heading]');
+      const focusSummary = document.querySelector('[data-focus-summary]');
+      const focusContent = document.querySelector('[data-focus-content]');
+      const detailEyebrow = document.querySelector('[data-detail-eyebrow]');
+      const detailHeading = document.querySelector('[data-detail-heading]');
+      const detailContent = document.querySelector('[data-detail-content]');
+      const detailSecondary = document.querySelector('[data-detail-secondary]');
+      const commitRaidButton = document.querySelector('[data-commit-raid]');
+      const routeScheduleDialog = document.querySelector('[data-route-schedule-dialog]');
+      const routeScheduleTitle = document.querySelector('#route-schedule-title');
+      const routeScheduleContent = document.querySelector('[data-route-schedule-content]');
+      const closeRouteScheduleButton = document.querySelector('[data-close-route-schedule]');
       const endsAt = catalogs.battlePass.endsAt;
       const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
       const documentTotal = rewards.reduce(
@@ -1310,6 +1821,7 @@
 
       let refreshRewardRail = () => {};
       let refreshDocumentQuantities = () => {};
+      let refreshOptimization = () => {};
       const dispatch = (action) => {
         state = reduceState(state, action, catalogs);
         try {
@@ -1320,6 +1832,7 @@
         refreshProgress();
         refreshRewardRail();
         refreshDocumentQuantities();
+        refreshOptimization();
       };
 
       refreshProgress();
@@ -1610,6 +2123,317 @@
       };
       refreshDocumentQuantities();
 
+      const optimizerWorker = new Worker(new URL('./src/optimizer-worker.ts', import.meta.url), { type: 'module' });
+      let optimizerRequestId = 0;
+      let currentNextRaid;
+
+      const createElement = (tagName, className, textContent) => {
+        const element = document.createElement(tagName);
+        if (className) element.className = className;
+        if (textContent !== undefined) element.textContent = textContent;
+        return element;
+      };
+
+      const documentAssetUrl = (imagePath) => `${import.meta.env.BASE_URL}${imagePath.replace(/^\//u, '')}`;
+
+      const renderScheduleProjection = (profile) => {
+        routeScheduleTitle.textContent = localizer.text('ui.fullSchedule');
+        closeRouteScheduleButton.textContent = localizer.text('ui.close');
+        routeScheduleContent.replaceChildren();
+        profile.schedule.forEach((day) => {
+          const daySection = createElement('section', 'schedule-projection-day');
+          daySection.append(createElement('h3', '', localizer.text('ui.scheduleDay', {
+            day: formatNumber(day.day, localizer.locale),
+            count: formatNumber(day.documentQuantity, localizer.locale),
+          })));
+          day.locations.forEach((location) => {
+            const targets = location.documents
+              .map((assignment) => `${localizer.text(assignment.documentId)} × ${formatNumber(assignment.quantity, localizer.locale)}`)
+              .join(' · ');
+            daySection.append(createElement('p', '', `${localizer.text(location.locationId)} — ${targets}`));
+          });
+          if (day.rewardIdsClaimed.length > 0) {
+            const claims = createElement('ul');
+            day.rewardIdsClaimed.forEach((rewardId) => claims.append(createElement('li', '', localizer.text(rewardId))));
+            daySection.append(claims);
+          }
+          routeScheduleContent.append(daySection);
+        });
+      };
+
+      const appendPlanGuidance = (profile, result) => {
+        detailSecondary.replaceChildren();
+        if (profile.schedule.length > 0) {
+          const scheduleButton = createElement('button', '', localizer.text('ui.viewFullSchedule'));
+          scheduleButton.type = 'button';
+          scheduleButton.addEventListener('click', () => {
+            renderScheduleProjection(profile);
+            routeScheduleDialog.showModal();
+          });
+          detailSecondary.append(scheduleButton);
+        }
+
+        const planDetails = createElement('details');
+        planDetails.append(createElement('summary', '', localizer.text('ui.planDetails')));
+        const classifiedUse = createElement('p', '', localizer.text('ui.classifiedUse', {
+          used: formatNumber(profile.classifiedConsumed, localizer.locale),
+          remaining: formatNumber(profile.classifiedRemaining, localizer.locale),
+        }));
+        planDetails.append(classifiedUse);
+        if (profile.exchanges.length > 0) {
+          planDetails.append(createElement('p', '', localizer.text('ui.exchange', {
+            count: formatNumber(profile.exchanges.length, localizer.locale),
+          })));
+          const exchangeList = createElement('ul');
+          profile.exchanges.forEach((exchange) => {
+            const donors = Object.entries(exchange.donors)
+              .map(([documentId, quantity]) => `${localizer.text(documentId)} × ${formatNumber(quantity, localizer.locale)}`)
+              .join(' + ');
+            exchangeList.append(createElement('li', '', localizer.text('ui.exchangeInstruction', {
+              donors,
+              received: localizer.text(exchange.receivedDocumentId),
+            })));
+          });
+          planDetails.append(exchangeList);
+        }
+        if (profile.purchases.classifiedDocumentsPurchased > 0) {
+          planDetails.append(createElement('p', '', localizer.text('ui.purchaseSummary', {
+            count: formatNumber(profile.purchases.classifiedDocumentsPurchased, localizer.locale),
+            tarCoins: formatNumber(profile.purchases.tarCoinsSpent, localizer.locale),
+          })));
+          const purchaseList = createElement('ul');
+          profile.purchases.bundleCounts.forEach((count, index) => {
+            if (count === 0) return;
+            const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
+            purchaseList.append(createElement('li', '', localizer.text('ui.classifiedBundleInstruction', {
+              documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
+              count: formatNumber(count, localizer.locale),
+            })));
+          });
+          planDetails.append(purchaseList);
+        }
+        detailSecondary.append(planDetails);
+
+        if (result.goal === 'all-unclaimed-rewards') {
+          const buyout = createElement('details');
+          buyout.append(createElement('summary', '', localizer.text('ui.buyout')));
+          buyout.append(createElement('p', '', localizer.text('ui.additionalTarCoins', {
+            count: formatNumber(result.buyout.minimumAdditionalTarCoins, localizer.locale),
+          })));
+          buyout.append(createElement('p', '', localizer.text('ui.buyoutFunding', {
+            starting: formatNumber(result.buyout.startingTarCoinsUsed, localizer.locale),
+            earned: formatNumber(result.buyout.earnedTarCoinsUsed, localizer.locale),
+          })));
+          buyout.append(createElement('p', '', localizer.text('ui.buyoutClassified', {
+            purchased: formatNumber(result.buyout.classifiedDocumentsPurchased, localizer.locale),
+            excess: formatNumber(result.buyout.excessClassifiedDocuments, localizer.locale),
+          })));
+          if (result.buyout.localEstimate?.display && result.buyout.localEstimate.costMinor > 0) {
+            buyout.append(createElement('p', '', localizer.text('ui.fromEstimate', {
+              price: result.buyout.localEstimate.display,
+            })));
+          }
+          detailSecondary.append(buyout);
+        }
+      };
+
+      const renderRaidDocuments = (nextRaid) => {
+        const instruction = createElement('p', 'focus-instruction', localizer.text('ui.enterRaidResult'));
+        const documentGrid = createElement('div', 'focus-documents');
+        nextRaid.documents.forEach((recommendation) => {
+          const documentRecord = documentsById.get(recommendation.documentId);
+          if (!documentRecord) return;
+          const isOptional = recommendation.role === 'optional';
+          const figure = createElement('figure', `focus-document${isOptional ? ' focus-document--optional' : ''}`);
+          figure.dataset.focusDocument = recommendation.documentId;
+          figure.dataset.documentRole = recommendation.role;
+          const statusId = recommendation.role === 'priority'
+            ? 'ui.priorityDocument'
+            : recommendation.role === 'stockpile' ? 'ui.stockpileDocument' : 'ui.optionalDocument';
+          const status = createElement('span', 'focus-document__status', localizer.text(statusId));
+          const imageFrame = createElement('div', 'focus-document__image-frame');
+          const image = document.createElement('img');
+          image.src = documentAssetUrl(documentRecord.imagePath);
+          image.alt = localizer.text(documentRecord.imageAltId);
+          imageFrame.append(image);
+          const caption = document.createElement('figcaption');
+          caption.append(createElement('strong', '', localizer.text(documentRecord.id)));
+          caption.append(createElement('span', '', recommendation.role === 'priority'
+            ? localizer.text('ui.targetQuantity', { count: formatNumber(recommendation.targetQuantity, localizer.locale) })
+            : localizer.text(recommendation.role === 'stockpile' ? 'ui.stockpileDocument' : 'ui.optionalDocument')));
+          const stepper = createElement('div', 'raid-result-stepper');
+          const decrement = createElement('button', '', '−');
+          const input = document.createElement('input');
+          const increment = createElement('button', '', '+');
+          decrement.type = 'button';
+          increment.type = 'button';
+          input.type = 'number';
+          input.min = '0';
+          input.step = '1';
+          input.value = '0';
+          input.dataset.raidResult = recommendation.documentId;
+          input.setAttribute('aria-label', `${localizer.text('ui.raidResult')}: ${localizer.text(documentRecord.id)}`);
+          decrement.setAttribute('aria-label', `${localizer.text('ui.raidResult')} − ${localizer.text(documentRecord.id)}`);
+          increment.setAttribute('aria-label', `${localizer.text('ui.raidResult')} + ${localizer.text(documentRecord.id)}`);
+          const updateDraft = (quantity) => {
+            input.value = String(Math.max(0, Math.trunc(quantity)));
+            input.setCustomValidity('');
+          };
+          decrement.addEventListener('click', () => updateDraft(Number(input.value) - 1));
+          increment.addEventListener('click', () => updateDraft(Number(input.value) + 1));
+          input.addEventListener('input', () => input.setCustomValidity(''));
+          input.addEventListener('change', () => {
+            const quantity = Number(input.value);
+            if (Number.isInteger(quantity) && quantity >= 0) updateDraft(quantity);
+          });
+          stepper.append(decrement, input, increment);
+          figure.append(status, imageFrame, caption, stepper);
+          documentGrid.append(figure);
+        });
+        focusContent.replaceChildren(instruction, documentGrid);
+      };
+
+      const renderRouteDetails = (profile, result) => {
+        currentNextRaid = profile.nextRaid;
+        focusEyebrow.textContent = localizer.text(`optimizer.${profile.profile}`);
+        focusSummary.textContent = localizer.text('ui.estimatedDays', {
+          count: formatNumber(profile.schedule.length, localizer.locale),
+        });
+        detailEyebrow.textContent = localizer.text('ui.projectedOutcome');
+        commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
+        commitRaidButton.hidden = true;
+        commitRaidButton.disabled = true;
+
+        if (!profile.route.available) {
+          focusHeading.textContent = localizer.text('optimizer.noRoute');
+          focusContent.replaceChildren(createElement('p', 'focus-message', localizer.text('optimizer.noRoute')));
+          detailHeading.textContent = localizer.text('ui.routeStop');
+          detailContent.replaceChildren(createElement('p', 'focus-message', localizer.text('optimizer.noRoute')));
+          appendPlanGuidance(profile, result);
+          return;
+        }
+
+        if (!profile.nextRaid) {
+          focusHeading.textContent = localizer.text('ui.readyNow');
+          focusContent.replaceChildren(createElement('p', 'focus-message', localizer.text('ui.noFarmingNeeded')));
+          detailHeading.textContent = localizer.text('ui.projectedOutcome');
+          detailContent.replaceChildren(createElement('p', 'focus-message', localizer.text('ui.noFarmingNeeded')));
+          appendPlanGuidance(profile, result);
+          return;
+        }
+
+        const nextRaid = profile.nextRaid;
+        focusEyebrow.textContent = localizer.text(nextRaid.purpose === 'crate-stockpile'
+          ? 'ui.crateStockpileRaid'
+          : 'ui.nextRaid');
+        focusHeading.textContent = localizer.text(nextRaid.locationId);
+        renderRaidDocuments(nextRaid);
+        detailHeading.textContent = localizer.text(nextRaid.locationId);
+        const facts = createElement('dl', 'route-facts');
+        const addFact = (label, value) => {
+          const row = document.createElement('div');
+          row.append(createElement('dt', '', label), createElement('dd', '', value));
+          facts.append(row);
+        };
+        addFact(localizer.text('optimizer.safest'), localizer.text(nextRaid.difficultyId));
+        addFact(localizer.text('optimizer.fastest'), `${formatNumber(nextRaid.maxRaidTimeMin, localizer.locale)} min`);
+        const priorities = nextRaid.documents
+          .filter((documentRecommendation) => documentRecommendation.role !== 'optional')
+          .map((documentRecommendation) => localizer.text(documentRecommendation.documentId))
+          .join(' · ');
+        addFact(localizer.text(nextRaid.purpose === 'crate-stockpile'
+          ? 'ui.stockpileDocuments'
+          : 'ui.priorityDocuments'), priorities);
+        detailContent.replaceChildren(facts);
+        commitRaidButton.hidden = false;
+        commitRaidButton.disabled = false;
+        appendPlanGuidance(profile, result);
+      };
+
+      const showOptimizerLoading = () => {
+        focusEyebrow.textContent = localizer.text(`optimizer.${state.selectedProfile}`);
+        focusHeading.textContent = localizer.text('ui.nextRaid');
+        focusSummary.textContent = '';
+        focusContent.replaceChildren(createElement('p', 'focus-loading', '…'));
+        detailEyebrow.textContent = localizer.text('ui.projectedOutcome');
+        detailHeading.textContent = localizer.text('ui.routeStop');
+        detailContent.replaceChildren(createElement('p', 'focus-loading', '…'));
+        detailSecondary.replaceChildren();
+        commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
+        commitRaidButton.hidden = false;
+        commitRaidButton.disabled = true;
+        currentNextRaid = undefined;
+      };
+
+      refreshOptimization = () => {
+        const requestId = ++optimizerRequestId;
+        showOptimizerLoading();
+        optimizerWorker.postMessage({
+          requestId,
+          input: {
+            catalogs,
+            claimedRewardIds: state.claimedRewardIds,
+            ownedDocuments: state.ownedDocuments,
+            classifiedDocuments: state.classifiedDocuments,
+            tarCoins: state.tarCoins,
+            spendTarCoinsOnClassifiedDocuments: state.spendTarCoinsOnClassifiedDocuments,
+            mode: state.mode,
+            locale: state.locale,
+            crateCount: state.crateCount,
+          },
+        });
+      };
+
+      optimizerWorker.addEventListener('message', ({ data }) => {
+        if (data.requestId !== optimizerRequestId) return;
+        if (data.error) {
+          focusHeading.textContent = localizer.text('optimizer.noRoute');
+          focusContent.replaceChildren(createElement('p', 'focus-message', data.error));
+          return;
+        }
+        const result = data.result;
+        const profile = result.profiles[result.goal === 'black-division-crates' ? 'fastest' : state.selectedProfile];
+        renderRouteDetails(profile, result);
+      });
+
+      commitRaidButton.addEventListener('click', () => {
+        if (!currentNextRaid) return;
+        const inputs = [...focusContent.querySelectorAll('[data-raid-result]')];
+        const updates = [];
+        for (const input of inputs) {
+          const quantity = Number(input.value);
+          if (!Number.isInteger(quantity) || quantity < 0) {
+            input.setCustomValidity(localizer.text('ui.invalidQuantity'));
+            input.reportValidity();
+            return;
+          }
+          updates.push({ documentId: input.dataset.raidResult, quantity });
+        }
+        let nextState = state;
+        updates.forEach(({ documentId, quantity }) => {
+          nextState = reduceState(nextState, {
+            type: 'set-owned-document',
+            documentId,
+            quantity: (nextState.ownedDocuments[documentId] ?? 0) + quantity,
+          }, catalogs);
+        });
+        state = nextState;
+        try {
+          saveState(state, browserCookieAdapter);
+        } catch (error) {
+          console.error(error);
+        }
+        refreshProgress();
+        refreshRewardRail();
+        refreshDocumentQuantities();
+        refreshOptimization();
+      });
+
+      closeRouteScheduleButton.addEventListener('click', () => routeScheduleDialog.close());
+      routeScheduleDialog.addEventListener('click', (event) => {
+        if (event.target === routeScheduleDialog) routeScheduleDialog.close();
+      });
+
       const modeData = [
         ['pvp-seasonal', 'mode.pvpSeasonal'],
         ['pvp', 'mode.pvp'],
@@ -1661,6 +2485,8 @@
           showSearch: false,
         },
       });
+
+      refreshOptimization();
 
       const updateTimer = () => {
         const totalSeconds = Math.max(0, Math.ceil(endsAt - Date.now() / 1000));

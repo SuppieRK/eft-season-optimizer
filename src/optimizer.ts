@@ -90,6 +90,21 @@ export interface ScheduleDay {
   readonly unlockedPage?: number;
 }
 
+export interface NextRaidDocument {
+  readonly documentId: string;
+  readonly role: 'priority' | 'optional' | 'stockpile';
+  readonly targetQuantity: number;
+}
+
+export interface NextRaidRecommendation {
+  readonly purpose: 'battle-pass' | 'crate-stockpile';
+  readonly locationId: string;
+  readonly difficultyId: LocationRecord['difficultyId'];
+  readonly difficultyRating: number;
+  readonly maxRaidTimeMin: number;
+  readonly documents: readonly NextRaidDocument[];
+}
+
 export interface CratePlan {
   readonly crateCount: number;
   readonly regularDocumentsRequired: number;
@@ -100,6 +115,7 @@ export interface CratePlan {
 
 export interface ProfileResult {
   readonly profile: OptimizationProfile;
+  readonly redemptionSequence: readonly string[];
   readonly route: RouteResult;
   readonly classifiedAllocation: Readonly<Record<string, number>>;
   readonly classifiedConsumed: number;
@@ -107,7 +123,8 @@ export interface ProfileResult {
   readonly exchanges: readonly ExchangePlan[];
   readonly remainingSurplus: Readonly<Record<string, number>>;
   readonly purchases: ClassifiedPurchasePlan;
-  readonly immediateRewardIds: readonly string[];
+  readonly projectedImmediateRewardIds: readonly string[];
+  readonly nextRaid?: NextRaidRecommendation;
   readonly schedule: readonly ScheduleDay[];
   readonly warnings: readonly string[];
 }
@@ -156,7 +173,6 @@ export function optimize(input: OptimizerInput): OptimizerResult {
   const allRewards = orderedRewards(input.catalogs.battlePass.pages);
   const claimed = new Set(input.claimedRewardIds);
   const unclaimedRewards = allRewards.filter((reward) => !claimed.has(reward.id));
-  const redemptionSequence = legalRedemptionSequence(input.catalogs.battlePass.pages, claimed);
   const requirements = aggregateRequirements(unclaimedRewards);
   const matching = consumeMatchingInventory(requirements, input.ownedDocuments, input.catalogs);
   const initialDeficits = subtract(requirements, matching.consumed);
@@ -167,6 +183,7 @@ export function optimize(input: OptimizerInput): OptimizerResult {
     fastest: buildProfile('fastest', input, initialDeficits, classifiedToConsume, matching.surplus),
     safest: buildProfile('safest', input, initialDeficits, classifiedToConsume, matching.surplus),
   } as const;
+  const redemptionSequence = profiles.safest.redemptionSequence;
   const buyout = calculateBuyout(input, unclaimedRewards, redemptionSequence);
   const profilesCoincide = sameAssignment(profiles.fastest, profiles.safest);
   return {
@@ -195,10 +212,6 @@ function validateInput(input: OptimizerInput): void {
 
 function orderedRewards(pages: readonly BattlePassPage[]): readonly RewardRecord[] {
   return pages.flatMap((page) => page.rewards);
-}
-
-function legalRedemptionSequence(pages: readonly BattlePassPage[], claimed: ReadonlySet<string>): readonly string[] {
-  return pages.flatMap((page) => page.rewards.filter((reward) => !claimed.has(reward.id)).map((reward) => reward.id));
 }
 
 function aggregateRequirements(rewards: readonly RewardRecord[]): Record<string, number> {
@@ -235,16 +248,37 @@ function buildProfile(
   classifiedToConsume: number,
   surplus: Readonly<Record<string, number>>,
 ): ProfileResult {
-  const allocation = allocateClassified(initialDeficits, classifiedToConsume, profile, input.catalogs);
+  const allocation = allocateClassifiedForProgression(
+    initialDeficits,
+    classifiedToConsume,
+    profile,
+    input.catalogs,
+    input.catalogs.battlePass.pages,
+    input.claimedRewardIds,
+  );
   const afterClassified = subtract(initialDeficits, allocation);
   const exchanges = applyExchanges(afterClassified, surplus, profile, input.catalogs);
   let route = routeForDeficits(exchanges.deficits, profile, input.catalogs);
+  let redemptionSequence = pageTwelveFirstSequence(
+    input.catalogs.battlePass.pages,
+    input.claimedRewardIds,
+    route,
+    profile,
+    input.catalogs,
+  );
   let purchases = emptyPurchase(input.catalogs.optimizerRules.classifiedDocuments.bundles.length);
   if (input.spendTarCoinsOnClassifiedDocuments && sumValues(route.deficits) > 0) {
-    const staged = selectStagedPurchases(input, allocation, exchanges.plans, profile);
+    const staged = selectStagedPurchases(input, allocation, exchanges.plans, profile, redemptionSequence);
     if (staged) {
       route = routeForDeficits(subtract(route.deficits, staged.allocation), profile, input.catalogs);
       purchases = staged.purchase;
+      redemptionSequence = pageTwelveFirstSequence(
+        input.catalogs.battlePass.pages,
+        input.claimedRewardIds,
+        route,
+        profile,
+        input.catalogs,
+      );
     }
   }
   const progression = scheduleProgressiveRoute(
@@ -253,9 +287,11 @@ function buildProfile(
     input.claimedRewardIds,
     input.catalogs.optimizerRules.dailyDocumentLimits[input.mode],
     profile,
+    redemptionSequence,
   );
   return {
     profile,
+    redemptionSequence,
     route,
     classifiedAllocation: allocation,
     classifiedConsumed: sumValues(allocation),
@@ -263,7 +299,11 @@ function buildProfile(
     exchanges: exchanges.plans,
     remainingSurplus: exchanges.surplus,
     purchases,
-    immediateRewardIds: progression.immediateRewardIds,
+    projectedImmediateRewardIds: progression.projectedImmediateRewardIds,
+    nextRaid: route.available
+      ? buildNextRaidRecommendation(progression.days[0]?.locations[0], input.catalogs)
+        ?? buildStockpileRaidRecommendation(profile, input.catalogs)
+      : undefined,
     schedule: progression.days,
     warnings: route.available ? [] : [route.reason ?? 'Route unavailable'],
   };
@@ -278,6 +318,47 @@ function allocateClassified(
   const target = Math.min(quantity, sumValues(deficits));
   if (target === 0) return {};
   return sortRecord(greedyClassified(deficits, target, profile, catalogs));
+}
+
+function allocateClassifiedForProgression(
+  deficits: Readonly<Record<string, number>>,
+  quantity: number,
+  profile: OptimizationProfile,
+  catalogs: Catalogs,
+  pages: readonly BattlePassPage[],
+  claimedRewardIds: readonly string[],
+): Readonly<Record<string, number>> {
+  const target = Math.min(quantity, sumValues(deficits));
+  if (target === 0) return {};
+  const baseRoute = routeForDeficits(deficits, profile, catalogs);
+  const sequence = greedyPageTwelveSequence(pages, claimedRewardIds, baseRoute, profile, catalogs);
+  const rewards = new Map(orderedRewards(pages).map((reward) => [reward.id, reward]));
+  const remainingDeficits = { ...deficits };
+  const allocation: Record<string, number> = {};
+  let remaining = target;
+  for (const rewardId of sequence) {
+    const reward = rewards.get(rewardId);
+    if (!reward) continue;
+    const requirements = [...reward.requirements].sort((left, right) =>
+      bestSourceFactor(right.documentId, profile, catalogs) - bestSourceFactor(left.documentId, profile, catalogs)
+      || left.documentId.localeCompare(right.documentId));
+    for (const requirement of requirements) {
+      const availableDeficit = Math.min(requirement.quantity, remainingDeficits[requirement.documentId] ?? 0);
+      const used = Math.min(availableDeficit, remaining);
+      if (used <= 0) continue;
+      allocation[requirement.documentId] = (allocation[requirement.documentId] ?? 0) + used;
+      remainingDeficits[requirement.documentId] -= used;
+      remaining -= used;
+      if (remaining === 0) return sortRecord(allocation);
+    }
+  }
+  if (remaining > 0) {
+    const fallback = greedyClassified(remainingDeficits, remaining, profile, catalogs);
+    for (const [documentId, used] of Object.entries(fallback)) {
+      allocation[documentId] = (allocation[documentId] ?? 0) + used;
+    }
+  }
+  return sortRecord(allocation);
 }
 
 function greedyClassified(
@@ -339,6 +420,7 @@ function selectStagedPurchases(
   ownedClassifiedAllocation: Readonly<Record<string, number>>,
   exchanges: readonly ExchangePlan[],
   profile: OptimizationProfile,
+  redemptionSequence: readonly string[],
 ): StagedPurchaseResult | undefined {
   const rewardsById = new Map(orderedRewards(input.catalogs.battlePass.pages).map((reward) => [reward.id, reward]));
   const regularInventory: Record<string, number> = { ...input.ownedDocuments };
@@ -357,26 +439,32 @@ function selectStagedPurchases(
   let startingUsed = 0;
   let earnedUsed = 0;
   const purchasedAllocation: Record<string, number> = {};
-  for (const rewardId of legalRedemptionSequence(input.catalogs.battlePass.pages, new Set(input.claimedRewardIds))) {
+  const simulatedClaimed = new Set(input.claimedRewardIds);
+  for (const rewardId of redemptionSequence) {
     const reward = rewardsById.get(rewardId);
-    if (!reward) continue;
+    if (!reward || !progressionCandidates(input.catalogs.battlePass.pages, simulatedClaimed).some((candidate) => candidate.id === rewardId)) continue;
+    const nextRegularInventory = { ...regularInventory };
+    const nextOwnedClassified = { ...ownedClassifiedRemaining };
+    let nextPurchasedAvailable = purchasedAvailable;
+    let nextPurchasedUsed = purchasedUsed;
+    const rewardPurchasedAllocation: Record<string, number> = {};
     const missing: Record<string, number> = {};
     for (const requirement of reward.requirements) {
-      const available = regularInventory[requirement.documentId] ?? 0;
+      const available = nextRegularInventory[requirement.documentId] ?? 0;
       const regularUsed = Math.min(available, requirement.quantity);
-      regularInventory[requirement.documentId] = available - regularUsed;
+      nextRegularInventory[requirement.documentId] = available - regularUsed;
       let remainder = requirement.quantity - regularUsed;
-      const ownedClassified = Math.min(ownedClassifiedRemaining[requirement.documentId] ?? 0, remainder);
-      if (ownedClassified > 0) ownedClassifiedRemaining[requirement.documentId] -= ownedClassified;
+      const ownedClassified = Math.min(nextOwnedClassified[requirement.documentId] ?? 0, remainder);
+      if (ownedClassified > 0) nextOwnedClassified[requirement.documentId] -= ownedClassified;
       remainder -= ownedClassified;
       if (remainder > 0) missing[requirement.documentId] = (missing[requirement.documentId] ?? 0) + remainder;
     }
-    const useExistingPurchased = allocateClassified(missing, Math.min(purchasedAvailable, sumValues(missing)), profile, input.catalogs);
+    const useExistingPurchased = allocateClassified(missing, Math.min(nextPurchasedAvailable, sumValues(missing)), profile, input.catalogs);
     for (const [documentId, quantity] of Object.entries(useExistingPurchased)) {
       missing[documentId] -= quantity;
-      purchasedAvailable -= quantity;
-      purchasedUsed += quantity;
-      purchasedAllocation[documentId] = (purchasedAllocation[documentId] ?? 0) + quantity;
+      nextPurchasedAvailable -= quantity;
+      nextPurchasedUsed += quantity;
+      rewardPurchasedAllocation[documentId] = (rewardPurchasedAllocation[documentId] ?? 0) + quantity;
     }
     const remaining = sumValues(missing);
     if (remaining > 0) {
@@ -385,7 +473,7 @@ function selectStagedPurchases(
       if (selection) {
         selection.counts.forEach((count, index) => { bundleCounts[index] += count; });
         purchasedTotal += selection.totalDocuments;
-        purchasedAvailable += selection.totalDocuments;
+        nextPurchasedAvailable += selection.totalDocuments;
         const fromStarting = Math.min(startingBalance, selection.totalTarCoins);
         startingBalance -= fromStarting;
         startingUsed += fromStarting;
@@ -395,12 +483,25 @@ function selectStagedPurchases(
         const purchased = allocateClassified(missing, Math.min(selection.totalDocuments, remaining), profile, input.catalogs);
         for (const [documentId, quantity] of Object.entries(purchased)) {
           missing[documentId] -= quantity;
-          purchasedAvailable -= quantity;
-          purchasedUsed += quantity;
-          purchasedAllocation[documentId] = (purchasedAllocation[documentId] ?? 0) + quantity;
+          nextPurchasedAvailable -= quantity;
+          nextPurchasedUsed += quantity;
+          rewardPurchasedAllocation[documentId] = (rewardPurchasedAllocation[documentId] ?? 0) + quantity;
         }
       }
     }
+    if (sumValues(missing) > 0) {
+      const attemptedPurchasedUse = nextPurchasedUsed - purchasedUsed;
+      purchasedAvailable = nextPurchasedAvailable + attemptedPurchasedUse;
+      continue;
+    }
+    Object.assign(regularInventory, nextRegularInventory);
+    Object.assign(ownedClassifiedRemaining, nextOwnedClassified);
+    purchasedAvailable = nextPurchasedAvailable;
+    purchasedUsed = nextPurchasedUsed;
+    for (const [documentId, quantity] of Object.entries(rewardPurchasedAllocation)) {
+      purchasedAllocation[documentId] = (purchasedAllocation[documentId] ?? 0) + quantity;
+    }
+    simulatedClaimed.add(reward.id);
     if (reward.tarCoinsAwarded) earnedBalance += reward.tarCoinsAwarded;
   }
   if (purchasedTotal === 0) return undefined;
@@ -481,21 +582,305 @@ function routeForDeficits(
   };
 }
 
+const PROGRESSION_BEAM_WIDTH = 16;
+
+interface ProgressionSequenceState {
+  readonly claimed: ReadonlySet<string>;
+  readonly sequence: readonly string[];
+  readonly requirements: Readonly<Record<string, number>>;
+}
+
+function greedyPageTwelveSequence(
+  pages: readonly BattlePassPage[],
+  initialClaimedRewardIds: readonly string[],
+  route: RouteResult,
+  profile: OptimizationProfile,
+  catalogs: Catalogs,
+): readonly string[] {
+  const initiallyClaimed = new Set(initialClaimedRewardIds);
+  const unclaimed = orderedRewards(pages).filter((reward) => !initiallyClaimed.has(reward.id));
+  const totalRequirements = aggregateRequirements(unclaimed);
+  const available = Object.fromEntries(
+    Object.entries(totalRequirements).map(([documentId, quantity]) => [
+      documentId,
+      Math.max(0, quantity - (route.deficits[documentId] ?? 0)),
+    ]),
+  );
+  let state: ProgressionSequenceState = { claimed: initiallyClaimed, sequence: [], requirements: {} };
+  while (unlockedPageCount(pages, state.claimed) < pages.length) {
+    const unlocked = unlockedPageCount(pages, state.claimed);
+    const frontier = pages[unlocked - 1];
+    const claimedOnFrontier = frontier.rewards.filter((reward) => state.claimed.has(reward.id)).length;
+    const claimsNeeded = Math.max(0, frontier.rewards.length - 1 - claimedOnFrontier);
+    const candidates = frontier.rewards.filter((reward) => !state.claimed.has(reward.id));
+    const expanded = rewardCombinations(candidates, claimsNeeded).map((combination) => {
+      const claimed = new Set(state.claimed);
+      let requirements = state.requirements;
+      const orderedCombination = [...combination].sort((left, right) =>
+        compareCleanupRewards(left, right, requirements, available, profile, catalogs));
+      for (const reward of orderedCombination) {
+        claimed.add(reward.id);
+        requirements = addRequirements(requirements, reward);
+      }
+      return {
+        claimed,
+        sequence: [...state.sequence, ...orderedCombination.map((reward) => reward.id)],
+        requirements,
+      };
+    });
+    const next = rankProgressionStates(expanded, pages, available, profile, catalogs)[0];
+    if (!next) break;
+    state = next;
+  }
+  return state.sequence;
+}
+
+function pageTwelveFirstSequence(
+  pages: readonly BattlePassPage[],
+  initialClaimedRewardIds: readonly string[],
+  route: RouteResult,
+  profile: OptimizationProfile,
+  catalogs: Catalogs,
+): readonly string[] {
+  if (pages.length === 0) return [];
+  const initiallyClaimed = new Set(initialClaimedRewardIds);
+  const unclaimed = orderedRewards(pages).filter((reward) => !initiallyClaimed.has(reward.id));
+  if (unclaimed.length === 0) return [];
+  const totalRequirements = aggregateRequirements(unclaimed);
+  const available = Object.fromEntries(
+    Object.entries(totalRequirements).map(([documentId, quantity]) => [
+      documentId,
+      Math.max(0, quantity - (route.deficits[documentId] ?? 0)),
+    ]),
+  );
+  let beam: readonly ProgressionSequenceState[] = [{ claimed: initiallyClaimed, sequence: [], requirements: {} }];
+  while (beam.some((state) => unlockedPageCount(pages, state.claimed) < pages.length)) {
+    const expanded = new Map<string, ProgressionSequenceState>();
+    for (const state of beam) {
+      const unlocked = unlockedPageCount(pages, state.claimed);
+      if (unlocked >= pages.length) {
+        expanded.set(sequenceStateKey(state), state);
+        continue;
+      }
+      const frontier = pages[unlocked - 1];
+      const claimedOnFrontier = frontier.rewards.filter((reward) => state.claimed.has(reward.id)).length;
+      const claimsNeeded = Math.max(0, frontier.rewards.length - 1 - claimedOnFrontier);
+      const candidates = frontier.rewards.filter((reward) => !state.claimed.has(reward.id));
+      for (const combination of rewardCombinations(candidates, claimsNeeded)) {
+        const claimed = new Set(state.claimed);
+        let requirements = state.requirements;
+        const orderedCombination = [...combination].sort((left, right) =>
+          compareCleanupRewards(left, right, requirements, available, profile, catalogs));
+        for (const reward of orderedCombination) {
+          claimed.add(reward.id);
+          requirements = addRequirements(requirements, reward);
+        }
+        const next: ProgressionSequenceState = {
+          claimed,
+          sequence: [...state.sequence, ...orderedCombination.map((reward) => reward.id)],
+          requirements,
+        };
+        const key = sequenceStateKey(next);
+        const previous = expanded.get(key);
+        if (!previous || next.sequence.join('|').localeCompare(previous.sequence.join('|')) < 0) {
+          expanded.set(key, next);
+        }
+      }
+    }
+    const nextBeam = rankProgressionStates([...expanded.values()], pages, available, profile, catalogs)
+      .slice(0, PROGRESSION_BEAM_WIDTH);
+    if (nextBeam.length === 0) break;
+    beam = nextBeam;
+  }
+  const best = rankProgressionStates([...beam], pages, available, profile, catalogs)[0]
+    ?? { claimed: initiallyClaimed, sequence: [], requirements: {} };
+  const claimed = new Set(best.claimed);
+  const sequence = [...best.sequence];
+  const accumulated = { ...best.requirements };
+  while (claimed.size < initiallyClaimed.size + unclaimed.length) {
+    const finalPageCandidates = pages[pages.length - 1].rewards.filter((reward) => !claimed.has(reward.id));
+    const candidates = finalPageCandidates.length > 0 ? finalPageCandidates : progressionCandidates(pages, claimed);
+    const reward = [...candidates]
+      .sort((left, right) => compareCleanupRewards(left, right, accumulated, available, profile, catalogs))[0];
+    if (!reward) break;
+    claimed.add(reward.id);
+    sequence.push(reward.id);
+    Object.assign(accumulated, addRequirements(accumulated, reward));
+  }
+  return sequence;
+}
+
+function rewardCombinations(
+  rewards: readonly RewardRecord[],
+  count: number,
+): readonly (readonly RewardRecord[])[] {
+  if (count <= 0) return [[]];
+  if (count > rewards.length) return [];
+  const combinations: RewardRecord[][] = [];
+  const visit = (start: number, selected: RewardRecord[]): void => {
+    if (selected.length === count) {
+      combinations.push([...selected]);
+      return;
+    }
+    for (let index = start; index <= rewards.length - (count - selected.length); index += 1) {
+      selected.push(rewards[index]);
+      visit(index + 1, selected);
+      selected.pop();
+    }
+  };
+  visit(0, []);
+  return combinations;
+}
+
+function sequenceStateKey(state: ProgressionSequenceState): string {
+  return [...state.claimed].sort().join('|');
+}
+
+function addRequirements(
+  requirements: Readonly<Record<string, number>>,
+  reward: RewardRecord,
+): Readonly<Record<string, number>> {
+  const next = { ...requirements };
+  for (const requirement of reward.requirements) {
+    next[requirement.documentId] = (next[requirement.documentId] ?? 0) + requirement.quantity;
+  }
+  return next;
+}
+
+function progressionWork(
+  requirements: Readonly<Record<string, number>>,
+  available: Readonly<Record<string, number>>,
+  profile: OptimizationProfile,
+  catalogs: Catalogs,
+): { readonly cost: number; readonly locations: number; readonly quantity: number } {
+  let cost = 0;
+  let quantity = 0;
+  const locations = new Set<string>();
+  for (const [documentId, required] of Object.entries(requirements)) {
+    const missing = Math.max(0, required - (available[documentId] ?? 0));
+    if (missing === 0) continue;
+    quantity += missing;
+    cost += missing * bestSourceFactor(documentId, profile, catalogs);
+    const source = bestSource(documentId, profile, catalogs);
+    if (source) locations.add(source.id);
+  }
+  return { cost, locations: locations.size, quantity };
+}
+
+function rankProgressionStates(
+  states: readonly ProgressionSequenceState[],
+  pages: readonly BattlePassPage[],
+  available: Readonly<Record<string, number>>,
+  profile: OptimizationProfile,
+  catalogs: Catalogs,
+): readonly ProgressionSequenceState[] {
+  return states.map((state) => ({
+    state,
+    unlockedPages: unlockedPageCount(pages, state.claimed),
+    work: progressionWork(state.requirements, available, profile, catalogs),
+    stableOrder: state.sequence.join('|'),
+  })).sort((left, right) => right.unlockedPages - left.unlockedPages
+    || left.work.cost - right.work.cost
+    || left.work.locations - right.work.locations
+    || left.work.quantity - right.work.quantity
+    || left.stableOrder.localeCompare(right.stableOrder))
+    .map(({ state }) => state);
+}
+
+function compareCleanupRewards(
+  left: RewardRecord,
+  right: RewardRecord,
+  accumulated: Readonly<Record<string, number>>,
+  available: Readonly<Record<string, number>>,
+  profile: OptimizationProfile,
+  catalogs: Catalogs,
+): number {
+  const current = progressionWork(accumulated, available, profile, catalogs);
+  const leftWork = progressionWork(addRequirements(accumulated, left), available, profile, catalogs);
+  const rightWork = progressionWork(addRequirements(accumulated, right), available, profile, catalogs);
+  return (leftWork.cost - current.cost) - (rightWork.cost - current.cost)
+    || leftWork.locations - rightWork.locations
+    || sumRequirements(left) - sumRequirements(right)
+    || left.id.localeCompare(right.id);
+}
+
+function bestSource(
+  documentId: string,
+  profile: OptimizationProfile,
+  catalogs: Catalogs,
+): LocationRecord | undefined {
+  const document = catalogs.documents.documents.find((candidate) => candidate.id === documentId);
+  return document?.sourceLocationIds
+    .map((locationId) => catalogs.locations.locations.find((location) => location.id === locationId))
+    .filter((location): location is LocationRecord => Boolean(location))
+    .sort((left, right) => Number(left[PROFILE_FACTORS[profile]]) - Number(right[PROFILE_FACTORS[profile]]) || left.id.localeCompare(right.id))[0];
+}
+
+function buildNextRaidRecommendation(
+  location: LocationAssignment | undefined,
+  catalogs: Catalogs,
+): NextRaidRecommendation | undefined {
+  if (!location) return undefined;
+  const assignments = new Map(location.documents.map((document) => [document.documentId, document.quantity]));
+  const priorityDocumentId = location.documents[0]?.documentId;
+  const documents = catalogs.documents.documents
+    .filter((document) => document.kind === 'regular' && document.sourceLocationIds.includes(location.locationId))
+    .map((document) => ({
+      documentId: document.id,
+      role: document.id === priorityDocumentId ? 'priority' as const : 'optional' as const,
+      targetQuantity: document.id === priorityDocumentId ? assignments.get(document.id) ?? 0 : 0,
+    }));
+  return {
+    purpose: 'battle-pass',
+    locationId: location.locationId,
+    difficultyId: location.difficultyId,
+    difficultyRating: location.difficultyRating,
+    maxRaidTimeMin: location.maxRaidTimeMin,
+    documents,
+  };
+}
+
+function buildStockpileRaidRecommendation(
+  profile: OptimizationProfile,
+  catalogs: Catalogs,
+): NextRaidRecommendation | undefined {
+  const primaryFactor = PROFILE_FACTORS[profile];
+  const secondaryFactor = profile === 'fastest' ? 'difficultyRating' : 'maxRaidTimeMin';
+  const regularDocuments = catalogs.documents.documents.filter((document) => document.kind === 'regular');
+  const location = catalogs.locations.locations
+    .filter((candidate) => regularDocuments.some((document) => document.sourceLocationIds.includes(candidate.id)))
+    .sort((left, right) => Number(left[primaryFactor]) - Number(right[primaryFactor])
+      || Number(left[secondaryFactor]) - Number(right[secondaryFactor])
+      || left.id.localeCompare(right.id))[0];
+  if (!location) return undefined;
+  return {
+    purpose: 'crate-stockpile',
+    locationId: location.id,
+    difficultyId: location.difficultyId,
+    difficultyRating: location.difficultyRating,
+    maxRaidTimeMin: location.maxRaidTimeMin,
+    documents: regularDocuments
+      .filter((document) => document.sourceLocationIds.includes(location.id))
+      .map((document) => ({ documentId: document.id, role: 'stockpile', targetQuantity: 0 })),
+  };
+}
+
 function scheduleProgressiveRoute(
   route: RouteResult,
   pages: readonly BattlePassPage[],
   initialClaimedRewardIds: readonly string[],
   dailyLimit: number,
   profile: OptimizationProfile,
-): { immediateRewardIds: readonly string[]; days: readonly ScheduleDay[] } {
-  if (!route.available) return { immediateRewardIds: [], days: [] };
+  redemptionSequence: readonly string[],
+): { projectedImmediateRewardIds: readonly string[]; days: readonly ScheduleDay[] } {
+  if (!route.available) return { projectedImmediateRewardIds: [], days: [] };
   const unclaimedRewards = orderedRewards(pages).filter((reward) => !initialClaimedRewardIds.includes(reward.id));
   const totalRequirements = aggregateRequirements(unclaimedRewards);
   const farmRemaining = { ...route.deficits };
   const available = Object.fromEntries(Object.entries(totalRequirements).map(([documentId, quantity]) => [documentId, quantity - (farmRemaining[documentId] ?? 0)]));
   const claimed = new Set(initialClaimedRewardIds);
-  const immediateRewardIds: string[] = [];
-  claimAvailableRewards(pages, claimed, available, immediateRewardIds);
+  const projectedImmediateRewardIds: string[] = [];
+  claimAvailableRewards(pages, claimed, available, projectedImmediateRewardIds, redemptionSequence);
 
   const sources = new Map<string, LocationAssignment>();
   for (const location of route.locations) for (const document of location.documents) sources.set(document.documentId, location);
@@ -506,14 +891,17 @@ function scheduleProgressiveRoute(
     const unlockedBefore = unlockedPageCount(pages, claimed);
     let documentQuantity = 0;
     while (documentQuantity < dailyLimit) {
-      claimAvailableRewards(pages, claimed, available, rewardIdsClaimed);
-      const target = selectProgressionTarget(pages, claimed, available, farmRemaining, sources, profile);
+      claimAvailableRewards(pages, claimed, available, rewardIdsClaimed, redemptionSequence);
+      const target = selectProgressionTarget(pages, claimed, available, farmRemaining, sources, profile, redemptionSequence);
       if (!target) break;
       const missing = missingRequirements(target, available);
       const documentIds = Object.keys(missing).sort((left, right) => {
         const leftSource = sources.get(left);
         const rightSource = sources.get(right);
-        return (leftSource?.locationId ?? '').localeCompare(rightSource?.locationId ?? '') || left.localeCompare(right);
+        return Number(leftSource?.[PROFILE_FACTORS[profile]] ?? Number.POSITIVE_INFINITY)
+          - Number(rightSource?.[PROFILE_FACTORS[profile]] ?? Number.POSITIVE_INFINITY)
+          || (leftSource?.locationId ?? '').localeCompare(rightSource?.locationId ?? '')
+          || left.localeCompare(right);
       });
       let farmed = 0;
       for (const documentId of documentIds) {
@@ -530,27 +918,27 @@ function scheduleProgressiveRoute(
       }
       if (farmed === 0) break;
     }
-    claimAvailableRewards(pages, claimed, available, rewardIdsClaimed);
+    claimAvailableRewards(pages, claimed, available, rewardIdsClaimed, redemptionSequence);
     if (documentQuantity === 0) break;
     const unlockedAfter = unlockedPageCount(pages, claimed);
     days.push({
       day: days.length + 1,
       expanded: days.length === 0,
       documentQuantity,
-      locations: locations.sort((left, right) => left.locationId.localeCompare(right.locationId)),
+      locations,
       rewardIdsClaimed,
       ...(unlockedAfter > unlockedBefore ? { unlockedPage: pages[unlockedAfter - 1].page } : {}),
     });
   }
   const trailingClaims: string[] = [];
-  claimAvailableRewards(pages, claimed, available, trailingClaims);
+  claimAvailableRewards(pages, claimed, available, trailingClaims, redemptionSequence);
   if (days.length > 0 && trailingClaims.length > 0) {
     const last = days[days.length - 1];
     days[days.length - 1] = { ...last, rewardIdsClaimed: [...last.rewardIdsClaimed, ...trailingClaims] };
   } else {
-    immediateRewardIds.push(...trailingClaims);
+    projectedImmediateRewardIds.push(...trailingClaims);
   }
-  return { immediateRewardIds, days };
+  return { projectedImmediateRewardIds, days };
 }
 
 function progressionCandidates(pages: readonly BattlePassPage[], claimed: ReadonlySet<string>): readonly RewardRecord[] {
@@ -576,11 +964,15 @@ function claimAvailableRewards(
   claimed: Set<string>,
   available: Record<string, number>,
   output: string[],
+  redemptionSequence: readonly string[],
 ): void {
+  const sequenceOrder = new Map(redemptionSequence.map((rewardId, index) => [rewardId, index]));
   while (true) {
     const reward = progressionCandidates(pages, claimed)
       .filter((candidate) => candidate.requirements.every((requirement) => (available[requirement.documentId] ?? 0) >= requirement.quantity))
-      .sort((left, right) => sumRequirements(left) - sumRequirements(right) || left.id.localeCompare(right.id))[0];
+      .sort((left, right) => (sequenceOrder.get(left.id) ?? Number.MAX_SAFE_INTEGER) - (sequenceOrder.get(right.id) ?? Number.MAX_SAFE_INTEGER)
+        || sumRequirements(left) - sumRequirements(right)
+        || left.id.localeCompare(right.id))[0];
     if (!reward) return;
     for (const requirement of reward.requirements) available[requirement.documentId] -= requirement.quantity;
     claimed.add(reward.id);
@@ -595,13 +987,16 @@ function selectProgressionTarget(
   farmRemaining: Readonly<Record<string, number>>,
   sources: ReadonlyMap<string, LocationAssignment>,
   profile: OptimizationProfile,
+  redemptionSequence: readonly string[],
 ): RewardRecord | undefined {
+  const sequenceOrder = new Map(redemptionSequence.map((rewardId, index) => [rewardId, index]));
   return progressionCandidates(pages, claimed)
     .filter((reward) => {
       const missing = missingRequirements(reward, available);
       return Object.entries(missing).every(([documentId, quantity]) => quantity <= (farmRemaining[documentId] ?? 0) && sources.has(documentId));
     })
-    .sort((left, right) => compareProgressionTargets(left, right, available, sources, profile))[0];
+    .sort((left, right) => (sequenceOrder.get(left.id) ?? Number.MAX_SAFE_INTEGER) - (sequenceOrder.get(right.id) ?? Number.MAX_SAFE_INTEGER)
+      || compareProgressionTargets(left, right, available, sources, profile))[0];
 }
 
 function compareProgressionTargets(
@@ -687,14 +1082,19 @@ function optimizeCrates(input: OptimizerInput, effectiveDailyLimit: number): Opt
   const regularDocumentsOwned = regularDocuments.reduce((sum, document) => sum + (input.ownedDocuments[document.id] ?? 0), 0);
   const regularDocumentsRequired = crateCount * ratio;
   const regularDocumentsToFarm = Math.max(0, regularDocumentsRequired - regularDocumentsOwned);
-  const eligibleLocations = input.catalogs.locations.locations.filter((location) => regularDocuments.some((document) => document.sourceLocationIds.includes(location.id)))
-    .sort((left, right) => left.maxRaidTimeMin - right.maxRaidTimeMin || left.id.localeCompare(right.id));
-  const farmingLocation = regularDocumentsToFarm > 0 ? eligibleLocations[0] : undefined;
-  const farmingDocument = farmingLocation ? regularDocuments.find((document) => document.sourceLocationIds.includes(farmingLocation.id)) : undefined;
-  const deficits = farmingDocument && farmingLocation ? { [farmingDocument.id]: regularDocumentsToFarm } : {};
   const profiles = (['fastest', 'safest'] as const).reduce((result, profile) => {
+    const nextRaid = buildStockpileRaidRecommendation(profile, input.catalogs);
+    const farmingLocation = nextRaid
+      ? input.catalogs.locations.locations.find((location) => location.id === nextRaid.locationId)
+      : undefined;
+    const farmingDocument = farmingLocation
+      ? regularDocuments.find((document) => document.sourceLocationIds.includes(farmingLocation.id))
+      : undefined;
+    const deficits = farmingDocument && farmingLocation && regularDocumentsToFarm > 0
+      ? { [farmingDocument.id]: regularDocumentsToFarm }
+      : {};
     const route = farmingLocation && farmingDocument
-      ? {
+      ? regularDocumentsToFarm > 0 ? {
           available: true,
           locations: [{
             locationId: farmingLocation.id,
@@ -706,12 +1106,12 @@ function optimizeCrates(input: OptimizerInput, effectiveDailyLimit: number): Opt
           profileCost: regularDocumentsToFarm * Number(farmingLocation[PROFILE_FACTORS[profile]]),
           rawDocumentQuantity: regularDocumentsToFarm,
           deficits,
-        }
-      : regularDocumentsToFarm === 0
-        ? { available: true, locations: [], profileCost: 0, rawDocumentQuantity: 0, deficits: {} }
-        : { available: false, reason: 'No regular-document source location is available for Black Division crates', locations: [], profileCost: Number.POSITIVE_INFINITY, rawDocumentQuantity: regularDocumentsToFarm, deficits };
+        } : { available: true, locations: [], profileCost: 0, rawDocumentQuantity: 0, deficits: {} }
+      : { available: false, reason: 'No regular-document source location is available for Black Division crates', locations: [], profileCost: Number.POSITIVE_INFINITY, rawDocumentQuantity: regularDocumentsToFarm, deficits };
+    const schedule = scheduleRoute(route, effectiveDailyLimit);
     result[profile] = {
       profile,
+      redemptionSequence: [],
       route,
       classifiedAllocation: {},
       classifiedConsumed: 0,
@@ -719,8 +1119,9 @@ function optimizeCrates(input: OptimizerInput, effectiveDailyLimit: number): Opt
       exchanges: [],
       remainingSurplus: {},
       purchases: emptyPurchase(input.catalogs.optimizerRules.classifiedDocuments.bundles.length),
-      immediateRewardIds: [],
-      schedule: scheduleRoute(route, effectiveDailyLimit),
+      projectedImmediateRewardIds: [],
+      nextRaid,
+      schedule,
       warnings: route.available ? [] : [route.reason ?? 'Route unavailable'],
     };
     return result;
@@ -735,14 +1136,14 @@ function optimizeCrates(input: OptimizerInput, effectiveDailyLimit: number): Opt
     classifiedRemaining: input.classifiedDocuments,
     effectiveDailyLimit,
     profiles,
-    profilesCoincide: true,
+    profilesCoincide: sameAssignment(profiles.fastest, profiles.safest),
     buyout: emptyBuyout(input.catalogs.optimizerRules.classifiedDocuments.bundles.length, input.catalogs.optimizerRules.tarCoinBundles.length),
     cratePlan: {
       crateCount,
       regularDocumentsRequired,
       regularDocumentsOwned,
       regularDocumentsToFarm,
-      ...(farmingLocation ? { farmingLocationId: farmingLocation.id } : {}),
+      ...(profiles.fastest.nextRaid ? { farmingLocationId: profiles.fastest.nextRaid.locationId } : {}),
     },
   };
 }
@@ -991,7 +1392,8 @@ function locationIds(route: RouteResult): string {
 
 function sameAssignment(left: ProfileResult, right: ProfileResult): boolean {
   return JSON.stringify(left.route.locations) === JSON.stringify(right.route.locations)
-    && JSON.stringify(left.route.deficits) === JSON.stringify(right.route.deficits);
+    && JSON.stringify(left.route.deficits) === JSON.stringify(right.route.deficits)
+    && JSON.stringify(left.nextRaid) === JSON.stringify(right.nextRaid);
 }
 
 function emptyPurchase(bundleCount: number): ClassifiedPurchasePlan {

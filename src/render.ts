@@ -1,7 +1,7 @@
 import type { Catalogs } from './catalogs';
 import { buildIssueUrl, composeFeedback, openIssueComposer, validateFeedbackMessage, type FeedbackConfig } from './feedback';
 import { formatAccessibleRequirements, formatCompactRequirements, formatCountdownUnit, formatDateTime, formatLocalPrice, formatNumber, createLocalizer } from './localization';
-import { optimize, type LocationAssignment, type OptimizerResult, type ProfileResult, type ScheduleDay } from './optimizer';
+import { optimize, type LocationAssignment, type NextRaidRecommendation, type OptimizerResult, type ProfileResult, type ScheduleDay } from './optimizer';
 import { getClassifiedDocumentMinimum, type AppState, type StateAction } from './state';
 
 let countdownTimer: number | undefined;
@@ -131,9 +131,9 @@ function renderRouteWorkspace(localizer: ReturnType<typeof createLocalizer>, cat
   if (!profile.route.available) return `<article class="route-workspace unavailable" data-route-workspace>${header}<p class="manifest-empty">${escapeHtml(localizer.text('optimizer.noRoute'))}</p></article>`;
   const firstDay = profile.schedule[0];
   const crate = result.goal === 'black-division-crates' ? `<p class="crate-shortage">${escapeHtml(localizer.text('ui.crateShortage', { count: formatNumber(result.cratePlan!.regularDocumentsToFarm, localizer.locale) }))}</p>` : '';
-  const action = profile.immediateRewardIds.length > 0
-    ? `<div class="claim-stage"><p class="eyebrow">${escapeHtml(localizer.text('ui.nextAction'))}</p><h3>${escapeHtml(localizer.text('ui.readyNow'))}</h3></div>`
-    : firstDay ? renderCurrentRouteDay(localizer, catalogs, firstDay) : `<div class="manifest-empty"><p class="eyebrow">${escapeHtml(localizer.text('ui.nextAction'))}</p><h3 class="manifest-action-title">${escapeHtml(localizer.text('ui.readyNow'))}</h3></div>`;
+  const action = firstDay
+    ? renderCurrentRouteDay(localizer, catalogs, firstDay)
+    : profile.nextRaid ? renderStockpileRaid(localizer, catalogs, profile.nextRaid) : `<div class="manifest-empty"><p class="eyebrow">${escapeHtml(localizer.text('ui.nextAction'))}</p><h3 class="manifest-action-title">${escapeHtml(localizer.text('ui.readyNow'))}</h3></div>`;
   return `<article class="route-workspace" data-route-workspace>${header}<p class="estimate-note">${escapeHtml(localizer.text('ui.planEstimate'))}</p>${crate}${action}</article>`;
 }
 
@@ -155,22 +155,36 @@ function renderAssignedDocumentArtwork(localizer: ReturnType<typeof createLocali
   }).join('')}</div>`;
 }
 
+function renderStockpileRaid(localizer: ReturnType<typeof createLocalizer>, catalogs: Catalogs, raid: NextRaidRecommendation): string {
+  const documents = raid.documents.map((recommendation) => {
+    const document = catalogs.documents.documents.find((candidate) => candidate.id === recommendation.documentId);
+    if (!document) return '';
+    return `<article class="route-document" data-document-role="${recommendation.role}"><img src="${escapeHtml(assetUrl(document.imagePath))}" alt="${escapeHtml(localizer.text(document.imageAltId))}" /><div><strong>${escapeHtml(localizer.text(document.id))}</strong><span>${escapeHtml(localizer.text('ui.stockpileDocument'))}</span></div></article>`;
+  }).join('');
+  return `<section class="current-route-day route-stockpile"><header><p class="eyebrow">${escapeHtml(localizer.text('ui.crateStockpileRaid'))}</p><h3>${escapeHtml(localizer.text(raid.locationId))}</h3></header><div class="route-stop-stage"><div class="route-documents">${documents}</div></div></section>`;
+}
+
 function renderRouteContext(localizer: ReturnType<typeof createLocalizer>, state: AppState, result: OptimizerResult): string {
   const profile = result.profiles[result.goal === 'black-division-crates' ? 'fastest' : state.selectedProfile];
   const firstDay = profile.schedule[0];
   let primary: string;
   if (!profile.route.available) {
     primary = `<p class="context-empty warning">${escapeHtml(localizer.text('optimizer.noRoute'))}</p>`;
-  } else if (profile.immediateRewardIds.length > 0) {
-    primary = `<div class="context-claims"><p class="eyebrow">${escapeHtml(localizer.text('ui.nextClaims'))}</p>${renderClaimList(localizer, profile.immediateRewardIds)}</div>`;
   } else if (firstDay) {
     primary = firstDay.locations.map((location, index) => renderStopContext(localizer, location, index, firstDay.locations.length)).join('');
+  } else if (profile.nextRaid) {
+    primary = renderStockpileContext(localizer, profile.nextRaid);
   } else {
     primary = `<div class="context-empty"><p class="eyebrow">${escapeHtml(localizer.text('ui.nextAction'))}</p><strong>${escapeHtml(localizer.text('ui.readyNow'))}</strong></div>`;
   }
   const dayClaims = firstDay?.rewardIdsClaimed.length ? `<section class="context-day-outcome"><p class="eyebrow">${escapeHtml(localizer.text('ui.claimOnDay'))}</p><ul class="day-claims-list">${firstDay.rewardIdsClaimed.map((id) => `<li>${escapeHtml(localizer.text(id))}</li>`).join('')}</ul></section>` : '';
   const schedule = profile.schedule.length > 0 ? `<div class="context-actions"><button type="button" data-action="open-schedule">${escapeHtml(localizer.text('ui.viewFullSchedule'))}</button></div>` : '';
   return `<h2 id="route-context-title">${escapeHtml(localizer.text('ui.routeStop'))}</h2><div class="route-context-primary">${primary}</div>${dayClaims}${schedule}<div class="context-disclosures">${renderPlanDetails(localizer, profile)}${result.goal === 'all-unclaimed-rewards' ? renderBuyout(localizer, result) : ''}</div>`;
+}
+
+function renderStockpileContext(localizer: ReturnType<typeof createLocalizer>, raid: NextRaidRecommendation): string {
+  const difficulty = localizer.text(raid.difficultyId);
+  return `<section class="route-stop-context" data-stockpile-context><p class="eyebrow">${escapeHtml(localizer.text('ui.crateStockpileRaid'))}</p><h3>${escapeHtml(localizer.text(raid.locationId))}</h3><p class="context-factor">${escapeHtml(localizer.text('ui.locationFactor', { difficulty, minutes: formatNumber(raid.maxRaidTimeMin, localizer.locale) }))}</p><ul class="context-document-list">${raid.documents.map((document) => `<li><span>${escapeHtml(localizer.text(document.documentId))}</span><strong>${escapeHtml(localizer.text('ui.stockpileDocument'))}</strong></li>`).join('')}</ul></section>`;
 }
 
 function renderStopContext(localizer: ReturnType<typeof createLocalizer>, location: LocationAssignment, index: number, total: number): string {
@@ -184,10 +198,6 @@ function renderPlanDetails(localizer: ReturnType<typeof createLocalizer>, profil
   const purchases = profile.purchases.classifiedDocumentsPurchased > 0 ? `<p>${escapeHtml(localizer.text('ui.purchaseSummary', { count: formatNumber(profile.purchases.classifiedDocumentsPurchased, localizer.locale), tarCoins: formatNumber(profile.purchases.tarCoinsSpent, localizer.locale) }))}</p>` : '';
   const warnings = profile.warnings.map((warning) => `<p class="warning">${escapeHtml(localizer.text('ui.warning', { text: warning }))}</p>`).join('');
   return `<details class="plan-details"><summary>${escapeHtml(localizer.text('ui.planDetails'))}</summary><div><p>${escapeHtml(localizer.text('ui.classifiedUse', { used: formatNumber(profile.classifiedConsumed, localizer.locale), remaining: formatNumber(profile.classifiedRemaining, localizer.locale) }))}</p>${exchanges}${purchases}${warnings}</div></details>`;
-}
-
-function renderClaimList(localizer: ReturnType<typeof createLocalizer>, rewardIds: readonly string[]): string {
-  return `<ul class="claim-list">${rewardIds.map((id) => `<li>${escapeHtml(localizer.text(id))}</li>`).join('')}</ul>`;
 }
 
 function renderScheduleDay(localizer: ReturnType<typeof createLocalizer>, day: ScheduleDay, focused = false): string {

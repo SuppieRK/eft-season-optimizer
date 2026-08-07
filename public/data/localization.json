@@ -1267,6 +1267,108 @@
       }
     },
     {
+      "id": "ui.nextRaid",
+      "localizations": {
+        "en": "Next raid"
+      }
+    },
+    {
+      "id": "ui.raidResult",
+      "localizations": {
+        "en": "Raid result"
+      }
+    },
+    {
+      "id": "ui.commitRaidResult",
+      "localizations": {
+        "en": "Commit"
+      }
+    },
+    {
+      "id": "ui.priorityDocument",
+      "localizations": {
+        "en": "Priority"
+      }
+    },
+    {
+      "id": "ui.optionalDocument",
+      "localizations": {
+        "en": "Optional pickup"
+      }
+    },
+    {
+      "id": "ui.stockpileDocument",
+      "localizations": {
+        "en": "Crate stockpile"
+      }
+    },
+    {
+      "id": "ui.stockpileDocuments",
+      "localizations": {
+        "en": "Stockpile documents"
+      }
+    },
+    {
+      "id": "ui.crateStockpileRaid",
+      "localizations": {
+        "en": "Optional crate raid"
+      }
+    },
+    {
+      "id": "ui.targetQuantity",
+      "localizations": {
+        "en": "Plan needs {count}"
+      }
+    },
+    {
+      "id": "ui.enterRaidResult",
+      "localizations": {
+        "en": "Enter the documents you extracted, then commit."
+      }
+    },
+    {
+      "id": "ui.projectedOutcome",
+      "localizations": {
+        "en": "Projected outcome"
+      }
+    },
+    {
+      "id": "ui.noFarmingNeeded",
+      "localizations": {
+        "en": "No farming is needed."
+      }
+    },
+    {
+      "id": "ui.priorityDocuments",
+      "localizations": {
+        "en": "Priority documents"
+      }
+    },
+    {
+      "id": "ui.exchangeInstruction",
+      "localizations": {
+        "en": "{donors} → {received}"
+      }
+    },
+    {
+      "id": "ui.classifiedBundleInstruction",
+      "localizations": {
+        "en": "{documents} Classified Documents × {count}"
+      }
+    },
+    {
+      "id": "ui.buyoutFunding",
+      "localizations": {
+        "en": "Starting TarCoins used: {starting}; earned used: {earned}"
+      }
+    },
+    {
+      "id": "ui.buyoutClassified",
+      "localizations": {
+        "en": "Classified Documents purchased: {purchased}; excess: {excess}"
+      }
+    },
+    {
       "id": "rewards.short.pending",
       "localizations": {
         "en": "Reward description pending."

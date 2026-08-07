@@ -41,13 +41,23 @@ function input(catalogs: Catalogs, overrides: Partial<Parameters<typeof optimize
 }
 
 describe('optimizer', () => {
-  it('uses the fixed all-unclaimed objective and the implicit page order', () => {
+  it('uses the fixed Page-12-first complete-pass objective', () => {
     const catalogs = loadCatalogs();
     const result = optimize(input(catalogs));
 
     expect(result.goal).toBe('all-unclaimed-rewards');
     expect(result.unclaimedRewardIds).toHaveLength(53);
-    expect(result.redemptionSequence).toEqual(result.unclaimedRewardIds);
+    expect(result.redemptionSequence).toHaveLength(result.unclaimedRewardIds.length);
+    expect(new Set(result.redemptionSequence)).toEqual(new Set(result.unclaimedRewardIds));
+    const pageByReward = new Map(catalogs.battlePass.pages.flatMap((page) => page.rewards.map((reward) => [reward.id, page.page] as const)));
+    let sequenceOffset = 0;
+    for (const page of catalogs.battlePass.pages.slice(0, -1)) {
+      const requiredClaims = page.rewards.length - 1;
+      expect(result.redemptionSequence.slice(sequenceOffset, sequenceOffset + requiredClaims)
+        .every((rewardId) => pageByReward.get(rewardId) === page.page)).toBe(true);
+      sequenceOffset += requiredClaims;
+    }
+    expect(pageByReward.get(result.redemptionSequence[sequenceOffset])).toBe(12);
     expect(Object.values(result.initialDeficits).reduce((sum, quantity) => sum + quantity, 0)).toBe(501);
     expect(result.profiles.fastest.route.available).toBe(true);
     expect(result.profiles.safest.route.available).toBe(true);
@@ -57,9 +67,35 @@ describe('optimizer', () => {
     expect(result.profiles.fastest.schedule[0].unlockedPage).toBe(2);
     expect(result.profiles.fastest.schedule.slice(1).every((day) => !day.expanded)).toBe(true);
     expect([
-      ...result.profiles.fastest.immediateRewardIds,
+      ...result.profiles.fastest.projectedImmediateRewardIds,
       ...result.profiles.fastest.schedule.flatMap((day) => day.rewardIdsClaimed),
     ].sort()).toEqual([...result.unclaimedRewardIds].sort());
+  });
+
+  it('uses the season-start Classified Document on the Page 12 rush path', () => {
+    const catalogs = loadCatalogs();
+    const result = optimize(input(catalogs, { classifiedDocuments: 1, mode: 'pvp-seasonal' }));
+
+    expect(result.profiles.safest.classifiedAllocation).toEqual({ 'documents.financial.name': 1 });
+    expect(result.profiles.safest.projectedImmediateRewardIds).toContain('rewards.dogtag01.name');
+    expect(result.profiles.safest.nextRaid?.purpose).toBe('battle-pass');
+    expect(result.profiles.safest.nextRaid?.documents.map((document) => document.role).sort()).toEqual(['optional', 'priority']);
+  });
+
+  it('looks ahead to the next farming deficit without confirming covered rewards', () => {
+    const catalogs = loadCatalogs();
+    const firstPageOwned = catalogs.battlePass.pages[0].rewards
+      .flatMap((reward) => reward.requirements)
+      .reduce<Record<string, number>>((owned, requirement) => {
+        owned[requirement.documentId] = (owned[requirement.documentId] ?? 0) + requirement.quantity;
+        return owned;
+      }, {});
+    const result = optimize(input(catalogs, { ownedDocuments: firstPageOwned }));
+
+    expect(result.unclaimedRewardIds).toHaveLength(allRewardIds(catalogs).length);
+    expect(result.profiles.safest.projectedImmediateRewardIds.length).toBeGreaterThan(0);
+    expect(result.profiles.safest.nextRaid?.purpose).toBe('battle-pass');
+    expect(result.profiles.safest.nextRaid?.documents.some((document) => document.role === 'priority')).toBe(true);
   });
 
   it('consumes matching regular documents before Classified Documents and can complete a reward with Classified Documents', () => {
@@ -145,6 +181,7 @@ describe('optimizer', () => {
     expect(result.profiles.fastest.route.available).toBe(false);
     expect(result.profiles.fastest.route.locations).toEqual([]);
     expect(result.profiles.fastest.warnings.length).toBeGreaterThan(0);
+    expect(result.profiles.fastest.nextRaid).toBeUndefined();
   });
 
   it('keeps the informational buyout independent and credits TarCoins only after redemption', () => {
@@ -170,6 +207,45 @@ describe('optimizer', () => {
     expect(disabled.profiles.fastest.purchases.classifiedDocumentsPurchased).toBe(0);
     expect(enabled.profiles.fastest.purchases.classifiedDocumentsPurchased).toBeGreaterThan(0);
     expect(enabled.buyout).toEqual(disabled.buyout);
+  });
+
+  it('does not fund a purchase with TarCoins from an uncovered reward', () => {
+    const raw = readRaw();
+    const battlePass = structuredClone(raw.battlePass) as Record<string, unknown>;
+    battlePass.pages = [
+      {
+        page: 1,
+        rewards: [
+          {
+            id: 'rewards.tarcoins50-01.name',
+            kind: 'tarcoins',
+            tarCoinsAwarded: 500,
+            requirements: [{ documentId: 'documents.test.name', quantity: 100 }],
+          },
+          {
+            id: 'rewards.burn-poster.name',
+            kind: 'cosmetic',
+            requirements: [{ documentId: 'documents.test.name', quantity: 200 }],
+          },
+        ],
+      },
+      {
+        page: 2,
+        rewards: [
+          {
+            id: 'rewards.dogtag01.name',
+            kind: 'cosmetic',
+            requirements: [{ documentId: 'documents.financial.name', quantity: 1 }],
+          },
+        ],
+      },
+    ];
+    const catalogs = parseCatalogs({ ...raw, battlePass });
+    const result = optimize(input(catalogs, { spendTarCoinsOnClassifiedDocuments: true }));
+
+    expect(result.profiles.fastest.redemptionSequence[0]).toBe('rewards.tarcoins50-01.name');
+    expect(result.profiles.fastest.purchases.classifiedDocumentsPurchased).toBe(0);
+    expect(result.profiles.fastest.purchases.earnedTarCoinsUsed).toBe(0);
   });
 
   it('does not consume Classified Documents when there is no redeemable reward', () => {
@@ -219,5 +295,49 @@ describe('optimizer', () => {
     const immediate = optimize(input(catalogs, { claimedRewardIds: claimed, ownedDocuments: { 'documents.project.name': 20 }, crateCount: 2 }));
     expect(immediate.cratePlan?.regularDocumentsToFarm).toBe(0);
     expect(immediate.profiles.fastest.route.locations).toEqual([]);
+    expect(immediate.profiles.fastest.nextRaid?.purpose).toBe('crate-stockpile');
+    expect(immediate.profiles.fastest.nextRaid?.locationId).toBe('locations.factory.name');
+    expect(immediate.profiles.fastest.nextRaid?.documents.every((document) => document.role === 'stockpile')).toBe(true);
+  });
+
+  it('keeps the reward goal and recommends profile-specific stockpile raids when the remaining pass is covered', () => {
+    const catalogs = loadCatalogs();
+    const ownedDocuments = Object.fromEntries(catalogs.documents.documents
+      .filter((document) => document.kind === 'regular')
+      .map((document) => [document.id, 999]));
+    const result = optimize(input(catalogs, { ownedDocuments }));
+
+    expect(result.goal).toBe('all-unclaimed-rewards');
+    expect(result.profiles.fastest.route.rawDocumentQuantity).toBe(0);
+    expect(result.profiles.fastest.nextRaid).toMatchObject({
+      purpose: 'crate-stockpile',
+      locationId: 'locations.factory.name',
+    });
+    expect(result.profiles.safest.nextRaid?.purpose).toBe('crate-stockpile');
+    expect(result.profiles.safest.nextRaid?.documents.every((document) => document.role === 'stockpile')).toBe(true);
+  });
+
+  it('selects optional stockpile locations by the active profile with deterministic secondary factors', () => {
+    const catalogs = structuredClone(loadCatalogs()) as Catalogs;
+    const factory = catalogs.locations.locations.find((location) => location.id === 'locations.factory.name') as {
+      maxRaidTimeMin: number;
+      difficultyRating: number;
+    };
+    const customs = catalogs.locations.locations.find((location) => location.id === 'locations.customs.name') as {
+      maxRaidTimeMin: number;
+      difficultyRating: number;
+    };
+    factory.maxRaidTimeMin = 10;
+    factory.difficultyRating = 4;
+    customs.maxRaidTimeMin = 20;
+    customs.difficultyRating = 1;
+    const ownedDocuments = Object.fromEntries(catalogs.documents.documents
+      .filter((document) => document.kind === 'regular')
+      .map((document) => [document.id, 999]));
+    const result = optimize(input(catalogs, { ownedDocuments }));
+
+    expect(result.profiles.fastest.nextRaid?.locationId).toBe('locations.factory.name');
+    expect(result.profiles.safest.nextRaid?.locationId).toBe('locations.customs.name');
+    expect(result.profilesCoincide).toBe(false);
   });
 });
