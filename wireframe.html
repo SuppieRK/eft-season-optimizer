@@ -73,7 +73,7 @@
       .wireframe-workspace {
         grid-template-areas:
           "reward focus detail"
-          "pagination documents actions";
+          "documents documents documents";
         grid-template-rows: minmax(0, 1fr) var(--lower-band-height);
         row-gap: var(--grid-gap);
       }
@@ -395,8 +395,6 @@
 
       .reward-rail {
         grid-area: reward;
-        display: grid;
-        grid-template-rows: var(--section-heading-height) minmax(0, 1fr);
       }
 
       .focus-stage {
@@ -405,8 +403,8 @@
         grid-template-rows: var(--section-heading-height) minmax(0, 1fr);
       }
 
+      .reward-rail,
       .detail-rail {
-        grid-area: detail;
         display: grid;
         grid-template-rows:
           var(--section-heading-height)
@@ -415,22 +413,18 @@
           minmax(0, 1fr);
       }
 
+      .detail-rail {
+        grid-area: detail;
+      }
+
       .section-heading,
       .detail-content,
       .primary-action {
         border-block-end: 1px dashed var(--line-muted);
       }
 
-      .page-navigation {
-        grid-area: pagination;
-      }
-
       .document-strip {
         grid-area: documents;
-      }
-
-      .secondary-actions {
-        grid-area: actions;
       }
 
     </style>
@@ -488,8 +482,11 @@
           <div class="slot section-heading" aria-label="Reward heading">
             <span class="slot-label">Reward heading slot</span>
           </div>
-          <div class="slot primary-content" aria-label="Reward list">
-            <span class="slot-label">Reward list slot</span>
+          <div class="slot detail-content" aria-label="Reward content">
+            <span class="slot-label">Reward content slot</span>
+          </div>
+          <div class="slot primary-action" aria-label="Reward primary action">
+            <span class="slot-label">Reward primary action slot</span>
           </div>
         </section>
 
@@ -516,16 +513,8 @@
           </div>
         </aside>
 
-        <nav class="region page-navigation" aria-label="Page navigation">
-          <span class="region-label">Page navigation slot</span>
-        </nav>
-
         <section class="region document-strip" aria-label="Document strip">
           <span class="region-label">Document strip slot</span>
-        </section>
-
-        <section class="region secondary-actions" aria-label="Secondary actions">
-          <span class="region-label">Secondary actions slot</span>
         </section>
       </main>
     </div>
