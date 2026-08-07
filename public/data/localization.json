@@ -1449,7 +1449,7 @@
     {
       "id": "ui.enterRaidResult",
       "localizations": {
-        "en": "Enter the documents you extracted, then commit."
+        "en": "Enter the documents you extracted, then {commit}."
       }
     },
     {

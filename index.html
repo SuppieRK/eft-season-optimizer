@@ -589,6 +589,27 @@
         text-align: center;
       }
 
+      .focus-instruction__commit {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--document-frame);
+        font: inherit;
+        font-weight: 700;
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        cursor: pointer;
+      }
+
+      .focus-instruction__commit:hover {
+        color: var(--label);
+      }
+
+      .focus-instruction__commit:focus-visible {
+        outline: 2px solid var(--label);
+        outline-offset: var(--space-xxs);
+      }
+
       .focus-documents {
         display: grid;
         grid-template-columns: repeat(2, minmax(118px, 140px));
@@ -2450,7 +2471,23 @@
       };
 
       const renderRaidDocuments = (nextRaid) => {
-        const instruction = createElement('p', 'focus-instruction', localizer.text('ui.enterRaidResult'));
+        const instruction = createElement('p', 'focus-instruction');
+        const commitMarker = '\uFFFC';
+        const instructionText = localizer.text('ui.enterRaidResult', { commit: commitMarker });
+        const markerIndex = instructionText.indexOf(commitMarker);
+        const inlineCommitButton = createElement(
+          'button',
+          'focus-instruction__commit',
+          localizer.text('ui.commitRaidResult').toLocaleLowerCase(localizer.locale),
+        );
+        inlineCommitButton.type = 'button';
+        inlineCommitButton.dataset.commitRaidInline = '';
+        inlineCommitButton.addEventListener('click', () => commitRaidButton.click());
+        instruction.append(
+          instructionText.slice(0, markerIndex),
+          inlineCommitButton,
+          instructionText.slice(markerIndex + commitMarker.length),
+        );
         const documentGrid = createElement('div', 'focus-documents');
         nextRaid.documents.forEach((recommendation) => {
           const documentRecord = documentsById.get(recommendation.documentId);

@@ -95,7 +95,10 @@ test('keeps raid results as drafts until Commit, then updates and persists inven
   await expect(documentQuantity(page, documentIds[0])).toHaveValue('0');
   await expect(documentQuantity(page, documentIds[1])).toHaveValue('0');
 
-  await page.locator('[data-commit-raid]').click();
+  const inlineCommit = page.locator('[data-commit-raid-inline]');
+  await expect(inlineCommit).toHaveText('commit');
+  await expect(inlineCommit).toHaveCSS('text-decoration-line', 'underline');
+  await inlineCommit.click();
   await expect(documentQuantity(page, documentIds[0])).toHaveValue('2');
   await expect(documentQuantity(page, documentIds[1])).toHaveValue('1');
   await expect(page.locator('[data-focus-content]')).not.toContainText('Start new game day');
