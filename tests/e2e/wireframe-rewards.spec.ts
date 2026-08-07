@@ -12,6 +12,9 @@ import {
 
 const dogtagReward = 'rewards.dogtag01.name';
 const tarCoinsReward = 'rewards.tarcoins50-01.name';
+const burnPosterReward = 'rewards.burn-poster.name';
+const crateReward = 'rewards.bd-crate01.name';
+const blackWoodReward = 'rewards.black-wood-ceiling.name';
 
 test('keeps one accordion page open and persists the selected page', async ({ page }) => {
   await openWireframe(page);
@@ -33,8 +36,20 @@ test('uses alternative-option redeemable counts from the same inventory snapshot
   await openWireframe(page);
 
   await expect(page.locator('#reward-page-trigger-1 .reward-page__redeemable')).toHaveText('(1 redeemable)');
+  await expect(rewardRow(page, dogtagReward)).toHaveClass(/reward-item--redeemable/u);
+  await expect(rewardRow(page, tarCoinsReward)).not.toHaveClass(/reward-item--redeemable/u);
   await setDocumentQuantity(page, 'documents.classified.name', 3);
   await expect(page.locator('#reward-page-trigger-1 .reward-page__redeemable')).toHaveText('(4 redeemable)');
+  await expect(rewardRow(page, dogtagReward)).toHaveClass(/reward-item--redeemable/u);
+  await expect(rewardRow(page, tarCoinsReward)).toHaveClass(/reward-item--redeemable/u);
+  await expect(rewardRow(page, burnPosterReward)).toHaveClass(/reward-item--redeemable/u);
+  await expect(rewardRow(page, crateReward)).toHaveClass(/reward-item--redeemable/u);
+  await expect(rewardRow(page, blackWoodReward)).not.toHaveClass(/reward-item--redeemable/u);
+
+  const redeemableBackground = await rewardRow(page, tarCoinsReward).evaluate((element) => getComputedStyle(element).backgroundImage);
+  const ordinaryBackground = await rewardRow(page, blackWoodReward).evaluate((element) => getComputedStyle(element).backgroundImage);
+  expect(redeemableBackground).toContain('linear-gradient');
+  expect(ordinaryBackground).toBe('none');
 });
 
 test('focuses Redeem and subtract so Enter consumes inventory and completes the row', async ({ page }) => {
@@ -50,6 +65,7 @@ test('focuses Redeem and subtract so Enter consumes inventory and completes the 
   await page.keyboard.press('Enter');
   await expect(dialog).toBeHidden();
   await expect(rewardCheckbox).toBeChecked();
+  await expect(rewardRow(page, dogtagReward)).not.toHaveClass(/reward-item--redeemable/u);
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('0');
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveAttribute('min', '0');
   await expect(page.locator('[data-reward-progress-current]')).toHaveText('1');

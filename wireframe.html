@@ -40,6 +40,12 @@
             color-mix(in srgb, var(--document-frame) 10%, transparent),
             color-mix(in srgb, var(--document-frame) 30%, transparent)
           );
+        --reward-redeemable-background:
+          linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--document-frame) 6%, transparent),
+            color-mix(in srgb, var(--document-frame) 16%, transparent)
+          );
         --tooltip-surface: #050607;
         --tooltip-line: #777e84;
       }
@@ -1050,6 +1056,10 @@
         line-height: var(--line-height-ui);
       }
 
+      .reward-item--redeemable {
+        background: var(--reward-redeemable-background);
+      }
+
       .reward-item:has(input:checked) {
         background: var(--reward-complete-background);
       }
@@ -1999,7 +2009,7 @@
             checkbox.checked = false;
             openRedemptionDialog(reward, plan);
           });
-          return { rewardId: reward.id, checkbox };
+          return { reward, rewardId: reward.id, checkbox, item };
         });
 
         trigger.append(pageLabel, claimedCount, chevron);
@@ -2049,8 +2059,15 @@
             ? localizer.text('battlePass.redeemableCount', { count: formatNumber(redeemableOnPage, localizer.locale) })
             : '';
           claimedCount.textContent = `${formatNumber(claimedOnPage, localizer.locale)} / ${formatNumber(page.rewards.length, localizer.locale)}`;
-          rewardInputs.forEach(({ rewardId, checkbox }) => {
-            checkbox.checked = claimedRewards.has(rewardId);
+          rewardInputs.forEach(({ reward, rewardId, checkbox, item }) => {
+            const claimed = claimedRewards.has(rewardId);
+            const redeemable = !claimed && planRewardRedemption(
+              reward,
+              state.ownedDocuments,
+              state.classifiedDocuments,
+            ).canRedeem;
+            checkbox.checked = claimed;
+            item.classList.toggle('reward-item--redeemable', redeemable);
           });
         });
       };

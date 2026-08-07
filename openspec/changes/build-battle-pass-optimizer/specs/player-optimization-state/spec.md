@@ -70,6 +70,12 @@ While at least one Battle Pass reward remains unclaimed, the left column SHALL d
 - **WHEN** no unclaimed reward on a page can be covered by current documents
 - **THEN** that page heading shows no redeemable-count label
 
+#### Scenario: Highlight an inventory-redeemable reward
+- **WHEN** current matching regular documents and Classified backfill can cover an unclaimed reward
+- **THEN** that reward row receives a restrained redeemable background highlight from the same inventory calculation as the page count
+- **AND** the highlight disappears when the reward is no longer redeemable or is marked claimed
+- **AND** the claimed reward treatment remains visually stronger than the redeemable highlight
+
 #### Scenario: Replace the completed accordion with the crate reward
 - **WHEN** all Battle Pass rewards are claimed
 - **THEN** no reward-page accordion is rendered
