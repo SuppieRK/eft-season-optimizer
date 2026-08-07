@@ -1259,9 +1259,13 @@
       .document-strip__item {
         position: relative;
         display: grid;
+        flex: 0 0 var(--document-strip-image-size);
+        grid-template-columns: minmax(0, 1fr);
         grid-template-rows: auto auto auto;
         gap: var(--space-xs);
         inline-size: var(--document-strip-image-size);
+        min-inline-size: 0;
+        max-inline-size: var(--document-strip-image-size);
         margin: 0;
       }
 
@@ -1273,7 +1277,7 @@
         font-size: var(--font-size-label);
         font-weight: 700;
         line-height: var(--line-height-ui);
-        letter-spacing: 0.04em;
+        letter-spacing: 0;
         white-space: nowrap;
       }
 

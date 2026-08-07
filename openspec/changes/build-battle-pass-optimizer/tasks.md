@@ -155,3 +155,4 @@
 - [x] 16.16 Keep the full-schedule header and scrolling content inside one dynamic-viewport-bounded modal frame, prevent the vertical scrollbar from crossing its border, and add desktop/mobile Playwright geometry regressions.
 - [x] 16.17 Group each full-schedule day's Rewards to redeem manifest by Battle Pass page with compact localized page headings and rule separators while preserving legal redemption order and responsive stacking, and add a Playwright regression.
 - [x] 16.18 Render the localized raid-result instruction's Commit term as a keyboard-operable inline link-styled action that delegates to the Focus-header Commit operation, and add a Playwright regression proving identical inventory persistence.
+- [x] 16.19 Constrain every persistent document-ribbon tile, artwork frame, and quantity control to the same shared dimensions regardless of intrinsic title width, and add a Chromium geometry regression covering every document type.

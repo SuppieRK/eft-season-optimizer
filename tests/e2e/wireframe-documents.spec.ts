@@ -25,6 +25,20 @@ test('renders the square document artwork in source-of-truth order', async ({ pa
     await expect(tile.locator('img')).toHaveAttribute('alt', /\S+/u);
   }
 
+  const geometries = await page.locator('[data-document-id]').evaluateAll((tiles) => tiles.map((tile) => {
+    const frame = tile.querySelector('.document-strip__image-frame')!.getBoundingClientRect();
+    const title = tile.querySelector('[data-document-title]')!.getBoundingClientRect();
+    const quantity = tile.querySelector('.document-strip__quantity')!.getBoundingClientRect();
+    const tileBox = tile.getBoundingClientRect();
+    return {
+      tile: [tileBox.width, tileBox.height],
+      title: [title.width, title.height],
+      frame: [frame.width, frame.height],
+      quantity: [quantity.width, quantity.height],
+    };
+  }));
+  geometries.slice(1).forEach((geometry) => expect(geometry).toEqual(geometries[0]));
+
   const regularBorder = await documentTile(page, 'documents.financial.name').locator('.document-strip__image-frame').evaluate((element) => getComputedStyle(element).borderColor);
   const classifiedBorder = await documentTile(page, 'documents.classified.name').locator('.document-strip__image-frame').evaluate((element) => getComputedStyle(element).borderColor);
   expect(regularBorder).not.toBe(classifiedBorder);
