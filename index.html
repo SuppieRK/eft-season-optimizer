@@ -1533,13 +1533,15 @@
       .document-strip__title {
         display: grid;
         place-items: center;
-        min-block-size: calc(var(--font-size-label) * var(--line-height-ui));
+        min-block-size: calc(var(--font-size-label) * 1.75);
         color: var(--label);
         font-size: var(--font-size-label);
         font-weight: 700;
-        line-height: var(--line-height-ui);
+        hyphens: manual;
+        line-height: 0.84;
         letter-spacing: 0;
-        white-space: nowrap;
+        text-align: center;
+        white-space: normal;
       }
 
       .document-strip__image-frame {
@@ -2147,7 +2149,7 @@
       import { CircleHelp, X, createElement as createIconElement } from 'lucide';
       import flagIconUrls from 'virtual:locale-flags';
       import { loadCatalogs } from './src/catalogs.ts';
-      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber, getCompleteLocales, getLocaleRegion } from './src/localization.ts';
+      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber, getCompleteLocales, getLocaleRegion, hyphenateForLocale } from './src/localization.ts';
       import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from './src/persistence.ts';
       import { countPageRedeemableRewards, planRewardRedemption } from './src/redeemable.ts';
       import { isBattlePassPageUnlocked } from './src/page-unlocks.ts';
@@ -2564,7 +2566,10 @@
         const incrementButton = tile.querySelector('[data-document-increment]');
         const tooltipId = `document-strip-tooltip-${index}`;
         tooltip.id = tooltipId;
-        tile.querySelector('[data-document-title]').textContent = fullName.trim().split(/\s+/u)[0];
+        tile.querySelector('[data-document-title]').textContent = hyphenateForLocale(
+          fullName.trim().split(/\s+/u)[0],
+          localizer.locale,
+        );
         tile.querySelector('img').alt = localizer.text(documentRecord.imageAltId);
         tile.querySelector('[data-document-tooltip-name]').textContent = fullName;
         tile.querySelector('[data-document-tooltip-description]').textContent = localizer.text(documentRecord.descriptionId);

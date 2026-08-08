@@ -13,6 +13,7 @@ import {
   getCompleteLocales,
   getLocaleRegion,
   getTextDirection,
+  hyphenateForLocale,
   pluralCategory,
   resolvePreferredLocale,
   resolveStoredLocale,
@@ -95,6 +96,12 @@ describe('localization', () => {
     expect(resolvePreferredLocale(['de-DE'], completeLocales, 'en-GB')).toBe('en-GB');
     expect(getLocaleRegion('en-GB')).toBe('gb');
     expect(getLocaleRegion('fr-CA')).toBe('ca');
+  });
+
+  it('inserts language-correct soft hyphens for supported interface locales', () => {
+    expect(hyphenateForLocale('Blueprints', 'en-GB')).toBe('Blue\u00ADprints');
+    expect(hyphenateForLocale('Эксплуатационная', 'ru-RU')).toBe('Экс\u00ADплу\u00ADа\u00ADта\u00ADци\u00ADон\u00ADная');
+    expect(hyphenateForLocale('Document', 'fr-FR')).toBe('Document');
   });
 
   it('preserves placeholders in every supplied translation', () => {

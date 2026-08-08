@@ -9,7 +9,9 @@ test('renders the square document artwork in source-of-truth order', async ({ pa
 
   await expect(page.locator('[data-document-id]')).toHaveCount(documentIds.length);
   expect(await page.locator('[data-document-id]').evaluateAll((tiles) => tiles.map((tile) => (tile as HTMLElement).dataset.documentId))).toEqual(documentIds);
-  await expect(page.locator('[data-document-title]')).toHaveText(documentTitles);
+  const renderedTitles = await page.locator('[data-document-title]').allTextContents();
+  expect(renderedTitles.map((title) => title.replaceAll('\u00AD', ''))).toEqual(documentTitles);
+  expect(renderedTitles.some((title) => title.includes('\u00AD'))).toBe(true);
 
   for (const documentId of documentIds) {
     const tile = documentTile(page, documentId);
@@ -63,6 +65,36 @@ test('renders the square document artwork in source-of-truth order', async ({ pa
   await expect(counterNote).toHaveText('Document counts are independent from reward claims and must be adjusted separately.');
   expect(counterNoteBox!.y + counterNoteBox!.height).toBeLessThanOrEqual(ribbon!.y);
   expect(Math.abs(ribbon!.x + ribbon!.width / 2 - (strip!.x + strip!.width / 2))).toBeLessThanOrEqual(1);
+});
+
+test('wraps Russian document titles at language-correct hyphenation points', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openWireframe(page);
+  await page.locator('.ss-main.language-select').click();
+  await page.locator('.ss-content.language-select .ss-option')
+    .filter({ has: page.locator('[data-flag-region="ru"]') })
+    .click();
+  await expect(page.locator('html')).toHaveAttribute('lang', /^ru(?:-|$)/u);
+
+  const layout = await page.locator('[data-document-id]').evaluateAll((tiles) => tiles.map((tile) => {
+    const title = tile.querySelector<HTMLElement>('[data-document-title]')!;
+    const frame = tile.querySelector<HTMLElement>('.document-strip__image-frame')!.getBoundingClientRect();
+    const tileBox = tile.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(title);
+    const lineBoxes = [...range.getClientRects()];
+    return {
+      hasSoftHyphen: title.textContent?.includes('\u00AD') ?? false,
+      lineCount: lineBoxes.length,
+      staysInsideTile: lineBoxes.every((box) => box.left >= tileBox.left - 1 && box.right <= tileBox.right + 1),
+      staysAboveImage: lineBoxes.every((box) => box.bottom <= frame.top),
+    };
+  }));
+
+  expect(layout.some(({ lineCount }) => lineCount > 1)).toBe(true);
+  expect(layout.every(({ hasSoftHyphen, staysInsideTile, staysAboveImage }) =>
+    hasSoftHyphen && staysInsideTile && staysAboveImage)).toBe(true);
+  expect(await page.locator('.focus-content').evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true);
 });
 
 test('shows full document details and spawn locations in tooltips', async ({ page }) => {
