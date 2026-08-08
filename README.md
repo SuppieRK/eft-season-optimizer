@@ -6,7 +6,7 @@ The site recommends the next location to farm. It uses owned documents, claimed 
 
 The current catalog targets game-data version `1.1.0.0.46657.8.6.2026`.
 
-The localization catalog marks the project as development-only. Additional reviewed localizations remain a release requirement.
+The localization catalog marks the project as development-only. The Russian draft and human-authored item text require review.
 
 ## Features
 
@@ -86,7 +86,7 @@ The application reads its game data from JSON files in [`public/data`](public/da
 
 [`tests/documents.csv`](tests/documents.csv) is the reviewed source of truth for reward document quantities. Catalog tests compare `battle-pass.json` with this file.
 
-The localization catalog currently contains `en-GB`.
+The localization catalog contains `en-GB` and a best-effort `ru-RU` draft. The Russian text requires review against official game terminology.
 
 ## Project structure
 
@@ -118,3 +118,13 @@ Use the reset action in the site footer to erase the stored optimizer state.
 ## Asset disclaimer
 
 This site is an unofficial fan-made project. All Escape from Tarkov image assets belong to Battlestate Games.
+
+## Contributing and security
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before you submit a change.
+
+Report security vulnerabilities through the private process in [SECURITY.md](SECURITY.md).
+
+## License
+
+The source code is available under the [MIT License](LICENSE).

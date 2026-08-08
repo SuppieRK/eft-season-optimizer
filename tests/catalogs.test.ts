@@ -56,16 +56,20 @@ describe('catalogs', () => {
       regularDocumentsPerBlackDivisionGearCrate: 10,
       regularDocumentsPerOtherDocuments: 5,
     });
-    expect(catalogs.optimizerRules.tarCoinBundles.map((bundle) => [bundle.tarCoins, bundle.bonusTarCoins])).toEqual([
-      [500, 0],
-      [1100, 100],
-      [2300, 300],
-      [6000, 1000],
-      [12500, 2500],
-      [20250, 5250],
+    expect(catalogs.optimizerRules.tarCoinBundles.map((bundle) => [bundle.tarCoins, bundle.localPriceId])).toEqual([
+      [500, 'tarCoinBundles.500.localPrice'],
+      [1200, 'tarCoinBundles.1200.localPrice'],
+      [2600, 'tarCoinBundles.2600.localPrice'],
+      [7000, 'tarCoinBundles.7000.localPrice'],
+      [15000, 'tarCoinBundles.15000.localPrice'],
+      [25500, 'tarCoinBundles.25500.localPrice'],
     ]);
+    expect(JSON.stringify(readCatalogs().optimizerRules)).not.toContain('bonusTarCoins');
+    expect(catalogs.optimizerRules.tarCoinBundles.every((bundle) => !('bonusTarCoins' in bundle))).toBe(true);
+    expect(catalogs.optimizerRules.classifiedDocuments.bundles.every((bundle) => !('bonusTarCoins' in bundle))).toBe(true);
     expect(catalogs.localization.schemaVersion).toBe(2);
     expect(catalogs.localization.defaultLocale).toBe('en-GB');
+    expect(catalogs.localization.supportedLocales).toEqual(['en-GB', 'ru-RU']);
     expect(catalogs.localization.priceEntries.map((entry) => entry.localizations['en-GB'])).toEqual([
       { price: 4.99, currency: 'USD' },
       { price: 9.99, currency: 'USD' },

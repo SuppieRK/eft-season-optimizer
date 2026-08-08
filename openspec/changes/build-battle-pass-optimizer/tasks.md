@@ -101,6 +101,8 @@
 - [x] 11.3 Add production release-gate validation that rejects missing language values, missing or orphaned IDs, placeholders, absent descriptions, incomplete selectable locales, and untranslated assistive text.
 - [x] 11.4 Implement the non-blocking dismissible cookie-storage toast as the final UI feature, persist its dismissal, clear that dismissal during complete reset, and test first-use, dismissal, return-visit, and reset behavior.
 - [x] 11.5 After the toast is complete, run strict OpenSpec validation, all unit and DOM tests, accessibility checks, catalog validation, and the GitHub Pages production build; document any publication blockers without bypassing localization or UI/UX approval gates.
+- [x] 11.6 Add complete best-effort `ru-RU` text coverage, preserve every interpolation placeholder, expose the locale through its generated Russian flag asset, retain explicit screenshot-backed USD prices until regional prices are reviewed, and keep Russian terminology review as a release blocker.
+- [x] 11.7 Remove localization entries that have no reference in the application entry, maintained TypeScript modules, or runtime data catalogs, and add a regression that rejects future unreferenced text or structured-price IDs.
 
 ## 12. Correct Interactive UI and Development Tooling
 
@@ -174,3 +176,4 @@
 - [x] 16.34 Add concise localized Fastest and Safest tooltips that explain lower-max-time or easier-difficulty priority on hover and keyboard focus, with Chromium interaction regressions.
 - [x] 16.35 Update the season deadline to `1796634000`, remove the duplicate runtime timestamp constant and equality rejection, retain positive-integer catalog validation, and update countdown and OpenSpec regressions.
 - [x] 16.36 Apply the reward accordion's thin black scrollbar styling to schedule and buyout modal content, remove hard-coded runtime season ID and game-version equality checks, derive cookie versioning from the loaded catalog, and replace fixed reward/document total regressions with catalog-derived expectations.
+- [x] 16.37 Fold credited bonuses into each purchasable TarCoin package's `tarCoins` total, remove `bonusTarCoins` from TarCoin and Classified Document bundles, exclude Classified bundle discount presentation from calculations, rename package price IDs to the final totals, and update catalog and optimizer regressions.

@@ -89,7 +89,7 @@ Battle Pass pages SHALL be interpreted in ascending `page` order. Page 1 SHALL h
 - **THEN** pages 2 through 12 require `4, 4, 4, 4, 4, 2, 3, 4, 4, 3, 3` rewards respectively from their immediately preceding pages
 
 ### Requirement: Configurable optimizer rules
-The optimizer rules catalog SHALL define mode daily document limits under `dailyDocumentLimits`; `exchange.regularDocumentsPerOtherDocuments` and `exchange.regularDocumentsPerBlackDivisionGearCrate`; the complete configured set of Classified Document purchase bundles with integer document quantities and TarCoin costs; purchasable TarCoin packages with total and bonus TarCoins plus local-price references; Fastest and Safest factor-field selection; and deterministic optimizer ordering without embedding those values in UI code.
+The optimizer rules catalog SHALL define mode daily document limits under `dailyDocumentLimits`; `exchange.regularDocumentsPerOtherDocuments` and `exchange.regularDocumentsPerBlackDivisionGearCrate`; the complete configured set of Classified Document purchase bundles with integer document quantities and TarCoin costs; purchasable TarCoin packages with final credited TarCoin totals plus local-price references; Fastest and Safest factor-field selection; and deterministic optimizer ordering without embedding those values in UI code. Neither purchase-bundle collection SHALL store `bonusTarCoins`.
 
 #### Scenario: Default daily limits
 - **WHEN** the optimizer rules are loaded
@@ -110,7 +110,9 @@ The optimizer rules catalog SHALL define mode daily document limits under `daily
 
 #### Scenario: TarCoin package configuration
 - **WHEN** the local real-money cost of additional TarCoins is evaluated
-- **THEN** `optimizer-rules.json` supplies purchasable package totals `500, 1100, 2300, 6000, 12500, 20250`, bonus quantities `0, 100, 300, 1000, 2500, 5250`, and a local-price localization reference for each package
+- **THEN** `optimizer-rules.json` supplies final credited package totals `500, 1200, 2600, 7000, 15000, 25500` and a local-price localization reference for each package
+- **AND** TarCoin packages and Classified Document bundles do not expose `bonusTarCoins`
+- **AND** Classified Document bundle discount presentation does not participate in optimizer calculations
 - **AND** the unpriced `2,000` TarCoin “RECEIVED” offer is absent from purchasable package data
 
 #### Scenario: Route factor configuration

@@ -114,15 +114,19 @@ test('orders and persists game modes while keeping the language selector icon-on
   await languageControl.click();
   const languageMenu = page.locator('.ss-content.language-select');
   await expect(languageMenu).toBeVisible();
-  await expect(languageMenu.locator('.ss-option')).toHaveCount(1);
+  await expect(languageMenu.locator('.ss-option')).toHaveCount(2);
   await expect(languageMenu.locator('.locale-choice__flag[data-flag-region="gb"]')).toBeVisible();
+  await expect(languageMenu.locator('.locale-choice__flag[data-flag-region="ru"]')).toBeVisible();
   const opensBelowLanguage = await Promise.all([languageControl, languageMenu].map((locator) => locator.boundingBox()));
   expect(opensBelowLanguage[1]!.y).toBeGreaterThanOrEqual(opensBelowLanguage[0]!.y + opensBelowLanguage[0]!.height - 1);
-  await page.keyboard.press('Escape');
+  await languageMenu.locator('.ss-option').filter({ has: page.locator('[data-flag-region="ru"]') }).click();
 
-  await page.reload();
+  await expect(page.locator('[data-language-select]')).toHaveValue('ru-RU');
+  await expect(page.locator('.ss-main.language-select .locale-choice__flag[data-flag-region="ru"]')).toBeVisible();
   await expect(page.locator('[data-mode-select]')).toHaveValue('pvp');
-  await expect(page.locator('.ss-main.mode-select')).toContainText('PvP · 15 / day');
+  await expect(page.locator('.ss-main.mode-select')).toContainText('PvP · 15 / день');
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
 test('loads the production application without errors or failed app resources', async ({ page }) => {

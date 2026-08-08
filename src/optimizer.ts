@@ -1350,7 +1350,6 @@ function estimateLocalTarCoins(required: number, catalogs: Catalogs, locale: str
     const selection = choosePricedPackages(required, bundles.map((entry) => ({
       classifiedDocuments: entry.bundle.tarCoins,
       tarCoins: Math.round(entry.price.price * currencyScale),
-      bonusTarCoins: 0,
     })));
     if (!selection) continue;
     const packageCounts = catalogs.optimizerRules.tarCoinBundles.map(() => 0);

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -33,6 +33,24 @@ function catalogs() {
 }
 
 describe('localization', () => {
+  it('contains no text or price entries without an application source reference', () => {
+    const catalog = catalogs().localization;
+    const runtimeSourcePaths = [
+      'index.html',
+      ...readdirSync(resolve('src')).filter((fileName) => fileName.endsWith('.ts')).map((fileName) => `src/${fileName}`),
+      'public/data/battle-pass.json',
+      'public/data/documents.json',
+      'public/data/locations.json',
+      'public/data/optimizer-rules.json',
+    ];
+    const runtimeSource = runtimeSourcePaths
+      .map((filePath) => readFileSync(resolve(filePath), 'utf8'))
+      .join('\n');
+
+    expect(catalog.entries.filter((entry) => !runtimeSource.includes(entry.id)).map((entry) => entry.id)).toEqual([]);
+    expect(catalog.priceEntries.filter((entry) => !runtimeSource.includes(entry.id)).map((entry) => entry.id)).toEqual([]);
+  });
+
   it('resolves text with default fallback and never falls back real-money prices', () => {
     const catalog = catalogs().localization;
     const incomplete = structuredClone(catalog) as typeof catalog & { supportedLocales: string[] };
@@ -40,7 +58,7 @@ describe('localization', () => {
     const localizer = createLocalizer(incomplete, 'fr-FR');
 
     expect(localizer.locale).toBe('fr-FR');
-    expect(localizer.text('app.title')).toBe('KORD Breach Optimizer');
+    expect(localizer.text('battlePass.rewards')).toBe('Rewards');
     expect(localizer.text('missing.id')).toBe('⟦missing:missing.id⟧');
     expect(localizer.price('tarCoinBundles.500.localPrice')).toBeUndefined();
     expect(getCompleteLocales(incomplete)).toEqual(['en-GB']);
@@ -75,5 +93,24 @@ describe('localization', () => {
     expect(resolvePreferredLocale(['de-DE'], completeLocales, 'en-GB')).toBe('en-GB');
     expect(getLocaleRegion('en-GB')).toBe('gb');
     expect(getLocaleRegion('fr-CA')).toBe('ca');
+  });
+
+  it('provides complete Russian text, placeholders, prices, and browser selection', () => {
+    const catalog = catalogs().localization;
+    const localizer = createLocalizer(catalog, 'ru-RU');
+    const placeholders = (value: string) => [...value.matchAll(/\{[\w-]+\}/g)].map((match) => match[0]).sort();
+
+    expect(getCompleteLocales(catalog)).toEqual(['en-GB', 'ru-RU']);
+    expect(localizer.text('battlePass.rewards')).toBe('Награды');
+    expect(localizer.text('locations.factory.name')).toBe('Завод');
+    expect(localizer.price('tarCoinBundles.500.localPrice')).toEqual({ price: 4.99, currency: 'USD' });
+    expect(resolvePreferredLocale(['ru'], getCompleteLocales(catalog), catalog.defaultLocale)).toBe('ru-RU');
+    expect(getLocaleRegion('ru-RU')).toBe('ru');
+    expect(getTextDirection('ru-RU')).toBe('ltr');
+
+    for (const entry of catalog.entries) {
+      expect(entry.localizations['ru-RU'], entry.id).toBeTruthy();
+      expect(placeholders(entry.localizations['ru-RU']!), entry.id).toEqual(placeholders(entry.localizations['en-GB']!));
+    }
   });
 });

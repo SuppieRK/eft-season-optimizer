@@ -39,6 +39,12 @@ The header locale selector SHALL expose only declared regional BCP 47 locales th
 - **WHEN** one declared locale is missing any required entry value
 - **THEN** that locale is not offered as selectable and a production validation fails
 
+#### Scenario: Best-effort Russian draft is available
+- **WHEN** `ru-RU` supplies every required text and structured-price entry with the same interpolation placeholders as `en-GB`
+- **THEN** the selector offers `ru-RU` with the Russian flag and browser preference matching can select it
+- **AND** release status remains development-only until its game terminology and regional prices receive human review
+- **AND** explicit screenshot-backed USD values remain price data rather than a runtime fallback or inferred conversion
+
 ### Requirement: Localization catalog integrity
 Production validation SHALL reject duplicate or orphaned IDs across both entry collections, missing or empty required values, malformed structured prices, undeclared language keys, unknown domain references, and absent default-locale coverage.
 

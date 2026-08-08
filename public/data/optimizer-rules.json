@@ -12,33 +12,27 @@
   "tarCoinBundles": [
     {
       "tarCoins": 500,
-      "bonusTarCoins": 0,
       "localPriceId": "tarCoinBundles.500.localPrice"
     },
     {
-      "tarCoins": 1100,
-      "bonusTarCoins": 100,
-      "localPriceId": "tarCoinBundles.1100.localPrice"
+      "tarCoins": 1200,
+      "localPriceId": "tarCoinBundles.1200.localPrice"
     },
     {
-      "tarCoins": 2300,
-      "bonusTarCoins": 300,
-      "localPriceId": "tarCoinBundles.2300.localPrice"
+      "tarCoins": 2600,
+      "localPriceId": "tarCoinBundles.2600.localPrice"
     },
     {
-      "tarCoins": 6000,
-      "bonusTarCoins": 1000,
-      "localPriceId": "tarCoinBundles.6000.localPrice"
+      "tarCoins": 7000,
+      "localPriceId": "tarCoinBundles.7000.localPrice"
     },
     {
-      "tarCoins": 12500,
-      "bonusTarCoins": 2500,
-      "localPriceId": "tarCoinBundles.12500.localPrice"
+      "tarCoins": 15000,
+      "localPriceId": "tarCoinBundles.15000.localPrice"
     },
     {
-      "tarCoins": 20250,
-      "bonusTarCoins": 5250,
-      "localPriceId": "tarCoinBundles.20250.localPrice"
+      "tarCoins": 25500,
+      "localPriceId": "tarCoinBundles.25500.localPrice"
     }
   ],
   "classifiedDocuments": {
@@ -47,28 +41,23 @@
     "bundles": [
       {
         "classifiedDocuments": 500,
-        "tarCoins": 8750,
-        "bonusTarCoins": 3750
+        "tarCoins": 8750
       },
       {
         "classifiedDocuments": 250,
-        "tarCoins": 5000,
-        "bonusTarCoins": 1250
+        "tarCoins": 5000
       },
       {
         "classifiedDocuments": 75,
-        "tarCoins": 1680,
-        "bonusTarCoins": 195
+        "tarCoins": 1680
       },
       {
         "classifiedDocuments": 40,
-        "tarCoins": 950,
-        "bonusTarCoins": 50
+        "tarCoins": 950
       },
       {
         "classifiedDocuments": 20,
-        "tarCoins": 500,
-        "bonusTarCoins": 0
+        "tarCoins": 500
       }
     ],
     "purchasePolicy": "When enabled, evaluate purchases only after matching regular inventory, maximizing legally usable owned Classified Document consumption across all unclaimed rewards, and applying useful regular-document exchanges. Use available TarCoins immediately and choose the bundle combination that minimizes remaining uncovered backfill, then TarCoins spent, then bundle count. Never purchase Classified Documents to replace a matching regular document already owned."

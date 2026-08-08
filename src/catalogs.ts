@@ -96,12 +96,10 @@ export interface BattlePassCatalog {
 export interface ClassifiedBundle {
   readonly classifiedDocuments: number;
   readonly tarCoins: number;
-  readonly bonusTarCoins: number;
 }
 
 export interface TarCoinBundle {
   readonly tarCoins: number;
-  readonly bonusTarCoins: number;
   readonly localPriceId: string;
 }
 
@@ -447,7 +445,6 @@ function parseRules(raw: unknown, localization: LocalizationCatalog, issues: str
     if (!priceIds.has(localPriceId)) issues.push(`${localPriceId} is not defined in localization.priceEntries`);
     return {
       tarCoins: asInteger(bundle.tarCoins, `optimizerRules.tarCoinBundles[${index}].tarCoins`, issues, 1),
-      bonusTarCoins: asInteger(bundle.bonusTarCoins, `optimizerRules.tarCoinBundles[${index}].bonusTarCoins`, issues),
       localPriceId,
     };
   });
@@ -458,7 +455,6 @@ function parseRules(raw: unknown, localization: LocalizationCatalog, issues: str
     return {
       classifiedDocuments: asInteger(bundle.classifiedDocuments, `optimizerRules.classifiedDocuments.bundles[${index}].classifiedDocuments`, issues, 1),
       tarCoins: asInteger(bundle.tarCoins, `optimizerRules.classifiedDocuments.bundles[${index}].tarCoins`, issues, 1),
-      bonusTarCoins: asInteger(bundle.bonusTarCoins, `optimizerRules.classifiedDocuments.bundles[${index}].bonusTarCoins`, issues),
     };
   });
   const routeProfiles = asObject(object.routeProfiles, 'optimizerRules.routeProfiles', issues);
