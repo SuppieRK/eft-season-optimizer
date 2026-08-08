@@ -166,11 +166,10 @@ describe('state and cookie persistence', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
     const defaults = createDefaultState(catalog);
-    saveState({ ...defaults, mode: 'pvp', tarCoins: 3 }, cookies, catalog);
+    saveState({ ...defaults, mode: 'pvp' }, cookies, catalog);
     cookies.values['kord-breach-settings'] = encodeURIComponent(JSON.stringify({ gameDataVersion: 'old', schemaVersion: 1, payload: { mode: 'pvp-seasonal' } }));
     const restored = restoreState(cookies, catalog);
     expect(restored.mode).toBe('pvp-seasonal');
-    expect(restored.tarCoins).toBe(3);
 
     expect(() => saveState({ ...defaults, claimedRewardIds: Array.from({ length: 1000 }, (_, index) => `unknown-${index}`) }, cookies, catalog)).toThrow(/cookie size limit/);
   });

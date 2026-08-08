@@ -2296,7 +2296,6 @@
         'set-mode',
         'set-owned-document',
         'set-spending',
-        'set-tar-coins',
       ]);
       const dispatch = (action) => {
         state = reduceState(state, action, catalogs);
@@ -2638,7 +2637,7 @@
         routeScheduleContent.replaceChildren();
         routeScheduleContent.append(createElement('p', 'schedule-estimate-note', localizer.text('ui.planEstimate')));
 
-        if (profile.exchanges.length > 0 || profile.purchases.classifiedDocumentsPurchased > 0) {
+        if (profile.exchanges.length > 0 || profile.purchases.bundleCounts.some((count) => count > 0)) {
           const actions = createElement('section', 'schedule-plan-actions');
           actions.append(createElement('h3', '', localizer.text('ui.planActions')));
           if (profile.exchanges.length > 0) {
@@ -2657,14 +2656,10 @@
             group.append(list);
             actions.append(group);
           }
-          if (profile.purchases.classifiedDocumentsPurchased > 0) {
+          if (profile.purchases.bundleCounts.some((count) => count > 0)) {
             const group = createElement('div', 'schedule-action-group');
-            const summary = createElement('p', '', localizer.text('ui.purchaseSummary', {
-              count: formatNumber(profile.purchases.classifiedDocumentsPurchased, localizer.locale),
-              tarCoins: formatNumber(profile.purchases.tarCoinsSpent, localizer.locale),
-            }));
             const list = document.createElement('ul');
-            group.append(createElement('h4', '', localizer.text('ui.classifiedPurchases')), summary);
+            group.append(createElement('h4', '', localizer.text('ui.classifiedPurchases')));
             profile.purchases.bundleCounts.forEach((count, index) => {
               if (count === 0) return;
               const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
@@ -2854,7 +2849,7 @@
           return section;
         };
 
-        const battlePassTarCoinsUsed = estimate.startingTarCoinsUsed + estimate.earnedTarCoinsUsed;
+        const battlePassTarCoinsUsed = estimate.earnedTarCoinsUsed;
         buyoutContent.append(
           createScenario('spend', 'ui.buyoutSpendBattlePassTarCoins', estimate.localEstimate, battlePassTarCoinsUsed),
           createScenario('keep', 'ui.buyoutKeepBattlePassTarCoins', estimate.keepBattlePassTarCoinsLocalEstimate, 0),
@@ -2963,7 +2958,7 @@
           profile.schedule.length > 0
           || profile.projectedImmediateRewardIds.length > 0
           || profile.exchanges.length > 0
-          || profile.purchases.classifiedDocumentsPurchased > 0
+          || profile.purchases.bundleCounts.some((count) => count > 0)
         );
         commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
         commitRaidButton.disabled = true;
@@ -3027,7 +3022,6 @@
             claimedRewardIds: state.claimedRewardIds,
             ownedDocuments: state.ownedDocuments,
             classifiedDocuments: state.classifiedDocuments,
-            tarCoins: state.tarCoins,
             spendTarCoinsOnClassifiedDocuments: state.spendTarCoinsOnClassifiedDocuments,
             mode: state.mode,
             locale: state.locale,

@@ -59,7 +59,6 @@ function input(catalogs: Catalogs, overrides: Partial<Parameters<typeof optimize
     claimedRewardIds: [],
     ownedDocuments: {},
     classifiedDocuments: 0,
-    tarCoins: 0,
     spendTarCoinsOnClassifiedDocuments: false,
     mode: 'pve',
     ...overrides,
@@ -242,29 +241,62 @@ describe('optimizer', () => {
     battlePass.pages = [{
       page: 1,
       rewards: [
-        { id: 'rewards.tarcoins50-01.name', kind: 'tarcoins', tarCoinsAwarded: 50, requirements: [] },
-        { id: 'rewards.burn-poster.name', kind: 'cosmetic', requirements: [{ documentId: 'documents.test.name', quantity: 1 }] },
+        { id: 'rewards.tarcoins50-01.name', kind: 'tarcoins', tarCoinsAwarded: 500, requirements: [] },
+        { id: 'rewards.burn-poster.name', kind: 'cosmetic', requirements: [{ documentId: 'documents.test.name', quantity: 20 }] },
       ],
     }];
     const catalogs = parseCatalogs({ ...raw, battlePass });
     const staged = optimize(input(catalogs));
-    const disabled = optimize(input(catalogs, { tarCoins: 500 }));
-    const enabled = optimize(input(catalogs, { spendTarCoinsOnClassifiedDocuments: true, tarCoins: 500 }));
+    const enabled = optimize(input(catalogs, { spendTarCoinsOnClassifiedDocuments: true }));
 
-    expect(staged.buyout.minimumAdditionalTarCoins).toBe(450);
-    expect(staged.buyout.earnedTarCoinsAwarded).toBe(50);
-    expect(staged.buyout.earnedTarCoinsUsed).toBe(50);
-    expect(staged.buyout.localEstimate?.packageCounts[0]).toBe(1);
-    expect(staged.buyout.localEstimate?.excessTarCoins).toBe(50);
-    expect(staged.buyout.keepBattlePassTarCoinsLocalEstimate?.packageCounts[0]).toBe(1);
-    expect(staged.buyout.keepBattlePassTarCoinsLocalEstimate?.excessTarCoins).toBe(0);
-    expect(staged.buyout.localEstimate?.price).toBe(4.99);
-    expect(staged.buyout.localEstimate?.currency).toBe('USD');
-    expect(disabled.buyout.localEstimate?.tarCoinsPurchased).toBe(0);
-    expect(disabled.buyout.keepBattlePassTarCoinsLocalEstimate?.tarCoinsPurchased).toBe(500);
-    expect(disabled.profiles.fastest.purchases.classifiedDocumentsPurchased).toBe(0);
-    expect(enabled.profiles.fastest.purchases.classifiedDocumentsPurchased).toBeGreaterThan(0);
-    expect(enabled.buyout).toEqual(disabled.buyout);
+    expect(staged.buyout.minimumAdditionalTarCoins).toBe(0);
+    expect(staged.buyout.earnedTarCoinsAwarded).toBe(500);
+    expect(staged.buyout.earnedTarCoinsUsed).toBe(500);
+    expect(staged.buyout.localEstimate?.packageCounts.every((count) => count === 0)).toBe(true);
+    expect(staged.buyout.localEstimate?.excessTarCoins).toBe(0);
+    expect(staged.buyout.keepBattlePassTarCoinsLocalEstimate?.tarCoinsPurchased)
+      .toBeGreaterThanOrEqual(staged.buyout.grossTarCoinsSpent);
+    expect(staged.buyout.localEstimate?.price).toBe(0);
+    expect(staged.buyout.localEstimate?.currency).toBe('');
+    expect(staged.profiles.fastest.purchases.bundleCounts.every((count) => count === 0)).toBe(true);
+    expect(enabled.profiles.fastest.purchases.bundleCounts.some((count) => count > 0)).toBe(true);
+    expect(enabled.buyout).toEqual(staged.buyout);
+  });
+
+  it.each([
+    { remaining: 500, bundleCounts: [1, 0, 0, 0, 0], tarCoins: 8750 },
+    { remaining: 450, bundleCounts: [0, 1, 2, 1, 0], tarCoins: 9310 },
+    { remaining: 400, bundleCounts: [0, 1, 2, 0, 0], tarCoins: 8360 },
+    { remaining: 350, bundleCounts: [0, 1, 1, 0, 1], tarCoins: 7180 },
+    { remaining: 300, bundleCounts: [0, 1, 0, 1, 0], tarCoins: 5950 },
+    { remaining: 250, bundleCounts: [0, 1, 0, 0, 0], tarCoins: 5000 },
+    { remaining: 200, bundleCounts: [0, 0, 2, 1, 0], tarCoins: 4310 },
+    { remaining: 150, bundleCounts: [0, 0, 2, 0, 0], tarCoins: 3360 },
+    { remaining: 100, bundleCounts: [0, 0, 1, 0, 1], tarCoins: 2180 },
+    { remaining: 71, bundleCounts: [0, 0, 0, 1, 1], tarCoins: 1450 },
+    { remaining: 50, bundleCounts: [0, 0, 0, 1, 0], tarCoins: 950 },
+    { remaining: 0, bundleCounts: [0, 0, 0, 0, 0], tarCoins: 0 },
+  ])('selects the cheapest complete buyout bundle plan with $remaining documents left', ({
+    remaining,
+    bundleCounts,
+    tarCoins,
+  }) => {
+    const raw = readRaw();
+    const sourceReward = (raw.battlePass as { pages: Array<{ rewards: Array<Record<string, unknown>> }> })
+      .pages.flatMap((page) => page.rewards)[0];
+    const battlePass = structuredClone(raw.battlePass) as Record<string, unknown>;
+    battlePass.pages = [{
+      page: 1,
+      rewards: [{
+        ...sourceReward,
+        requirements: [{ documentId: 'documents.financial.name', quantity: 500 }],
+      }],
+    }];
+    const catalogs = parseCatalogs({ ...raw, battlePass });
+    const result = optimize(input(catalogs, { classifiedDocuments: 500 - remaining }));
+
+    expect(result.buyout.bundleCounts).toEqual(bundleCounts);
+    expect(result.buyout.grossTarCoinsSpent).toBe(tarCoins);
   });
 
   it('does not fund a purchase with TarCoins from an uncovered reward', () => {
@@ -302,7 +334,7 @@ describe('optimizer', () => {
     const result = optimize(input(catalogs, { spendTarCoinsOnClassifiedDocuments: true }));
 
     expect(result.profiles.fastest.redemptionSequence[0]).toBe('rewards.tarcoins50-01.name');
-    expect(result.profiles.fastest.purchases.classifiedDocumentsPurchased).toBe(0);
+    expect(result.profiles.fastest.purchases.bundleCounts.every((count) => count === 0)).toBe(true);
     expect(result.profiles.fastest.purchases.earnedTarCoinsUsed).toBe(0);
   });
 
@@ -347,7 +379,7 @@ describe('optimizer', () => {
       farmingLocationId: 'locations.factory.name',
     });
     expect(result.classifiedRemaining).toBe(7);
-    expect(result.profiles.fastest.purchases.classifiedDocumentsPurchased).toBe(0);
+    expect(result.profiles.fastest.purchases.bundleCounts.every((count) => count === 0)).toBe(true);
     expect(result.profiles.fastest.route.locations[0].locationId).toBe('locations.factory.name');
 
     const immediate = optimize(input(catalogs, { claimedRewardIds: claimed, ownedDocuments: { 'documents.project.name': 20 }, crateCount: 2 }));

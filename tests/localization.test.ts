@@ -56,11 +56,13 @@ describe('localization', () => {
     const incomplete = structuredClone(catalog) as typeof catalog & { supportedLocales: string[] };
     incomplete.supportedLocales = ['en-GB', 'fr-FR'];
     const localizer = createLocalizer(incomplete, 'fr-FR');
+    const fallbackEntry = catalog.entries.find((entry) => entry.localizations[catalog.defaultLocale] !== undefined)!;
+    const priceEntry = catalog.priceEntries[0]!;
 
     expect(localizer.locale).toBe('fr-FR');
-    expect(localizer.text('battlePass.rewards')).toBe('Rewards');
+    expect(localizer.text(fallbackEntry.id)).toBe(fallbackEntry.localizations[catalog.defaultLocale]);
     expect(localizer.text('missing.id')).toBe('⟦missing:missing.id⟧');
-    expect(localizer.price('tarCoinBundles.500.localPrice')).toBeUndefined();
+    expect(localizer.price(priceEntry.id)).toBeUndefined();
     expect(getCompleteLocales(incomplete)).toEqual(['en-GB']);
     expect(resolveStoredLocale('fr-FR', ['en-GB'], 'en-GB')).toBe('en-GB');
     expect(resolveStoredLocale('en-GB', ['en-GB'], 'en-GB')).toBe('en-GB');
@@ -76,8 +78,8 @@ describe('localization', () => {
     expect(formatAccessibleRequirements(requirements, names, localizer.locale)).toBe('Financial documents: 2');
     expect(formatCountdownUnit(2, localizer.locale, 'day')).toBe('2 days');
     expect(formatDateTime(1796634000, 'en-US')).toContain('Dec 7, 2026');
-    expect(formatLocalPrice(localizer.price('tarCoinBundles.500.localPrice')!, 'en-US')).toBe('$4.99');
-    expect(formatLocalPrice(localizer.price('tarCoinBundles.500.localPrice')!, 'en-GB')).toBe('$4.99');
+    expect(formatLocalPrice({ price: 4.99, currency: 'USD' }, 'en-US')).toBe('$4.99');
+    expect(formatLocalPrice({ price: 4.99, currency: 'USD' }, 'en-GB')).toBe('$4.99');
     expect(pluralCategory(1, localizer.locale)).toBe('one');
     expect(pluralCategory(2, localizer.locale)).toBe('other');
     expect(getTextDirection('ar')).toBe('rtl');
@@ -95,22 +97,15 @@ describe('localization', () => {
     expect(getLocaleRegion('fr-CA')).toBe('ca');
   });
 
-  it('provides complete Russian text, placeholders, prices, and browser selection', () => {
+  it('preserves placeholders in every supplied translation', () => {
     const catalog = catalogs().localization;
-    const localizer = createLocalizer(catalog, 'ru-RU');
     const placeholders = (value: string) => [...value.matchAll(/\{[\w-]+\}/g)].map((match) => match[0]).sort();
 
-    expect(getCompleteLocales(catalog)).toEqual(['en-GB', 'ru-RU']);
-    expect(localizer.text('battlePass.rewards')).toBe('Награды');
-    expect(localizer.text('locations.factory.name')).toBe('Завод');
-    expect(localizer.price('tarCoinBundles.500.localPrice')).toEqual({ price: 4.99, currency: 'USD' });
-    expect(resolvePreferredLocale(['ru'], getCompleteLocales(catalog), catalog.defaultLocale)).toBe('ru-RU');
-    expect(getLocaleRegion('ru-RU')).toBe('ru');
-    expect(getTextDirection('ru-RU')).toBe('ltr');
-
     for (const entry of catalog.entries) {
-      expect(entry.localizations['ru-RU'], entry.id).toBeTruthy();
-      expect(placeholders(entry.localizations['ru-RU']!), entry.id).toEqual(placeholders(entry.localizations['en-GB']!));
+      const source = entry.localizations[catalog.defaultLocale]!;
+      for (const [locale, value] of Object.entries(entry.localizations)) {
+        if (value !== undefined) expect(placeholders(value), `${entry.id}:${locale}`).toEqual(placeholders(source));
+      }
     }
   });
 });

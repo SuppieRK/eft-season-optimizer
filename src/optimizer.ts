@@ -16,7 +16,6 @@ export interface OptimizerInput {
   readonly claimedRewardIds: readonly string[];
   readonly ownedDocuments: Readonly<Record<string, number>>;
   readonly classifiedDocuments: number;
-  readonly tarCoins: number;
   readonly spendTarCoinsOnClassifiedDocuments: boolean;
   readonly mode: GameMode;
   readonly locale?: string;
@@ -44,11 +43,7 @@ export interface ExchangePlan {
 export interface ClassifiedPurchasePlan {
   readonly bundleCounts: readonly number[];
   readonly tarCoinsSpent: number;
-  readonly startingTarCoinsUsed: number;
   readonly earnedTarCoinsUsed: number;
-  readonly classifiedDocumentsPurchased: number;
-  readonly classifiedDocumentsUsed: number;
-  readonly excessClassifiedDocuments: number;
 }
 
 export interface LocalTarCoinEstimate {
@@ -61,11 +56,7 @@ export interface LocalTarCoinEstimate {
 
 export interface BuyoutEstimate {
   readonly bundleCounts: readonly number[];
-  readonly classifiedDocumentsPurchased: number;
-  readonly classifiedDocumentsUsed: number;
-  readonly excessClassifiedDocuments: number;
   readonly grossTarCoinsSpent: number;
-  readonly startingTarCoinsUsed: number;
   readonly earnedTarCoinsAwarded: number;
   readonly earnedTarCoinsUsed: number;
   readonly minimumAdditionalTarCoins: number;
@@ -204,7 +195,6 @@ export function optimize(input: OptimizerInput): OptimizerResult {
 
 function validateInput(input: OptimizerInput): void {
   if (!Number.isInteger(input.classifiedDocuments) || input.classifiedDocuments < 0) throw new RangeError('Classified Documents must be a non-negative integer');
-  if (!Number.isInteger(input.tarCoins) || input.tarCoins < 0) throw new RangeError('TarCoins must be a non-negative integer');
   if (input.crateCount !== undefined && (!Number.isInteger(input.crateCount) || input.crateCount < 1)) throw new RangeError('Crate count must be a positive integer');
   for (const [documentId, quantity] of Object.entries(input.ownedDocuments)) {
     if (!Number.isInteger(quantity) || quantity < 0) throw new RangeError(`Owned quantity for ${documentId} must be a non-negative integer`);
@@ -213,6 +203,14 @@ function validateInput(input: OptimizerInput): void {
 
 function orderedRewards(pages: readonly BattlePassPage[]): readonly RewardRecord[] {
   return pages.flatMap((page) => page.rewards);
+}
+
+function claimedBattlePassTarCoins(input: OptimizerInput): number {
+  const claimed = new Set(input.claimedRewardIds);
+  return orderedRewards(input.catalogs.battlePass.pages).reduce(
+    (total, reward) => total + (claimed.has(reward.id) ? reward.tarCoinsAwarded ?? 0 : 0),
+    0,
+  );
 }
 
 function aggregateRequirements(rewards: readonly RewardRecord[]): Record<string, number> {
@@ -435,9 +433,7 @@ function selectStagedPurchases(
   let purchasedAvailable = 0;
   let purchasedTotal = 0;
   let purchasedUsed = 0;
-  let startingBalance = input.tarCoins;
-  let earnedBalance = 0;
-  let startingUsed = 0;
+  let earnedBalance = claimedBattlePassTarCoins(input);
   let earnedUsed = 0;
   const purchasedAllocation: Record<string, number> = {};
   const simulatedClaimed = new Set(input.claimedRewardIds);
@@ -469,16 +465,13 @@ function selectStagedPurchases(
     }
     const remaining = sumValues(missing);
     if (remaining > 0) {
-      const selection = chooseBundlesForDocuments(remaining, bundles, startingBalance + earnedBalance)
-        ?? chooseMaxAffordableBundles(remaining, bundles, startingBalance + earnedBalance);
+      const selection = chooseBundlesForDocuments(remaining, bundles, earnedBalance)
+        ?? chooseMaxAffordableBundles(remaining, bundles, earnedBalance);
       if (selection) {
         selection.counts.forEach((count, index) => { bundleCounts[index] += count; });
         purchasedTotal += selection.totalDocuments;
         nextPurchasedAvailable += selection.totalDocuments;
-        const fromStarting = Math.min(startingBalance, selection.totalTarCoins);
-        startingBalance -= fromStarting;
-        startingUsed += fromStarting;
-        const fromEarned = Math.min(earnedBalance, selection.totalTarCoins - fromStarting);
+        const fromEarned = Math.min(earnedBalance, selection.totalTarCoins);
         earnedBalance -= fromEarned;
         earnedUsed += fromEarned;
         const purchased = allocateClassified(missing, Math.min(selection.totalDocuments, remaining), profile, input.catalogs);
@@ -510,12 +503,8 @@ function selectStagedPurchases(
     allocation: sortRecord(purchasedAllocation),
     purchase: {
       bundleCounts,
-      tarCoinsSpent: startingUsed + earnedUsed,
-      startingTarCoinsUsed: startingUsed,
+      tarCoinsSpent: earnedUsed,
       earnedTarCoinsUsed: earnedUsed,
-      classifiedDocumentsPurchased: purchasedTotal,
-      classifiedDocumentsUsed: purchasedUsed,
-      excessClassifiedDocuments: purchasedTotal - purchasedUsed,
     },
   };
 }
@@ -1202,6 +1191,29 @@ function chooseBundlesForDocuments(target: number, bundles: readonly ClassifiedB
   return states.slice(target).filter((state): state is BundleState => Boolean(state)).sort(compareBundleStates)[0];
 }
 
+function chooseBundlesWithoutOverage(target: number, bundles: readonly ClassifiedBundle[]): BundleSelection {
+  const counts = bundles.map(() => 0);
+  let remaining = Math.max(0, target);
+  let totalDocuments = 0;
+  let totalTarCoins = 0;
+  const bundleIndexes = bundles.map((_, index) => index).sort((leftIndex, rightIndex) => (
+    bundles[rightIndex].classifiedDocuments - bundles[leftIndex].classifiedDocuments
+      || bundles[leftIndex].tarCoins - bundles[rightIndex].tarCoins
+      || leftIndex - rightIndex
+  ));
+  for (const bundleIndex of bundleIndexes) {
+    const bundle = bundles[bundleIndex];
+    const count = Math.floor(remaining / bundle.classifiedDocuments);
+    if (count === 0) continue;
+    counts[bundleIndex] = count;
+    const documents = count * bundle.classifiedDocuments;
+    totalDocuments += documents;
+    totalTarCoins += count * bundle.tarCoins;
+    remaining -= documents;
+  }
+  return { counts, totalDocuments, totalTarCoins };
+}
+
 function compareBundleStates(left: BundleState, right: BundleState): number {
   if (left.totalTarCoins !== right.totalTarCoins) return left.totalTarCoins - right.totalTarCoins;
   if (left.totalDocuments !== right.totalDocuments) return left.totalDocuments - right.totalDocuments;
@@ -1248,17 +1260,28 @@ function calculateBuyout(input: OptimizerInput, rewards: readonly RewardRecord[]
   }
   for (const [documentId, quantity] of Object.entries(preparedExchanges.received)) regularInventory[documentId] = (regularInventory[documentId] ?? 0) + quantity;
 
+  const bundles = input.catalogs.optimizerRules.classifiedDocuments.bundles;
+  const regularDeficit = Object.entries(requirements).reduce(
+    (total, [documentId, quantity]) => total + Math.max(0, quantity - (regularInventory[documentId] ?? 0)),
+    0,
+  );
+  const remainingDocuments = Math.max(0, regularDeficit - input.classifiedDocuments);
+  const bundlePlan = chooseBundlesWithoutOverage(remainingDocuments, bundles);
+  const plannedBundleIndexes = bundlePlan.counts.flatMap((count, bundleIndex) => (
+    Array.from({ length: count }, () => bundleIndex)
+  )).sort((leftIndex, rightIndex) => (
+    bundles[leftIndex].classifiedDocuments - bundles[rightIndex].classifiedDocuments
+      || bundles[leftIndex].tarCoins - bundles[rightIndex].tarCoins
+      || leftIndex - rightIndex
+  ));
+
   let classifiedAvailable = input.classifiedDocuments;
-  let purchased = 0;
-  let purchasedUsed = 0;
   let grossSpent = 0;
-  let startingBalance = input.tarCoins;
-  let earnedBalance = 0;
-  let startingUsed = 0;
+  let earnedBalance = claimedBattlePassTarCoins(input);
   let earnedUsed = 0;
   let additional = 0;
-  let earnedAwarded = 0;
-  const bundleCounts = input.catalogs.optimizerRules.classifiedDocuments.bundles.map(() => 0);
+  let earnedAwarded = earnedBalance;
+  const bundleCounts = bundles.map(() => 0);
   const rewardsById = new Map(rewards.map((reward) => [reward.id, reward]));
   const simulatedClaimed = new Set(input.claimedRewardIds);
   for (const rewardId of sequence) {
@@ -1271,29 +1294,22 @@ function calculateBuyout(input: OptimizerInput, rewards: readonly RewardRecord[]
       regularInventory[requirement.documentId] = available - consumed;
       missing += requirement.quantity - consumed;
     }
-    const fromOwnedClassified = Math.min(classifiedAvailable, missing);
-    classifiedAvailable -= fromOwnedClassified;
-    missing -= fromOwnedClassified;
+    const availableClassified = Math.min(classifiedAvailable, missing);
+    classifiedAvailable -= availableClassified;
+    missing -= availableClassified;
     if (missing > 0) {
-      const selection = chooseBundlesForDocuments(missing, input.catalogs.optimizerRules.classifiedDocuments.bundles);
-      if (!selection) continue;
-      selection.counts.forEach((count, index) => { bundleCounts[index] += count; });
-      purchased += selection.totalDocuments;
-      classifiedAvailable += selection.totalDocuments;
-      const spend = selection.totalTarCoins;
-      grossSpent += spend;
-      const fromStarting = Math.min(startingBalance, spend);
-      startingBalance -= fromStarting;
-      startingUsed += fromStarting;
-      const afterStarting = spend - fromStarting;
-      const fromEarned = Math.min(earnedBalance, afterStarting);
-      earnedBalance -= fromEarned;
-      earnedUsed += fromEarned;
-      additional += afterStarting - fromEarned;
-      const purchasedClassified = Math.min(classifiedAvailable, missing);
-      classifiedAvailable -= purchasedClassified;
-      purchasedUsed += purchasedClassified;
-      missing -= purchasedClassified;
+      while (classifiedAvailable < missing && plannedBundleIndexes.length > 0) {
+        const bundleIndex = plannedBundleIndexes.shift()!;
+        const bundle = bundles[bundleIndex];
+        bundleCounts[bundleIndex] += 1;
+        classifiedAvailable += bundle.classifiedDocuments;
+        grossSpent += bundle.tarCoins;
+        const fromEarned = Math.min(earnedBalance, bundle.tarCoins);
+        earnedBalance -= fromEarned;
+        earnedUsed += fromEarned;
+        additional += bundle.tarCoins - fromEarned;
+      }
+      classifiedAvailable = Math.max(0, classifiedAvailable - missing);
     }
     if (reward.tarCoinsAwarded) {
       earnedBalance += reward.tarCoinsAwarded;
@@ -1306,11 +1322,7 @@ function calculateBuyout(input: OptimizerInput, rewards: readonly RewardRecord[]
   const keepBattlePassTarCoinsLocalEstimate = estimateLocalTarCoins(grossSpent, input.catalogs, locale);
   return {
     bundleCounts,
-    classifiedDocumentsPurchased: purchased,
-    classifiedDocumentsUsed: purchasedUsed,
-    excessClassifiedDocuments: purchased - purchasedUsed,
     grossTarCoinsSpent: grossSpent,
-    startingTarCoinsUsed: startingUsed,
     earnedTarCoinsAwarded: earnedAwarded,
     earnedTarCoinsUsed: earnedUsed,
     minimumAdditionalTarCoins: additional,
@@ -1399,17 +1411,13 @@ function sameAssignment(left: ProfileResult, right: ProfileResult): boolean {
 }
 
 function emptyPurchase(bundleCount: number): ClassifiedPurchasePlan {
-  return { bundleCounts: Array.from({ length: bundleCount }, () => 0), tarCoinsSpent: 0, startingTarCoinsUsed: 0, earnedTarCoinsUsed: 0, classifiedDocumentsPurchased: 0, classifiedDocumentsUsed: 0, excessClassifiedDocuments: 0 };
+  return { bundleCounts: Array.from({ length: bundleCount }, () => 0), tarCoinsSpent: 0, earnedTarCoinsUsed: 0 };
 }
 
 function emptyBuyout(bundleCount: number, packageCount: number): BuyoutEstimate {
   return {
     bundleCounts: Array.from({ length: bundleCount }, () => 0),
-    classifiedDocumentsPurchased: 0,
-    classifiedDocumentsUsed: 0,
-    excessClassifiedDocuments: 0,
     grossTarCoinsSpent: 0,
-    startingTarCoinsUsed: 0,
     earnedTarCoinsAwarded: 0,
     earnedTarCoinsUsed: 0,
     minimumAdditionalTarCoins: 0,

@@ -12,27 +12,27 @@
   "tarCoinBundles": [
     {
       "tarCoins": 500,
-      "localPriceId": "tarCoinBundles.500.localPrice"
+      "localPriceId": "tarCoinBundles.1.localPrice"
     },
     {
-      "tarCoins": 1200,
-      "localPriceId": "tarCoinBundles.1200.localPrice"
+      "tarCoins": 1100,
+      "localPriceId": "tarCoinBundles.2.localPrice"
     },
     {
-      "tarCoins": 2600,
-      "localPriceId": "tarCoinBundles.2600.localPrice"
+      "tarCoins": 2300,
+      "localPriceId": "tarCoinBundles.3.localPrice"
     },
     {
-      "tarCoins": 7000,
-      "localPriceId": "tarCoinBundles.7000.localPrice"
+      "tarCoins": 6000,
+      "localPriceId": "tarCoinBundles.4.localPrice"
     },
     {
-      "tarCoins": 15000,
-      "localPriceId": "tarCoinBundles.15000.localPrice"
+      "tarCoins": 12500,
+      "localPriceId": "tarCoinBundles.5.localPrice"
     },
     {
-      "tarCoins": 25500,
-      "localPriceId": "tarCoinBundles.25500.localPrice"
+      "tarCoins": 20250,
+      "localPriceId": "tarCoinBundles.6.localPrice"
     }
   ],
   "classifiedDocuments": {

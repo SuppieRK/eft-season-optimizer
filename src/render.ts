@@ -17,7 +17,6 @@ export function renderApp(documentRoot: Document, catalogs: Catalogs, state: App
     claimedRewardIds: state.claimedRewardIds,
     ownedDocuments: state.ownedDocuments,
     classifiedDocuments: state.classifiedDocuments,
-    tarCoins: state.tarCoins,
     spendTarCoinsOnClassifiedDocuments: state.spendTarCoinsOnClassifiedDocuments,
     mode: state.mode,
     locale: state.locale,
@@ -104,7 +103,6 @@ function renderSetupDialog(localizer: ReturnType<typeof createLocalizer>, catalo
   return `<dialog class="setup-dialog" data-setup-dialog aria-labelledby="setup-dialog-title"><header><h2 id="setup-dialog-title">${escapeHtml(localizer.text('ui.controls'))}</h2><button type="button" data-action="close-setup">${escapeHtml(localizer.text('ui.close'))}</button></header><div class="setup-fields">
       <fieldset class="mode-selector"><legend>${escapeHtml(localizer.text('optimizer.mode'))}</legend><div>${modes}</div></fieldset>
       <label class="check-row"><input type="checkbox" data-field="spending" ${state.spendTarCoinsOnClassifiedDocuments ? 'checked' : ''} /> ${escapeHtml(localizer.text('optimizer.includeTarCoins'))}</label>
-      <label>${escapeHtml(localizer.text('optimizer.tarCoinsOwned'))}<input type="number" min="0" step="1" value="${state.tarCoins}" data-field="tarcoins" /></label>
       ${result.goal === 'black-division-crates' ? `<label>${escapeHtml(localizer.text('ui.crateCount'))}<input type="number" min="1" step="1" value="${state.crateCount}" data-field="crate-count" /></label>` : ''}
     </div><footer><button class="danger-action" type="button" data-action="reset">${escapeHtml(localizer.text('ui.reset'))}</button></footer></dialog>`;
 }
@@ -195,7 +193,7 @@ function renderStopContext(localizer: ReturnType<typeof createLocalizer>, locati
 
 function renderPlanDetails(localizer: ReturnType<typeof createLocalizer>, profile: ProfileResult): string {
   const exchanges = profile.exchanges.length > 0 ? `<p>${escapeHtml(localizer.text('ui.exchange', { count: profile.exchanges.length }))}</p>` : '';
-  const purchases = profile.purchases.classifiedDocumentsPurchased > 0 ? `<p>${escapeHtml(localizer.text('ui.purchaseSummary', { count: formatNumber(profile.purchases.classifiedDocumentsPurchased, localizer.locale), tarCoins: formatNumber(profile.purchases.tarCoinsSpent, localizer.locale) }))}</p>` : '';
+  const purchases = profile.purchases.bundleCounts.some((count) => count > 0) ? `<p>${escapeHtml(localizer.text('ui.classifiedPurchases'))}</p>` : '';
   const warnings = profile.warnings.map((warning) => `<p class="warning">${escapeHtml(localizer.text('ui.warning', { text: warning }))}</p>`).join('');
   return `<details class="plan-details"><summary>${escapeHtml(localizer.text('ui.planDetails'))}</summary><div><p>${escapeHtml(localizer.text('ui.classifiedUse', { used: formatNumber(profile.classifiedConsumed, localizer.locale), remaining: formatNumber(profile.classifiedRemaining, localizer.locale) }))}</p>${exchanges}${purchases}${warnings}</div></details>`;
 }
@@ -283,7 +281,6 @@ function bindEvents(app: HTMLElement, dispatch: (action: StateAction) => void, l
     else if (target.matches('[data-field="locale"]')) dispatch({ type: 'set-locale', locale: target.value });
     else if (target.matches('[data-field="mode"]')) dispatch({ type: 'set-mode', mode: target.value as AppState['mode'] });
     else if (target.matches('[data-field="spending"]')) dispatch({ type: 'set-spending', enabled: (target as HTMLInputElement).checked });
-    else if (target.matches('[data-field="tarcoins"]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-tar-coins', quantity }), localizer);
     else if (target.matches('[data-field="crate-count"]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-crate-count', quantity }), localizer);
     else if (target.matches('[data-document-kind="classified"]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-classified-documents', quantity }), localizer);
     else if (target.matches('[data-document-id]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-owned-document', documentId: target.dataset.documentId!, quantity }), localizer);

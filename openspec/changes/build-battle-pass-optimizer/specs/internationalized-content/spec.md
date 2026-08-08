@@ -18,7 +18,7 @@ Names, textual descriptions, requirement abbreviations, image alternatives, disp
 Real-money TarCoin package prices SHALL use independent entries in `localization.json` whose value for each locale contains only a finite non-negative numeric `price` in major currency units and a three-letter uppercase ISO `currency` code. Optimizer rules SHALL reference these entries by ID. Code SHALL normalize `price` to the ISO currency's fraction digits for exact cost comparison, format it at runtime for the active locale, and SHALL NOT infer a price for another locale.
 
 #### Scenario: Local package price is loaded
-- **WHEN** a TarCoin package references `tarCoinBundles.500.localPrice` under English
+- **WHEN** a TarCoin package references `tarCoinBundles.1.localPrice` under English
 - **THEN** its localized value is `{ "price": 4.99, "currency": "USD" }`
 
 #### Scenario: Local package price is unavailable

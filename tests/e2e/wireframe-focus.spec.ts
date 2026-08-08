@@ -10,7 +10,6 @@ async function seedOptimizerState(
     claimedRewardIds: string[];
     ownedDocuments?: Record<string, number>;
     classifiedDocuments?: number;
-    tarCoins?: number;
     spendTarCoinsOnClassifiedDocuments?: boolean;
   },
 ): Promise<void> {
@@ -30,7 +29,6 @@ async function seedOptimizerState(
         claimedRewardIds: input.claimedRewardIds,
         ownedDocuments: input.ownedDocuments ?? {},
         classifiedDocuments: input.classifiedDocuments ?? 0,
-        tarCoins: input.tarCoins ?? 0,
         crateCount: 1,
       }),
       url: page.url(),
@@ -334,13 +332,11 @@ test('keeps required exchanges and Classified purchases visible in the full sche
 
   await seedOptimizerState(page, {
     claimedRewardIds: claimedExceptDogtag,
-    tarCoins: 500,
     spendTarCoinsOnClassifiedDocuments: true,
   });
   await page.getByRole('button', { name: 'View full schedule' }).click();
   dialog = page.locator('[data-route-schedule-dialog]');
   await expect(dialog.getByRole('heading', { name: 'Classified Document purchases' })).toBeVisible();
-  await expect(dialog.locator('.schedule-plan-actions')).toContainText('Purchased Classified Documents: 20; TarCoins spent: 500');
   await expect(dialog.locator('.schedule-plan-actions')).toContainText('20 Classified Documents × 1');
   await expect(dialog).not.toContainText('Owned Classified Documents consumed');
 });
@@ -398,7 +394,7 @@ test('opens a detailed buyout from the approximate Documents price', async ({ pa
     await expect(tables.nth(1).locator('tbody tr')).not.toHaveCount(0);
     await expect(tables.nth(1).locator('tfoot')).toContainText('TarCoins to spend');
   }
-  await expect(spend.locator('[data-buyout-battle-pass-tar-coins]')).toHaveCount(1);
+  await expect(spend.locator('[data-buyout-battle-pass-tar-coins]')).toHaveCount(0);
   await expect(keep.locator('[data-buyout-battle-pass-tar-coins]')).toHaveCount(0);
   await expect(spend.locator('[data-buyout-table="tar-coin-packages"]')).toContainText('$');
   await expect(keep.locator('[data-buyout-table="tar-coin-packages"]')).toContainText('$');

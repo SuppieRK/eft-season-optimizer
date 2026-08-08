@@ -32,7 +32,6 @@ interface ProgressPayload {
   readonly claimedRewardIds: readonly string[];
   readonly ownedDocuments: Readonly<Record<string, number>>;
   readonly classifiedDocuments: number;
-  readonly tarCoins: number;
   readonly crateCount: number;
 }
 
@@ -61,7 +60,6 @@ export function saveState(state: AppState, cookies: CookieAdapter, catalogs: Cat
     claimedRewardIds: state.claimedRewardIds,
     ownedDocuments: state.ownedDocuments,
     classifiedDocuments: state.classifiedDocuments,
-    tarCoins: state.tarCoins,
     crateCount: state.crateCount,
   }, gameDataVersion);
   writeEnvelope(cookies, COOKIE_NAMES.settings, {
@@ -145,7 +143,6 @@ function sanitizeProgress(payload: ProgressPayload, defaults: AppState, catalogs
     claimedRewardIds,
     ownedDocuments: { ...defaults.ownedDocuments, ...ownedDocuments },
     classifiedDocuments: Math.max(getClassifiedDocumentMinimum(claimedRewardIds), classifiedDocuments),
-    tarCoins: validQuantity(payload.tarCoins) ? payload.tarCoins : defaults.tarCoins,
     crateCount: validQuantity(payload.crateCount) && payload.crateCount > 0 ? payload.crateCount : defaults.crateCount,
   };
 }

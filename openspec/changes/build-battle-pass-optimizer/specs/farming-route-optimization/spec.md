@@ -103,10 +103,25 @@ The optimizer SHALL exclude TarCoin purchases unless the player enables spending
 
 #### Scenario: TarCoin spending enabled
 - **WHEN** the spending option is on and an affordable configured bundle improves the route
-- **THEN** each route profile reports its purchased bundles, TarCoins spent, purchased Classified Documents used, and any excess
+- **THEN** each route profile reports the recommended bundle counts and TarCoins spent
+- **AND** it does not report or persist Classified Documents as purchased, used, or excess
 
 ### Requirement: Remaining-pass Classified buyout estimate
-The optimizer SHALL calculate an informational estimate for purchasing enough Classified Documents to complete every unclaimed Battle Pass reward after applying owned matching regular documents, the maximum usable owned Classified Documents, and useful regular-document exchanges. The estimate SHALL be available regardless of the TarCoin spending selector, SHALL evaluate every Classified Document bundle configured in optimizer rules, and SHALL NOT alter route optimization or player state. It SHALL simulate a legal redemption sequence in which starting TarCoins are immediately available and Battle Pass TarCoins become available only after their reward is redeemed. Classified bundle selection SHALL minimize additional TarCoins required, then gross TarCoins spent, excess Classified Documents, and bundle count. The result SHALL report bundle counts, Classified Documents purchased and used, excess purchased documents, gross TarCoin spend, starting TarCoins used, earned Battle Pass TarCoins used, and minimum additional TarCoins required.
+The optimizer SHALL calculate an informational Classified bundle estimate for every unclaimed Battle Pass reward after applying matching regular documents, the maximum usable current Classified Documents, and useful regular-document exchanges. The estimate SHALL be available regardless of the TarCoin spending selector, SHALL evaluate every Classified Document bundle configured in optimizer rules, and SHALL NOT alter route optimization or player state. It SHALL visit bundles by descending Classified Document quantity and take the maximum whole count of each bundle that fits within the remaining deficit before visiting the next bundle. The combined selected quantity SHALL NOT exceed the remaining deficit. An uncovered remainder SHALL be allowed and remain farmable. The selected bundle plan SHALL be staged through a legal redemption sequence in which TarCoins from claimed Battle Pass rewards are immediately available and future Battle Pass TarCoins become available only after their reward is redeemed. The result SHALL report bundle counts, gross TarCoin spend, earned Battle Pass TarCoins used, and minimum additional TarCoins required. It SHALL NOT report or persist Classified Documents as purchased, used, or excess.
+
+#### Scenario: Large bundle is cheaper for the complete pass
+- **WHEN** repeated reward deficits together require 500 Classified Documents
+- **THEN** the estimate selects one 500-document bundle
+
+#### Scenario: Bundle total stays below the remaining deficit
+- **WHEN** 450 Classified Documents remain
+- **THEN** the estimate selects one 250-document bundle, two 75-document bundles, and one 40-document bundle
+- **AND** the selected total is 440 rather than exceeding the remaining deficit
+
+#### Scenario: Small uncovered remainder is allowed
+- **WHEN** 71 Classified Documents remain
+- **THEN** the estimate selects one 40-document bundle and one 20-document bundle
+- **AND** the remaining 11 documents stay farmable
 
 #### Scenario: Existing inventory already covers the remaining pass
 - **WHEN** owned regular and Classified Documents cover every unclaimed reward
@@ -125,7 +140,7 @@ The optimizer SHALL calculate an informational estimate for purchasing enough Cl
 - **THEN** the buyout estimate remains visible as informational output while no purchase affects the Fastest or Safest farming plan
 
 ### Requirement: Local TarCoin purchase estimate
-The optimizer SHALL use the TarCoin purchase packages configured in `optimizer-rules.json` and their locale-dependent `{ price, currency }` values from `localization.json` to calculate two local real-money package estimates for the remaining-pass buyout. The spend-Battle-Pass-TarCoins estimate SHALL cover the minimum additional TarCoins after applying available starting and reward-earned TarCoins. The keep-Battle-Pass-TarCoins estimate SHALL preserve those TarCoins and cover the gross TarCoin cost of the same required Classified Document bundle plan. Each estimate SHALL normalize numeric prices to the ISO currency's fraction digits and minimize that exact cost, then excess purchased TarCoins, then package count. It SHALL calculate an estimate only when every selected package has a price for the active locale and all selected prices use one currency. The unpriced `2,000` TarCoin “RECEIVED” offer SHALL NOT be included as a purchasable package.
+The optimizer SHALL use the TarCoin purchase packages configured in `optimizer-rules.json` and their locale-dependent `{ price, currency }` values from `localization.json` to calculate two local real-money package estimates for the remaining-pass buyout. The spend-Battle-Pass-TarCoins estimate SHALL cover the minimum additional TarCoins after applying available TarCoins from claimed and reward-sequenced Battle Pass rewards. The keep-Battle-Pass-TarCoins estimate SHALL preserve those TarCoins and cover the gross TarCoin cost of the same required Classified Document bundle plan. Each estimate SHALL normalize numeric prices to the ISO currency's fraction digits and minimize that exact cost, then excess purchased TarCoins, then package count. It SHALL calculate an estimate only when every selected package has a price for the active locale and all selected prices use one currency. The unpriced `2,000` TarCoin “RECEIVED” offer SHALL NOT be included as a purchasable package.
 
 #### Scenario: Complete local prices exist
 - **WHEN** the buyout requires additional TarCoins and the active locale has complete same-currency prices
@@ -136,7 +151,7 @@ The optimizer SHALL use the TarCoin purchase packages configured in `optimizer-r
 - **THEN** the optimizer leaves the local real-money estimate unavailable and does not infer a conversion
 
 #### Scenario: No additional TarCoins are required
-- **WHEN** starting and immediately earned TarCoins fund the complete buyout sequence
+- **WHEN** claimed and immediately earned Battle Pass TarCoins fund the complete buyout sequence
 - **THEN** the spend estimate reports zero packages and zero local cost while the keep estimate still covers gross TarCoin spend
 
 ### Requirement: Immediate reward TarCoin availability
