@@ -60,7 +60,7 @@
       "id": "battlePass.clearAll",
       "localizations": {
         "en-GB": "Clear all",
-        "ru-RU": "Снять все отметки"
+        "ru-RU": "Убрать все"
       }
     },
     {
@@ -74,14 +74,14 @@
       "id": "battlePass.classifiedDocuments",
       "localizations": {
         "en-GB": "Classified Documents",
-        "ru-RU": "Секретные документы"
+        "ru-RU": "Секретные данные"
       }
     },
     {
       "id": "battlePass.blackDivisionCrate",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
@@ -95,7 +95,7 @@
       "id": "battlePass.readyWhenUnlockedCount",
       "localizations": {
         "en-GB": "({count} ready when unlocked)",
-        "ru-RU": "(будет доступно после разблокировки: {count})"
+        "ru-RU": "(будет доступно: {count})"
       }
     },
     {
@@ -270,28 +270,28 @@
       "id": "documents.medical.name",
       "localizations": {
         "en-GB": "Medical documents",
-        "ru-RU": "Медицинские документы"
+        "ru-RU": "Медицинская документация"
       }
     },
     {
       "id": "documents.medical.description",
       "localizations": {
         "en-GB": "Medical records containing research findings. Many of them are ethically questionable, yet remarkably successful in every other regard.",
-        "ru-RU": "Медицинские записи с результатами исследований. Многие из них сомнительны с точки зрения этики, но при этом показали выдающиеся результаты."
+        "ru-RU": "Медицинские документы с результатами исследований. Многие из них сомнительны с точки зрения этики, но очень успешны со всех других."
       }
     },
     {
       "id": "documents.medical.alt",
       "localizations": {
         "en-GB": "Medical documents thumbnail",
-        "ru-RU": "Миниатюра медицинских документов"
+        "ru-RU": "Миниатюра медицинской документации"
       }
     },
     {
       "id": "documents.financial.name",
       "localizations": {
         "en-GB": "Financial documents",
-        "ru-RU": "Финансовые документы"
+        "ru-RU": "Финансовая документация"
       }
     },
     {
@@ -305,7 +305,7 @@
       "id": "documents.financial.alt",
       "localizations": {
         "en-GB": "Financial documents thumbnail",
-        "ru-RU": "Миниатюра финансовых документов"
+        "ru-RU": "Миниатюра финансовой документации"
       }
     },
     {
@@ -319,7 +319,7 @@
       "id": "documents.user.description",
       "localizations": {
         "en-GB": "Documentation issued to every new TerraGroup employee upon signing.",
-        "ru-RU": "Документация, которую выдают каждому новому сотруднику TerraGroup при подписании договора."
+        "ru-RU": "Документация, выдаваемая под роспись каждому новому сотруднику TerraGroup."
       }
     },
     {
@@ -340,7 +340,7 @@
       "id": "documents.test.description",
       "localizations": {
         "en-GB": "Documents detailing tests of various experimental compounds from TerraGroup-controlled laboratories.",
-        "ru-RU": "Документы с описанием испытаний различных экспериментальных веществ в подконтрольных TerraGroup лабораториях."
+        "ru-RU": "Документы о тестировании различных новых соединений из подконтрольных TerraGroup лабораторий."
       }
     },
     {
@@ -354,21 +354,21 @@
       "id": "documents.technical.name",
       "localizations": {
         "en-GB": "Technical documentation",
-        "ru-RU": "Техническая документация"
+        "ru-RU": "Эксплуатационная документация"
       }
     },
     {
       "id": "documents.technical.description",
       "localizations": {
         "en-GB": "Operating manuals for TerraGroup equipment.",
-        "ru-RU": "Руководства по эксплуатации оборудования TerraGroup."
+        "ru-RU": "Документация по эксплуатации определённой техники TerraGroup."
       }
     },
     {
       "id": "documents.technical.alt",
       "localizations": {
         "en-GB": "Technical documentation thumbnail",
-        "ru-RU": "Миниатюра технической документации"
+        "ru-RU": "Миниатюра эксплуатационной документации"
       }
     },
     {
@@ -382,7 +382,7 @@
       "id": "documents.project.description",
       "localizations": {
         "en-GB": "Documentation from Tarkov InfraLine. The company officially specialized in road construction, but these blueprints clearly have nothing to do with transportation infrastructure.",
-        "ru-RU": "Документация компании Tarkov InfraLine. Официально компания занималась строительством дорог, но эти чертежи явно не относятся к транспортной инфраструктуре."
+        "ru-RU": "Документация от «Тарков Инфалайн». Компания специализировалась на строительстве дорог, но чертежи явно не связаны с транспортной инфраструктурой."
       }
     },
     {
@@ -396,63 +396,63 @@
       "id": "documents.pmc.name",
       "localizations": {
         "en-GB": "PMC personnel files",
-        "ru-RU": "Личные дела бойцов ЧВК"
+        "ru-RU": "Личные данные ЧВК"
       }
     },
     {
       "id": "documents.pmc.description",
       "localizations": {
         "en-GB": "Rumor has it that TerraGroup keeps a personnel file on nearly every PMC operator.",
-        "ru-RU": "Ходят слухи, что TerraGroup хранит личное дело почти на каждого бойца ЧВК."
+        "ru-RU": "Ходят слухи, что у TerraGroup заведено личное дело чуть ли не на каждого бойца ЧВК."
       }
     },
     {
       "id": "documents.pmc.alt",
       "localizations": {
         "en-GB": "PMC personnel files thumbnail",
-        "ru-RU": "Миниатюра личных дел бойцов ЧВК"
+        "ru-RU": "Миниатюра личных данных ЧВК"
       }
     },
     {
       "id": "documents.blueprints.name",
       "localizations": {
         "en-GB": "Blueprints and technical documentation",
-        "ru-RU": "Чертежи и техническая документация"
+        "ru-RU": "Чертежи и тех. документация"
       }
     },
     {
       "id": "documents.blueprints.description",
       "localizations": {
         "en-GB": "Blueprints and technical documentation belonging to TerraGroup. For convenience, all of the data has also been backed up onto a disk.",
-        "ru-RU": "Чертежи и техническая документация TerraGroup. Для удобства все данные также сохранили на диске."
+        "ru-RU": "Чертежи и документация, принадлежавшая TerraGroup. Для удобства все данные задублированы на диск."
       }
     },
     {
       "id": "documents.blueprints.alt",
       "localizations": {
         "en-GB": "Blueprints and technical documentation thumbnail",
-        "ru-RU": "Миниатюра чертежей и технической документации"
+        "ru-RU": "Миниатюра чертежей и тех. документации"
       }
     },
     {
       "id": "documents.classified.name",
       "localizations": {
         "en-GB": "Classified documents",
-        "ru-RU": "Секретные документы"
+        "ru-RU": "Секретные данные"
       }
     },
     {
       "id": "documents.classified.description",
       "localizations": {
         "en-GB": "Classified information that somehow survived against all odds. A unique document that can be used to backfill any missing document required for the Battle Pass.",
-        "ru-RU": "Секретная информация, которая чудом уцелела. Этот уникальный документ восполняет любой недостающий документ для Боевого пропуска."
+        "ru-RU": "Чудом сохранившаяся секретная информация. Уникальная документация, которой можно заменить любую другую документацию в Боевом пропуске."
       }
     },
     {
       "id": "documents.classified.alt",
       "localizations": {
         "en-GB": "Classified documents thumbnail",
-        "ru-RU": "Миниатюра секретных документов"
+        "ru-RU": "Миниатюра секретных данных"
       }
     },
     {
@@ -512,13 +512,6 @@
       }
     },
     {
-      "id": "optimizer.tarCoinsOwned",
-      "localizations": {
-        "en-GB": "TarCoins owned",
-        "ru-RU": "TarCoins в наличии"
-      }
-    },
-    {
       "id": "season.countdown",
       "localizations": {
         "en-GB": "Season ends in {time}",
@@ -543,35 +536,35 @@
       "id": "rewards.dogtag01.name",
       "localizations": {
         "en-GB": "Dogtag",
-        "ru-RU": "Жетон"
+        "ru-RU": "Армейский жетон с отметками"
       }
     },
     {
       "id": "rewards.tarcoins50-01.name",
       "localizations": {
         "en-GB": "TarCoins (50)",
-        "ru-RU": "TarCoins (50)"
+        "ru-RU": "TarCoin (50)"
       }
     },
     {
       "id": "rewards.burn-poster.name",
       "localizations": {
         "en-GB": "Burn Poster",
-        "ru-RU": "Плакат «Burn»"
+        "ru-RU": "Плакат Burn"
       }
     },
     {
       "id": "rewards.bd-crate01.name",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
       "id": "rewards.black-wood-ceiling.name",
       "localizations": {
         "en-GB": "Black Wood Ceiling",
-        "ru-RU": "Черный деревянный потолок"
+        "ru-RU": "Потолок Чёрное Дерево"
       }
     },
     {
@@ -592,63 +585,63 @@
       "id": "rewards.bd-crate02.name",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
       "id": "rewards.scorpion-target.name",
       "localizations": {
         "en-GB": "Scorpion Target",
-        "ru-RU": "Мишень «Скорпион»"
+        "ru-RU": "Охотничья мишень со скорпионом"
       }
     },
     {
       "id": "rewards.tarcoins50-02.name",
       "localizations": {
         "en-GB": "TarCoins (50)",
-        "ru-RU": "TarCoins (50)"
+        "ru-RU": "TarCoin (50)"
       }
     },
     {
       "id": "rewards.mystery-ranch-sling.name",
       "localizations": {
         "en-GB": "Mystery Ranch Nice Frame Load Sling",
-        "ru-RU": "Подвесная система Mystery Ranch Nice Frame"
+        "ru-RU": "Грузовая рама Mystery Ranch «Nice Frame Load Sling» с защитным кейсом"
       }
     },
     {
       "id": "rewards.bd-crate03.name",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
       "id": "rewards.black-herringbone.name",
       "localizations": {
         "en-GB": "Black Herringbone",
-        "ru-RU": "Черная елочка"
+        "ru-RU": "Чёрная ёлочка"
       }
     },
     {
       "id": "rewards.tarcoins50-03.name",
       "localizations": {
         "en-GB": "TarCoins (50)",
-        "ru-RU": "TarCoins (50)"
+        "ru-RU": "TarCoin (50)"
       }
     },
     {
       "id": "rewards.heart.name",
       "localizations": {
         "en-GB": "Heart",
-        "ru-RU": "Сердце"
+        "ru-RU": "<3"
       }
     },
     {
       "id": "rewards.dogtag02.name",
       "localizations": {
         "en-GB": "Dogtag",
-        "ru-RU": "Жетон"
+        "ru-RU": "Армейский жетон с отметками"
       }
     },
     {
@@ -662,21 +655,21 @@
       "id": "rewards.tarcoins50-04.name",
       "localizations": {
         "en-GB": "TarCoins (50)",
-        "ru-RU": "TarCoins (50)"
+        "ru-RU": "TarCoin (50)"
       }
     },
     {
       "id": "rewards.beware-bear-poster.name",
       "localizations": {
         "en-GB": "Beware the Bear Poster",
-        "ru-RU": "Плакат «Остерегайся медведя»"
+        "ru-RU": "Плакат Beware the Bear"
       }
     },
     {
       "id": "rewards.bd-crate04.name",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
@@ -690,28 +683,28 @@
       "id": "rewards.tarcoins50-05.name",
       "localizations": {
         "en-GB": "TarCoins (50)",
-        "ru-RU": "TarCoins (50)"
+        "ru-RU": "TarCoin (50)"
       }
     },
     {
       "id": "rewards.black-division-target.name",
       "localizations": {
         "en-GB": "Black Division Target",
-        "ru-RU": "Мишень Black Division"
+        "ru-RU": "Охотничья мишень с Black Division"
       }
     },
     {
       "id": "rewards.bd-crate05.name",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
       "id": "rewards.ferro-fcpc.name",
       "localizations": {
         "en-GB": "Ferro Concepts FCPC V5 Plate Carrier (Black Division)",
-        "ru-RU": "Плитоносец Ferro Concepts FCPC V5 (Black Division)"
+        "ru-RU": "Чехол для бронеплит Ferro Concepts «FCPC V5» (Black Division)"
       }
     },
     {
@@ -739,14 +732,14 @@
       "id": "rewards.dogtag03.name",
       "localizations": {
         "en-GB": "Dogtag",
-        "ru-RU": "Жетон"
+        "ru-RU": "Армейский жетон с отметками"
       }
     },
     {
       "id": "rewards.tarcoins50-06.name",
       "localizations": {
         "en-GB": "TarCoins (50)",
-        "ru-RU": "TarCoins (50)"
+        "ru-RU": "TarCoin (50)"
       }
     },
     {
@@ -767,21 +760,21 @@
       "id": "rewards.bd-crate06.name",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
       "id": "rewards.tarcoins50-07.name",
       "localizations": {
         "en-GB": "TarCoins (50)",
-        "ru-RU": "TarCoins (50)"
+        "ru-RU": "TarCoin (50)"
       }
     },
     {
       "id": "rewards.white-accent-walls.name",
       "localizations": {
         "en-GB": "White Accent Walls",
-        "ru-RU": "Белые акцентные стены"
+        "ru-RU": "Стены с белым акцентом"
       }
     },
     {
@@ -802,28 +795,28 @@
       "id": "rewards.spiritus-lv119.name",
       "localizations": {
         "en-GB": "Spiritus Systems LV-119 Plate Carrier (Black Division V2)",
-        "ru-RU": "Плитоносец Spiritus Systems LV-119 (Black Division V2)"
+        "ru-RU": "Чехол для бронеплит Spiritus Systems «LV-119» (Black Division, снаряженный)"
       }
     },
     {
       "id": "rewards.tarcoins50-08.name",
       "localizations": {
         "en-GB": "TarCoins (50)",
-        "ru-RU": "TarCoins (50)"
+        "ru-RU": "TarCoin (50)"
       }
     },
     {
       "id": "rewards.tasmanian-tiger-pack.name",
       "localizations": {
         "en-GB": "Tasmanian Tiger Modular Pack 45 Plus (Multicam Black)",
-        "ru-RU": "Рюкзак Tasmanian Tiger Modular Pack 45 Plus (Multicam Black)"
+        "ru-RU": "Рюкзак Tasmanian Tiger «Modular Pack 45 Plus» (Multicam Black)"
       }
     },
     {
       "id": "rewards.bd-crate07.name",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
@@ -844,70 +837,70 @@
       "id": "rewards.garrett.name",
       "localizations": {
         "en-GB": "Garrett",
-        "ru-RU": "Гарретт"
+        "ru-RU": "Гаррет"
       }
     },
     {
       "id": "rewards.bd-crate08.name",
       "localizations": {
         "en-GB": "Black Division Gear Crate",
-        "ru-RU": "Контейнер с экипировкой Black Division"
+        "ru-RU": "Ящик со снаряжением Black Division"
       }
     },
     {
       "id": "rewards.tarcoins100.name",
       "localizations": {
         "en-GB": "TarCoins (100)",
-        "ru-RU": "TarCoins (100)"
+        "ru-RU": "TarCoin (100)"
       }
     },
     {
       "id": "rewards.dogtag04.name",
       "localizations": {
         "en-GB": "Dogtag",
-        "ru-RU": "Жетон"
+        "ru-RU": "Армейский жетон с отметками"
       }
     },
     {
       "id": "rewards.tarcoins150.name",
       "localizations": {
         "en-GB": "TarCoins (150)",
-        "ru-RU": "TarCoins (150)"
+        "ru-RU": "TarCoin (150)"
       }
     },
     {
       "id": "rewards.knyazev-after-battle.name",
       "localizations": {
         "en-GB": "Knyazev (After Battle)",
-        "ru-RU": "Князев (После боя)"
+        "ru-RU": "Князев после боя"
       }
     },
     {
       "id": "rewards.oconnor-after-battle.name",
       "localizations": {
         "en-GB": "O'Connor (After Battle)",
-        "ru-RU": "О'Коннор (После боя)"
+        "ru-RU": "О'Коннор после боя"
       }
     },
     {
       "id": "rewards.norinco-cq-a1.name",
       "localizations": {
-        "en-GB": "Norinco CQ-A1 5.56x45 Assault Rifle",
-        "ru-RU": "Штурмовая винтовка Norinco CQ-A1 5.56x45"
+        "en-GB": "Norinco QBZ-191 5.8x42mm Assault Rifle",
+        "ru-RU": "Штурмовая винтовка Norinco QBZ-191 5.8x42mm"
       }
     },
     {
       "id": "rewards.nocturnal-upper.name",
       "localizations": {
         "en-GB": "Nocturnal Upper",
-        "ru-RU": "Верх «Ночной»"
+        "ru-RU": "Верх «Ночь»"
       }
     },
     {
       "id": "rewards.nocturnal-lower.name",
       "localizations": {
         "en-GB": "Nocturnal Lower",
-        "ru-RU": "Низ «Ночной»"
+        "ru-RU": "Низ «Ночь»"
       }
     },
     {
@@ -927,7 +920,7 @@
     {
       "id": "ui.modeSummary",
       "localizations": {
-        "en-GB": "{mode} · {count}/{day}",
+        "en-GB": "{mode} · {count} / {day}",
         "ru-RU": "{mode} · {count} / {day}"
       }
     },
@@ -1047,7 +1040,7 @@
       "id": "ui.invalidQuantity",
       "localizations": {
         "en-GB": "Enter a non-negative whole number.",
-        "ru-RU": "Введите неотрицательное целое число."
+        "ru-RU": "Введите положительное целое число."
       }
     },
     {
@@ -1264,7 +1257,7 @@
       "id": "ui.zeroLocalPrice",
       "localizations": {
         "en-GB": "$0",
-        "ru-RU": "0 $"
+        "ru-RU": "0 ₽"
       }
     },
     {
@@ -1613,80 +1606,80 @@
   ],
   "priceEntries": [
     {
-      "id": "tarCoinBundles.500.localPrice",
+      "id": "tarCoinBundles.1.localPrice",
       "localizations": {
         "en-GB": {
           "price": 4.99,
           "currency": "USD"
         },
         "ru-RU": {
-          "price": 4.99,
+          "price": 299,
           "currency": "USD"
         }
       }
     },
     {
-      "id": "tarCoinBundles.1200.localPrice",
+      "id": "tarCoinBundles.2.localPrice",
       "localizations": {
         "en-GB": {
           "price": 9.99,
           "currency": "USD"
         },
         "ru-RU": {
-          "price": 9.99,
-          "currency": "USD"
+          "price": 599,
+          "currency": "RUB"
         }
       }
     },
     {
-      "id": "tarCoinBundles.2600.localPrice",
+      "id": "tarCoinBundles.3.localPrice",
       "localizations": {
         "en-GB": {
           "price": 19.99,
           "currency": "USD"
         },
         "ru-RU": {
-          "price": 19.99,
-          "currency": "USD"
+          "price": 1199,
+          "currency": "RUB"
         }
       }
     },
     {
-      "id": "tarCoinBundles.7000.localPrice",
+      "id": "tarCoinBundles.4.localPrice",
       "localizations": {
         "en-GB": {
           "price": 49.99,
           "currency": "USD"
         },
         "ru-RU": {
-          "price": 49.99,
-          "currency": "USD"
+          "price": 2999,
+          "currency": "RUB"
         }
       }
     },
     {
-      "id": "tarCoinBundles.15000.localPrice",
+      "id": "tarCoinBundles.5.localPrice",
       "localizations": {
         "en-GB": {
           "price": 99.99,
           "currency": "USD"
         },
         "ru-RU": {
-          "price": 99.99,
-          "currency": "USD"
+          "price": 5999,
+          "currency": "RUB"
         }
       }
     },
     {
-      "id": "tarCoinBundles.25500.localPrice",
+      "id": "tarCoinBundles.6.localPrice",
       "localizations": {
         "en-GB": {
           "price": 149.99,
           "currency": "USD"
         },
         "ru-RU": {
-          "price": 149.99,
-          "currency": "USD"
+          "price": 8999,
+          "currency": "RUB"
         }
       }
     }
