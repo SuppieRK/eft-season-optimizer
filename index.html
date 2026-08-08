@@ -17,7 +17,6 @@
         --canvas-height: 94vh;
         --canvas-min-width: 1180px;
         --canvas-min-height: 720px;
-        --workspace-height: clamp(500px, 62vh, 720px);
         --grid-gap: var(--space-m);
         --header-height: calc(var(--font-size-header) * 6);
         --header-body-font-size: var(--font-size-header);
@@ -99,11 +98,11 @@
 
       .wireframe-shell {
         display: grid;
-        grid-template-rows: var(--header-height) var(--workspace-height) auto;
+        grid-template-rows: var(--header-height) minmax(0, 1fr) auto;
         gap: var(--grid-gap);
         inline-size: var(--canvas-width);
         min-inline-size: calc(var(--canvas-min-width) - 6vw);
-        block-size: auto;
+        block-size: var(--canvas-height);
         min-block-size: calc(var(--canvas-min-height) - 6vh);
         margin: 3vh auto;
       }
@@ -1771,7 +1770,6 @@
           --canvas-min-width: 320px;
           --canvas-min-height: 0px;
           --header-height: auto;
-          --workspace-height: auto;
         }
 
         html,

@@ -183,3 +183,4 @@
 - [x] 16.42 Add a reserved bright amber exchange icon, localized accessible exchange count, and hover warning to View full schedule when the selected profile requires regular-document exchanges, with Chromium regression coverage.
 - [x] 16.43 Match the full-schedule Regular-document exchanges heading to the amber exchange warning and match all Day headings to the estimated-days season accent, with Chromium style regressions.
 - [x] 16.44 Remove optional TarCoin route purchases from optimizer inputs and results, application state, cookies, setup controls, schedule output, catalog policy, localization, tests, and documentation while preserving the informational buyout; remove the inactive schedule exchange icon from layout with `display: none`.
+- [x] 16.45 Let the desktop main workspace consume all vertical space left between the fixed header and intrinsic footer within the viewport-height shell, while retaining content-driven height below the stacked breakpoint.
