@@ -10,7 +10,6 @@ async function seedOptimizerState(
     claimedRewardIds: string[];
     ownedDocuments?: Record<string, number>;
     classifiedDocuments?: number;
-    spendTarCoinsOnClassifiedDocuments?: boolean;
   },
 ): Promise<void> {
   const gameDataVersion = await page.evaluate(async () => {
@@ -37,7 +36,6 @@ async function seedOptimizerState(
       name: 'kord-breach-settings',
       value: envelope({
         mode: 'pvp-seasonal',
-        spendTarCoinsOnClassifiedDocuments: input.spendTarCoinsOnClassifiedDocuments ?? false,
         locale: 'en-GB',
       }),
       url: page.url(),
@@ -53,6 +51,7 @@ test('offers a raid beside the starting Classified Document redemption option', 
   await expect(page.locator('[data-focus-heading]')).not.toHaveText('Claim now', { timeout: 10_000 });
   await expect(page.locator('[data-raid-result]')).toHaveCount(2);
   await expect(page.locator('[data-commit-raid]')).toBeVisible();
+  await expect(page.locator('[data-exchange-warning]')).toHaveCSS('display', 'none');
   await expect(page.locator(`[data-reward-id="${dogtagReward}"]`)).not.toBeChecked();
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
 });
@@ -318,7 +317,7 @@ test('keeps both location documents useful for optional crate stockpiling', asyn
   await expect(page.locator('[data-commit-raid]')).toBeVisible();
 });
 
-test('keeps required exchanges and Classified purchases visible in the full schedule', async ({ page }) => {
+test('keeps required exchanges visible in the full schedule', async ({ page }) => {
   await openWireframe(page);
   const allRewardIds = await page.locator('[data-reward-id]').evaluateAll((inputs) =>
     inputs.map((input) => (input as HTMLInputElement).dataset.rewardId ?? ''),
@@ -329,7 +328,7 @@ test('keeps required exchanges and Classified purchases visible in the full sche
     claimedRewardIds: claimedExceptDogtag,
     ownedDocuments: { 'documents.project.name': 5 },
   });
-  let scheduleButton = page.locator('[data-view-route-schedule]');
+  const scheduleButton = page.locator('[data-view-route-schedule]');
   const exchangeWarning = scheduleButton.locator('[data-exchange-warning]');
   await expect(scheduleButton).toHaveClass(/view-route-schedule--exchange-required/u);
   await expect(scheduleButton).toHaveAttribute('data-exchange-count', '1');
@@ -338,28 +337,13 @@ test('keeps required exchanges and Classified purchases visible in the full sche
   await expect(exchangeWarning).toBeVisible();
   await expect(exchangeWarning).toHaveCSS('color', 'rgb(242, 201, 76)');
   await scheduleButton.click();
-  let dialog = page.locator('[data-route-schedule-dialog]');
+  const dialog = page.locator('[data-route-schedule-dialog]');
   await expect(dialog.getByRole('heading', { name: 'Plan actions' })).toBeVisible();
   const exchangeHeading = dialog.getByRole('heading', { name: 'Regular-document exchanges' });
   await expect(exchangeHeading).toBeVisible();
   await expect(exchangeHeading).toHaveCSS('color', 'rgb(242, 201, 76)');
   await expect(dialog.locator('.schedule-plan-actions')).toContainText(/Project documentation × 5.*Financial documents/su);
   await dialog.getByRole('button', { name: 'Close' }).click();
-
-  await seedOptimizerState(page, {
-    claimedRewardIds: claimedExceptDogtag,
-    spendTarCoinsOnClassifiedDocuments: true,
-  });
-  scheduleButton = page.locator('[data-view-route-schedule]');
-  await expect(scheduleButton).not.toHaveClass(/view-route-schedule--exchange-required/u);
-  await expect(scheduleButton.locator('[data-exchange-warning]')).toBeHidden();
-  await expect(scheduleButton).not.toHaveAttribute('data-exchange-count');
-  await expect(scheduleButton).not.toHaveAttribute('title');
-  await scheduleButton.click();
-  dialog = page.locator('[data-route-schedule-dialog]');
-  await expect(dialog.getByRole('heading', { name: 'Classified Document purchases' })).toBeVisible();
-  await expect(dialog.locator('.schedule-plan-actions')).toContainText('20 Classified Documents × 1');
-  await expect(dialog).not.toContainText('Owned Classified Documents consumed');
 });
 
 test('opens a detailed buyout from the approximate Documents price', async ({ page }) => {

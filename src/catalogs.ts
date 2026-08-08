@@ -114,9 +114,7 @@ export interface OptimizerRulesCatalog {
   readonly tarCoinBundles: readonly TarCoinBundle[];
   readonly classifiedDocuments: {
     readonly backfillOnly: true;
-    readonly purchaseSource: string;
     readonly bundles: readonly ClassifiedBundle[];
-    readonly purchasePolicy: string;
   };
   readonly routeProfiles: {
     readonly fastest: { readonly factorField: 'maxRaidTimeMin'; readonly tieBreakOrder: readonly string[] };
@@ -480,9 +478,7 @@ function parseRules(raw: unknown, localization: LocalizationCatalog, issues: str
     tarCoinBundles,
     classifiedDocuments: {
       backfillOnly: asBoolean(classified.backfillOnly, 'optimizerRules.classifiedDocuments.backfillOnly', issues) as true,
-      purchaseSource: asString(classified.purchaseSource, 'optimizerRules.classifiedDocuments.purchaseSource', issues),
       bundles: classifiedBundles,
-      purchasePolicy: asString(classified.purchasePolicy, 'optimizerRules.classifiedDocuments.purchasePolicy', issues),
     },
     routeProfiles: {
       fastest: parseProfile('fastest', 'maxRaidTimeMin'),

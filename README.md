@@ -37,8 +37,7 @@ The optimizer adds all requirements for the unclaimed rewards. It then applies r
 3. It marks only the excess regular Documents as exchange surplus.
 4. It allocates owned Classified Documents to the remaining shortages.
 5. It exchanges five surplus regular Documents for one missing regular Document when the exchange improves the selected route.
-6. It applies optional Classified Document purchases when the TarCoin option is active.
-7. It sends the final shortages to the farming optimizer.
+6. It sends the final shortages to the farming optimizer.
 
 Classified Documents fill shortages during reward redemption. They never replace a matching regular Document that the player owns.
 
@@ -76,7 +75,7 @@ The Classified Document allocation uses a greedy legal sequence before the final
 
 The cost optimizer produces the informational Battle Pass buyout. This calculation does not change inventory, claimed rewards, or saved TarCoins.
 
-The buyout result does not depend on the Spend Battle Pass TarCoins option. The result always includes spend and keep scenarios.
+The buyout result always includes spend and keep scenarios. Neither scenario changes the farming route.
 
 The optimizer calculates the remaining buyout in this order:
 
@@ -131,27 +130,6 @@ The optimizer compares package combinations in this order:
 4. Stable package-count order.
 
 The optimizer converts prices to integer currency units before comparison. It uses only packages with localized prices in the same currency.
-
-### Optional TarCoin route purchases
-
-The Spend Battle Pass TarCoins option changes the farming route. It remains separate from the informational buyout calculation.
-
-The route simulation processes rewards in legal order. For each reward, it applies regular Documents, owned Classified Documents, and previously purchased Classified Documents.
-
-If a shortage remains, the optimizer searches for a bundle combination that the current earned TarCoin balance can fund.
-
-For a complete combination, the optimizer uses this order:
-
-1. Lower TarCoin cost.
-2. Fewer Classified Documents above the shortage.
-3. Fewer bundles.
-4. Stable bundle-count order.
-
-If no affordable combination covers the shortage, the optimizer selects the affordable combination with the largest Classified Document total.
-
-Purchased Classified Documents remain available for later simulated rewards. A TarCoin reward enters the balance only after its reward is legally redeemed.
-
-The optimizer recalculates the farming shortages and reward sequence after it applies the purchased Classified Documents.
 
 ### Farming optimizer
 

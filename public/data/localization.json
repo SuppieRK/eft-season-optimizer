@@ -505,13 +505,6 @@
       }
     },
     {
-      "id": "optimizer.includeTarCoins",
-      "localizations": {
-        "en-GB": "Spend Battle Pass TarCoins on Classified Documents",
-        "ru-RU": "Тратить TarCoins из Боевого пропуска на секретные документы"
-      }
-    },
-    {
       "id": "season.countdown",
       "localizations": {
         "en-GB": "Season ends in {time}",
@@ -1128,13 +1121,6 @@
       }
     },
     {
-      "id": "ui.classifiedPurchases",
-      "localizations": {
-        "en-GB": "Classified Document purchases",
-        "ru-RU": "Покупки секретных документов"
-      }
-    },
-    {
       "id": "ui.raids",
       "localizations": {
         "en-GB": "Raids",
@@ -1587,13 +1573,6 @@
       "localizations": {
         "en-GB": "{donors} → {received}",
         "ru-RU": "{donors} → {received}"
-      }
-    },
-    {
-      "id": "ui.classifiedBundleInstruction",
-      "localizations": {
-        "en-GB": "{documents} Classified Documents × {count}",
-        "ru-RU": "{documents} секретных документов × {count}"
       }
     }
   ],

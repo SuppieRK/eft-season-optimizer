@@ -699,11 +699,10 @@
       }
 
       .schedule-exchange-warning__icon {
-        flex: none;
+        display: none;
         inline-size: 1.25em;
         block-size: 1.25em;
         color: var(--exchange-warning);
-        visibility: hidden;
       }
 
       [data-view-route-schedule].view-route-schedule--exchange-required {
@@ -711,7 +710,8 @@
       }
 
       .view-route-schedule--exchange-required .schedule-exchange-warning__icon {
-        visibility: visible;
+        display: block;
+        flex: none;
       }
 
       .focus-heading__actions button:hover,
@@ -2323,7 +2323,6 @@
         'set-locale',
         'set-mode',
         'set-owned-document',
-        'set-spending',
       ]);
       const dispatch = (action) => {
         state = reduceState(state, action, catalogs);
@@ -2687,7 +2686,7 @@
         routeScheduleContent.replaceChildren();
         routeScheduleContent.append(createElement('p', 'schedule-estimate-note', localizer.text('ui.planEstimate')));
 
-        if (profile.exchanges.length > 0 || profile.purchases.bundleCounts.some((count) => count > 0)) {
+        if (profile.exchanges.length > 0) {
           const actions = createElement('section', 'schedule-plan-actions');
           actions.append(createElement('h3', '', localizer.text('ui.planActions')));
           if (profile.exchanges.length > 0) {
@@ -2701,21 +2700,6 @@
               list.append(createElement('li', '', localizer.text('ui.exchangeInstruction', {
                 donors,
                 received: localizer.text(exchange.receivedDocumentId),
-              })));
-            });
-            group.append(list);
-            actions.append(group);
-          }
-          if (profile.purchases.bundleCounts.some((count) => count > 0)) {
-            const group = createElement('div', 'schedule-action-group');
-            const list = document.createElement('ul');
-            group.append(createElement('h4', '', localizer.text('ui.classifiedPurchases')));
-            profile.purchases.bundleCounts.forEach((count, index) => {
-              if (count === 0) return;
-              const bundle = catalogs.optimizerRules.classifiedDocuments.bundles[index];
-              list.append(createElement('li', '', localizer.text('ui.classifiedBundleInstruction', {
-                documents: formatNumber(bundle.classifiedDocuments, localizer.locale),
-                count: formatNumber(count, localizer.locale),
               })));
             });
             group.append(list);
@@ -3008,7 +2992,6 @@
           profile.schedule.length > 0
           || profile.projectedImmediateRewardIds.length > 0
           || profile.exchanges.length > 0
-          || profile.purchases.bundleCounts.some((count) => count > 0)
         );
         commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
         commitRaidButton.disabled = true;
@@ -3072,7 +3055,6 @@
             claimedRewardIds: state.claimedRewardIds,
             ownedDocuments: state.ownedDocuments,
             classifiedDocuments: state.classifiedDocuments,
-            spendTarCoinsOnClassifiedDocuments: state.spendTarCoinsOnClassifiedDocuments,
             mode: state.mode,
             locale: state.locale,
             crateCount: state.crateCount,

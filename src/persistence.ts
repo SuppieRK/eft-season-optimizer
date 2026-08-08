@@ -37,7 +37,6 @@ interface ProgressPayload {
 
 interface SettingsPayload {
   readonly mode: GameMode;
-  readonly spendTarCoinsOnClassifiedDocuments: boolean;
   readonly locale: string;
 }
 
@@ -64,7 +63,6 @@ export function saveState(state: AppState, cookies: CookieAdapter, catalogs: Cat
   }, gameDataVersion);
   writeEnvelope(cookies, COOKIE_NAMES.settings, {
     mode: state.mode,
-    spendTarCoinsOnClassifiedDocuments: state.spendTarCoinsOnClassifiedDocuments,
     locale: state.locale,
   }, gameDataVersion);
   writeEnvelope(cookies, COOKIE_NAMES.ui, {
@@ -152,7 +150,6 @@ function sanitizeSettings(payload: SettingsPayload, defaults: AppState, catalogs
   const mode = payload.mode === 'pve' || payload.mode === 'pvp' || payload.mode === 'pvp-seasonal' ? payload.mode : defaults.mode;
   return {
     mode,
-    spendTarCoinsOnClassifiedDocuments: payload.spendTarCoinsOnClassifiedDocuments === true,
     locale: locales.includes(payload.locale) ? payload.locale : defaults.locale,
   };
 }

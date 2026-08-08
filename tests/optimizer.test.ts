@@ -59,7 +59,6 @@ function input(catalogs: Catalogs, overrides: Partial<Parameters<typeof optimize
     claimedRewardIds: [],
     ownedDocuments: {},
     classifiedDocuments: 0,
-    spendTarCoinsOnClassifiedDocuments: false,
     mode: 'pve',
     ...overrides,
   };
@@ -264,7 +263,7 @@ describe('optimizer', () => {
     expect(result.profiles.fastest.nextRaid).toBeUndefined();
   });
 
-  it('keeps the informational buyout independent and credits TarCoins only after redemption', () => {
+  it('credits TarCoins only after redemption in the informational buyout', () => {
     const raw = readRaw();
     const battlePass = structuredClone(raw.battlePass) as Record<string, unknown>;
     battlePass.pages = [{
@@ -275,21 +274,17 @@ describe('optimizer', () => {
       ],
     }];
     const catalogs = parseCatalogs({ ...raw, battlePass });
-    const staged = optimize(input(catalogs));
-    const enabled = optimize(input(catalogs, { spendTarCoinsOnClassifiedDocuments: true }));
+    const result = optimize(input(catalogs));
 
-    expect(staged.buyout.minimumAdditionalTarCoins).toBe(0);
-    expect(staged.buyout.earnedTarCoinsAwarded).toBe(500);
-    expect(staged.buyout.earnedTarCoinsUsed).toBe(500);
-    expect(staged.buyout.localEstimate?.packageCounts.every((count) => count === 0)).toBe(true);
-    expect(staged.buyout.localEstimate?.excessTarCoins).toBe(0);
-    expect(staged.buyout.keepBattlePassTarCoinsLocalEstimate?.tarCoinsPurchased)
-      .toBeGreaterThanOrEqual(staged.buyout.grossTarCoinsSpent);
-    expect(staged.buyout.localEstimate?.price).toBe(0);
-    expect(staged.buyout.localEstimate?.currency).toBe('');
-    expect(staged.profiles.fastest.purchases.bundleCounts.every((count) => count === 0)).toBe(true);
-    expect(enabled.profiles.fastest.purchases.bundleCounts.some((count) => count > 0)).toBe(true);
-    expect(enabled.buyout).toEqual(staged.buyout);
+    expect(result.buyout.minimumAdditionalTarCoins).toBe(0);
+    expect(result.buyout.earnedTarCoinsAwarded).toBe(500);
+    expect(result.buyout.earnedTarCoinsUsed).toBe(500);
+    expect(result.buyout.localEstimate?.packageCounts.every((count) => count === 0)).toBe(true);
+    expect(result.buyout.localEstimate?.excessTarCoins).toBe(0);
+    expect(result.buyout.keepBattlePassTarCoinsLocalEstimate?.tarCoinsPurchased)
+      .toBeGreaterThanOrEqual(result.buyout.grossTarCoinsSpent);
+    expect(result.buyout.localEstimate?.price).toBe(0);
+    expect(result.buyout.localEstimate?.currency).toBe('');
   });
 
   it.each([
@@ -326,45 +321,6 @@ describe('optimizer', () => {
 
     expect(result.buyout.bundleCounts).toEqual(bundleCounts);
     expect(result.buyout.grossTarCoinsSpent).toBe(tarCoins);
-  });
-
-  it('does not fund a purchase with TarCoins from an uncovered reward', () => {
-    const raw = readRaw();
-    const battlePass = structuredClone(raw.battlePass) as Record<string, unknown>;
-    battlePass.pages = [
-      {
-        page: 1,
-        rewards: [
-          {
-            id: 'rewards.tarcoins50-01.name',
-            kind: 'tarcoins',
-            tarCoinsAwarded: 500,
-            requirements: [{ documentId: 'documents.test.name', quantity: 100 }],
-          },
-          {
-            id: 'rewards.burn-poster.name',
-            kind: 'cosmetic',
-            requirements: [{ documentId: 'documents.test.name', quantity: 200 }],
-          },
-        ],
-      },
-      {
-        page: 2,
-        rewards: [
-          {
-            id: 'rewards.dogtag01.name',
-            kind: 'cosmetic',
-            requirements: [{ documentId: 'documents.financial.name', quantity: 1 }],
-          },
-        ],
-      },
-    ];
-    const catalogs = parseCatalogs({ ...raw, battlePass });
-    const result = optimize(input(catalogs, { spendTarCoinsOnClassifiedDocuments: true }));
-
-    expect(result.profiles.fastest.redemptionSequence[0]).toBe('rewards.tarcoins50-01.name');
-    expect(result.profiles.fastest.purchases.bundleCounts.every((count) => count === 0)).toBe(true);
-    expect(result.profiles.fastest.purchases.earnedTarCoinsUsed).toBe(0);
   });
 
   it('does not consume Classified Documents when there is no redeemable reward', () => {
@@ -408,7 +364,6 @@ describe('optimizer', () => {
       farmingLocationId: 'locations.factory.name',
     });
     expect(result.classifiedRemaining).toBe(7);
-    expect(result.profiles.fastest.purchases.bundleCounts.every((count) => count === 0)).toBe(true);
     expect(result.profiles.fastest.route.locations[0].locationId).toBe('locations.factory.name');
 
     const immediate = optimize(input(catalogs, { claimedRewardIds: claimed, ownedDocuments: { 'documents.project.name': 20 }, crateCount: 2 }));

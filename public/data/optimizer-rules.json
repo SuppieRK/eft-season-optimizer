@@ -37,7 +37,6 @@
   ],
   "classifiedDocuments": {
     "backfillOnly": true,
-    "purchaseSource": "Expansion Hub",
     "bundles": [
       {
         "classifiedDocuments": 500,
@@ -59,8 +58,7 @@
         "classifiedDocuments": 20,
         "tarCoins": 500
       }
-    ],
-    "purchasePolicy": "When enabled, evaluate purchases only after matching regular inventory, maximizing legally usable owned Classified Document consumption across all unclaimed rewards, and applying useful regular-document exchanges. Use available TarCoins immediately and choose the bundle combination that minimizes remaining uncovered backfill, then TarCoins spent, then bundle count. Never purchase Classified Documents to replace a matching regular document already owned."
+    ]
   },
   "routeProfiles": {
     "fastest": {

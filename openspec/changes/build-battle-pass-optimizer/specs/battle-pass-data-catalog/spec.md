@@ -110,8 +110,8 @@ The optimizer rules catalog SHALL define mode daily document limits under `daily
 - **AND** duplicate input types are valid and documents whose kind is `classified` are excluded
 
 #### Scenario: Classified bundle configuration
-- **WHEN** TarCoin-funded Classified Document purchases are evaluated
-- **THEN** the available bundle costs and quantities come from `optimizer-rules.json` and support both opt-in spending decisions and the remaining-pass buyout estimate
+- **WHEN** the remaining-pass buyout estimate is evaluated
+- **THEN** the available Classified Document bundle costs and quantities come from `optimizer-rules.json`
 
 #### Scenario: TarCoin package configuration
 - **WHEN** the local real-money cost of additional TarCoins is evaluated
