@@ -323,7 +323,7 @@ Each selected reward page after Page 1 SHALL show how many more rewards must be 
 - **THEN** the `Claim N more from Page X` hint disappears immediately
 
 ### Requirement: Versioned cookie persistence
-The application SHALL persist player-controlled progress, optimizer settings, locale, the selected reward page, and the selected route profile in bounded first-party cookies carrying both game-data version `1.1.0.0.46657.8.6.2026` and an independent cookie-schema version. Uncommitted raid-result inputs, the next recommended location, projected daily state, raid history, event history, and native-dialog states SHALL NOT be persisted.
+The application SHALL persist player-controlled progress, optimizer settings, locale, the selected reward page, and the selected route profile in bounded first-party cookies carrying both a semantic fingerprint of all five loaded data catalogs and an independent cookie-schema version. The catalog fingerprint SHALL change for catalog value or array-order changes and SHALL remain stable for object-key or JSON-formatting changes. The application SHALL request the catalogs without using stale browser cache before cookie restoration. Uncommitted raid-result inputs, the next recommended location, projected daily state, raid history, event history, and native-dialog states SHALL NOT be persisted.
 
 #### Scenario: Restore valid state
 - **WHEN** the player returns with valid supported cookies
@@ -332,6 +332,11 @@ The application SHALL persist player-controlled progress, optimizer settings, lo
 #### Scenario: Reject invalid state
 - **WHEN** a cookie is malformed or has an unsupported schema version
 - **THEN** the affected state falls back safely to catalog defaults
+
+#### Scenario: Refresh state after catalog data changes
+- **WHEN** the player reloads with an optimizer cookie that has no catalog fingerprint or has a fingerprint different from the freshly loaded catalogs
+- **THEN** the application deletes every optimizer cookie and immediately writes fresh defaults with the current fingerprint
+- **AND** no manual catalog version update is required
 
 ### Requirement: Cookie-storage notice
 The application SHALL show a non-blocking dismissible toast on first use explaining that cookies store planner selections on the device, and SHALL persist the dismissal.

@@ -1227,28 +1227,26 @@ function prepareGlobalExchanges(
 function estimateLocalTarCoins(required: number, catalogs: Catalogs, locale: string): LocalTarCoinEstimate | undefined {
   if (required <= 0) return { packageCounts: catalogs.optimizerRules.tarCoinBundles.map(() => 0), tarCoinsPurchased: 0, excessTarCoins: 0, price: 0, currency: '' };
   const prices = new Map(catalogs.localization.priceEntries.map((entry) => [entry.id, entry.localizations[locale]]));
-  const currencies = new Set(catalogs.optimizerRules.tarCoinBundles.map((bundle) => prices.get(bundle.localPriceId)?.currency).filter((currency): currency is string => Boolean(currency)));
-  let best: { estimate: LocalTarCoinEstimate; state: BundleState } | undefined;
-  for (const currency of currencies) {
-    const currencyScale = getCurrencyScale(currency);
-    const bundles = catalogs.optimizerRules.tarCoinBundles.map((bundle, index) => ({ bundle, index, price: prices.get(bundle.localPriceId)! })).filter((entry) => entry.price.currency === currency);
-    const selection = choosePricedPackages(required, bundles.map((entry) => ({
-      classifiedDocuments: entry.bundle.tarCoins,
-      tarCoins: Math.round(entry.price.price * currencyScale),
-    })));
-    if (!selection) continue;
-    const packageCounts = catalogs.optimizerRules.tarCoinBundles.map(() => 0);
-    bundles.forEach((entry, index) => { packageCounts[entry.index] = selection.counts[index]; });
-    const estimate: LocalTarCoinEstimate = {
-      packageCounts,
-      tarCoinsPurchased: selection.totalDocuments,
-      excessTarCoins: selection.totalDocuments - required,
-      price: selection.totalTarCoins / currencyScale,
-      currency,
-    };
-    if (!best || estimate.price < best.estimate.price || (estimate.price === best.estimate.price && estimate.excessTarCoins < best.estimate.excessTarCoins)) best = { estimate, state: selection as BundleState };
-  }
-  return best?.estimate;
+  const bundles = catalogs.optimizerRules.tarCoinBundles.map((bundle, index) => ({ bundle, index, price: prices.get(bundle.localPriceId) }));
+  if (bundles.some(({ price }) => !price)) return undefined;
+  const currencies = new Set(bundles.map(({ price }) => price!.currency));
+  if (currencies.size !== 1) return undefined;
+  const currency = [...currencies][0];
+  const currencyScale = getCurrencyScale(currency);
+  const selection = choosePricedPackages(required, bundles.map(({ bundle, price }) => ({
+    classifiedDocuments: bundle.tarCoins,
+    tarCoins: Math.round(price!.price * currencyScale),
+  })));
+  if (!selection) return undefined;
+  const packageCounts = catalogs.optimizerRules.tarCoinBundles.map(() => 0);
+  bundles.forEach(({ index }, selectionIndex) => { packageCounts[index] = selection.counts[selectionIndex]; });
+  return {
+    packageCounts,
+    tarCoinsPurchased: selection.totalDocuments,
+    excessTarCoins: selection.totalDocuments - required,
+    price: selection.totalTarCoins / currencyScale,
+    currency,
+  };
 }
 
 function getCurrencyScale(currency: string): number {

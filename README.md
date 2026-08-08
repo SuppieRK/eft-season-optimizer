@@ -292,7 +292,7 @@ The Vite base path is `/eft-season-optimizer/`. If the repository name changes, 
 
 ## Local storage
 
-The application stores progress, document counts, and interface choices in first-party cookies. It does not send this state to an application server.
+The application stores progress, document counts, and interface choices in first-party cookies. It does not send this state to an application server. On reload, the application automatically resets these cookies if any public data catalog changed.
 
 Use the reset action in the site footer to erase the stored optimizer state.
 

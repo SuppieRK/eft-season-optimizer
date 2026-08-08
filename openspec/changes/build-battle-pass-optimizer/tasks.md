@@ -186,3 +186,5 @@
 - [x] 16.45 Let the desktop main workspace consume all vertical space left between the fixed header and intrinsic footer within the viewport-height shell, while retaining content-driven height below the stacked breakpoint.
 - [x] 16.46 Preserve the reward accordion's scroll position when individual rewards change by keeping its page nodes mounted, while still replacing the rail when entering or leaving the all-rewards crate fallback.
 - [x] 16.47 Correct the first Russian TarCoin package currency to RUB and add optimizer coverage proving that changing remaining document requirements cannot switch the localized buyout between USD and RUB.
+- [x] 16.48 Reject local TarCoin estimates when one locale's package prices use mixed currencies, and add Chromium coverage proving that Russian buyout package rows and totals render only roubles.
+- [x] 16.49 Compute one semantic fingerprint across all public data catalogs, fetch catalogs without stale browser caching, and automatically replace all missing- or stale-fingerprint optimizer cookies with current default envelopes on reload.

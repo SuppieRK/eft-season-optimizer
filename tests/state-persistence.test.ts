@@ -14,10 +14,14 @@ const paths: Record<CatalogKey, string> = {
   localization: 'public/data/localization.json',
 };
 
-function catalogs() {
-  return parseCatalogs(Object.fromEntries(
+function readCatalogs(): Record<CatalogKey, unknown> {
+  return Object.fromEntries(
     Object.entries(paths).map(([key, filePath]) => [key, JSON.parse(readFileSync(resolve(filePath), 'utf8'))]),
-  ) as Record<CatalogKey, unknown>);
+  ) as Record<CatalogKey, unknown>;
+}
+
+function catalogs() {
+  return parseCatalogs(readCatalogs());
 }
 
 function memoryCookies(): CookieAdapter & { values: Record<string, string> } {
@@ -151,7 +155,7 @@ describe('state and cookie persistence', () => {
     const cookies = memoryCookies();
     saveState(createDefaultState(catalog), cookies, catalog);
     cookies.values['kord-breach-ui'] = encodeURIComponent(JSON.stringify({
-      gameDataVersion: catalog.battlePass.gameDataVersion,
+      dataFingerprint: catalog.dataFingerprint,
       schemaVersion: 1,
       payload: { collapsedPages: { '1': true, '2': false }, selectedProfile: 'safest', cookieNoticeDismissed: true },
     }));
@@ -162,16 +166,59 @@ describe('state and cookie persistence', () => {
     expect(restored.cookieNoticeDismissed).toBe(true);
   });
 
-  it('falls back malformed or incompatible segments and enforces cookie size limits', () => {
+  it('falls back malformed or unsupported-schema segments and enforces cookie size limits', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
     const defaults = createDefaultState(catalog);
     saveState({ ...defaults, mode: 'pvp' }, cookies, catalog);
-    cookies.values['kord-breach-settings'] = encodeURIComponent(JSON.stringify({ gameDataVersion: 'old', schemaVersion: 1, payload: { mode: 'pvp-seasonal' } }));
+    cookies.values['kord-breach-settings'] = encodeURIComponent(JSON.stringify({ dataFingerprint: catalog.dataFingerprint, schemaVersion: 999, payload: { mode: 'pvp' } }));
     const restored = restoreState(cookies, catalog);
     expect(restored.mode).toBe('pvp-seasonal');
 
     expect(() => saveState({ ...defaults, claimedRewardIds: Array.from({ length: 1000 }, (_, index) => `unknown-${index}`) }, cookies, catalog)).toThrow(/cookie size limit/);
+  });
+
+  it('replaces legacy cookies that do not contain a data fingerprint on reload', () => {
+    const catalog = catalogs();
+    const cookies = memoryCookies();
+    cookies.values['kord-breach-settings'] = encodeURIComponent(JSON.stringify({
+      gameDataVersion: catalog.battlePass.gameDataVersion,
+      schemaVersion: 1,
+      payload: { mode: 'pvp' },
+    }));
+
+    expect(restoreState(cookies, catalog)).toEqual(createDefaultState(catalog));
+    expect(Object.keys(cookies.values)).toHaveLength(3);
+    for (const raw of Object.values(cookies.values)) {
+      const envelope = JSON.parse(decodeURIComponent(raw)) as Record<string, unknown>;
+      expect(envelope.dataFingerprint).toBe(catalog.dataFingerprint);
+      expect(envelope).not.toHaveProperty('gameDataVersion');
+    }
+  });
+
+  it('replaces all cookies when any catalog value changes', () => {
+    const raw = readCatalogs();
+    const originalCatalog = parseCatalogs(raw);
+    const changedRaw = structuredClone(raw);
+    const localization = changedRaw.localization as {
+      priceEntries: Array<{ localizations: Record<string, { price: number }> }>;
+    };
+    localization.priceEntries[0].localizations['en-GB'].price += 1;
+    const changedCatalog = parseCatalogs(changedRaw);
+    const cookies = memoryCookies();
+    saveState({
+      ...createDefaultState(originalCatalog),
+      mode: 'pvp',
+      cookieNoticeDismissed: true,
+      ownedDocuments: { 'documents.financial.name': 12 },
+    }, cookies, originalCatalog);
+
+    expect(changedCatalog.dataFingerprint).not.toBe(originalCatalog.dataFingerprint);
+    expect(restoreState(cookies, changedCatalog)).toEqual(createDefaultState(changedCatalog));
+    for (const rawCookie of Object.values(cookies.values)) {
+      const envelope = JSON.parse(decodeURIComponent(rawCookie)) as Record<string, unknown>;
+      expect(envelope.dataFingerprint).toBe(changedCatalog.dataFingerprint);
+    }
   });
 
   it('requires deliberate reset confirmation and clears every optimizer cookie', () => {

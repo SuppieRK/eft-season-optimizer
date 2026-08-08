@@ -347,6 +347,17 @@ describe('optimizer', () => {
     }
   });
 
+  it('does not compare package prices from different currencies', () => {
+    const catalogs = structuredClone(loadCatalogs()) as Catalogs;
+    const firstRussianPrice = catalogs.localization.priceEntries[0].localizations['ru-RU'] as { currency: string };
+    firstRussianPrice.currency = 'USD';
+
+    const result = optimize(input(catalogs, { locale: 'ru-RU' }));
+
+    expect(result.buyout.localEstimate).toBeUndefined();
+    expect(result.buyout.keepBattlePassTarCoinsLocalEstimate).toBeUndefined();
+  });
+
   it('does not consume Classified Documents when there is no redeemable reward', () => {
     const catalogs = loadCatalogs();
     const result = optimize(input(catalogs, {

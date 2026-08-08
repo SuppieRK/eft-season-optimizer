@@ -79,8 +79,10 @@ describe('catalogs', () => {
   it('loads catalogs through the configured Pages base path', async () => {
     const raw = readCatalogs();
     const requested: string[] = [];
-    const catalogs = await loadCatalogs('/eft-season-optimizer/', async (url) => {
+    const requestOptions: Array<RequestInit | undefined> = [];
+    const catalogs = await loadCatalogs('/eft-season-optimizer/', async (url, options) => {
       requested.push(String(url));
+      requestOptions.push(options);
       const key = Object.entries(catalogPaths).find(([, filePath]) => String(url).endsWith(filePath.replace('public/', '')))?.[0] as CatalogKey;
       return { ok: true, status: 200, json: async () => raw[key] } as Response;
     });
@@ -93,6 +95,20 @@ describe('catalogs', () => {
       '/eft-season-optimizer/data/optimizer-rules.json',
       '/eft-season-optimizer/data/localization.json',
     ]);
+    expect(requestOptions).toEqual(Array.from({ length: 5 }, () => ({ cache: 'no-store' })));
+  });
+
+  it('creates a semantic fingerprint for every catalog value', () => {
+    const raw = readCatalogs();
+    const original = parseCatalogs(raw);
+    const reordered = Object.fromEntries(Object.entries(raw).reverse()) as Record<CatalogKey, unknown>;
+    const changed = structuredClone(raw);
+    const locations = changed.locations as { locations: Array<{ maxRaidTimeMin: number }> };
+    locations.locations[0].maxRaidTimeMin += 1;
+
+    expect(original.dataFingerprint).toMatch(/^catalog-v1-[a-z0-9]+-[a-f0-9]{16}$/u);
+    expect(parseCatalogs(reordered).dataFingerprint).toBe(original.dataFingerprint);
+    expect(parseCatalogs(changed).dataFingerprint).not.toBe(original.dataFingerprint);
   });
 
   it('accepts corrected season metadata without runtime constants', () => {

@@ -23,7 +23,7 @@ export const browserCookieAdapter: CookieAdapter = {
 };
 
 interface Envelope<T> {
-  readonly gameDataVersion: string;
+  readonly dataFingerprint: string;
   readonly schemaVersion: number;
   readonly payload: T;
 }
@@ -54,22 +54,22 @@ const COOKIE_NAMES = {
 } as const;
 
 export function saveState(state: AppState, cookies: CookieAdapter, catalogs: Catalogs): void {
-  const gameDataVersion = catalogs.battlePass.gameDataVersion;
+  const dataFingerprint = catalogs.dataFingerprint;
   writeEnvelope(cookies, COOKIE_NAMES.progress, {
     claimedRewardIds: state.claimedRewardIds,
     ownedDocuments: state.ownedDocuments,
     classifiedDocuments: state.classifiedDocuments,
     crateCount: state.crateCount,
-  }, gameDataVersion);
+  }, dataFingerprint);
   writeEnvelope(cookies, COOKIE_NAMES.settings, {
     mode: state.mode,
     locale: state.locale,
-  }, gameDataVersion);
+  }, dataFingerprint);
   writeEnvelope(cookies, COOKIE_NAMES.ui, {
     selectedPage: state.selectedPage,
     selectedProfile: state.selectedProfile,
     cookieNoticeDismissed: state.cookieNoticeDismissed,
-  }, gameDataVersion);
+  }, dataFingerprint);
 }
 
 export function restoreState(
@@ -86,10 +86,15 @@ export function restoreState(
       catalogDefaults.locale,
     ),
   };
-  const gameDataVersion = catalogs.battlePass.gameDataVersion;
-  const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress, gameDataVersion);
-  const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings, gameDataVersion);
-  const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui, gameDataVersion);
+  const dataFingerprint = catalogs.dataFingerprint;
+  if (hasDataFingerprintMismatch(cookies, dataFingerprint)) {
+    clearPersistedState(cookies);
+    saveState(defaults, cookies, catalogs);
+    return defaults;
+  }
+  const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress, dataFingerprint);
+  const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings, dataFingerprint);
+  const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui, dataFingerprint);
   const restored = {
     ...defaults,
     ...(progress ? sanitizeProgress(progress, defaults, catalogs) : {}),
@@ -114,21 +119,34 @@ export function clearPersistedState(cookies: CookieAdapter): void {
   Object.values(COOKIE_NAMES).forEach((name) => cookies.remove(name));
 }
 
-function writeEnvelope<T>(cookies: CookieAdapter, name: string, payload: T, gameDataVersion: string): void {
-  const value = JSON.stringify({ gameDataVersion, schemaVersion: COOKIE_SCHEMA_VERSION, payload } satisfies Envelope<T>);
+function writeEnvelope<T>(cookies: CookieAdapter, name: string, payload: T, dataFingerprint: string): void {
+  const value = JSON.stringify({ dataFingerprint, schemaVersion: COOKIE_SCHEMA_VERSION, payload } satisfies Envelope<T>);
   if (encodeURIComponent(value).length > MAX_COOKIE_BYTES) throw new RangeError(`${name} exceeds the cookie size limit`);
   cookies.write(name, value, 60 * 60 * 24 * 365);
 }
 
-function readEnvelope<T>(cookies: CookieAdapter, name: string, gameDataVersion: string): T | undefined {
+function readEnvelope<T>(cookies: CookieAdapter, name: string, dataFingerprint: string): T | undefined {
   const raw = cookies.read(name);
   if (!raw) return undefined;
   try {
     const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<T>>;
-    return envelope.gameDataVersion === gameDataVersion && envelope.schemaVersion === COOKIE_SCHEMA_VERSION ? envelope.payload : undefined;
+    return envelope.dataFingerprint === dataFingerprint && envelope.schemaVersion === COOKIE_SCHEMA_VERSION ? envelope.payload : undefined;
   } catch {
     return undefined;
   }
+}
+
+function hasDataFingerprintMismatch(cookies: CookieAdapter, dataFingerprint: string): boolean {
+  return Object.values(COOKIE_NAMES).some((name) => {
+    const raw = cookies.read(name);
+    if (!raw) return false;
+    try {
+      const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<unknown>>;
+      return envelope.dataFingerprint !== dataFingerprint;
+    } catch {
+      return false;
+    }
+  });
 }
 
 function sanitizeProgress(payload: ProgressPayload, defaults: AppState, catalogs: Catalogs): Partial<AppState> {

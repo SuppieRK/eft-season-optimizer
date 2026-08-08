@@ -4,6 +4,15 @@ import { documentQuantity, openWireframe, setDocumentQuantity } from './wirefram
 
 const dogtagReward = 'rewards.dogtag01.name';
 
+async function catalogDataFingerprint(page: Parameters<typeof openWireframe>[0]): Promise<string> {
+  return page.evaluate(async () => {
+    const catalogModule = await import(new URL('src/catalogs.ts', document.baseURI).href) as {
+      loadCatalogs: () => Promise<{ dataFingerprint: string }>;
+    };
+    return (await catalogModule.loadCatalogs()).dataFingerprint;
+  });
+}
+
 async function seedOptimizerState(
   page: Parameters<typeof openWireframe>[0],
   input: {
@@ -12,12 +21,9 @@ async function seedOptimizerState(
     classifiedDocuments?: number;
   },
 ): Promise<void> {
-  const gameDataVersion = await page.evaluate(async () => {
-    const response = await fetch(new URL('data/battle-pass.json', document.baseURI));
-    return ((await response.json()) as { gameDataVersion: string }).gameDataVersion;
-  });
+  const dataFingerprint = await catalogDataFingerprint(page);
   const envelope = (payload: object) => encodeURIComponent(JSON.stringify({
-    gameDataVersion,
+    dataFingerprint,
     schemaVersion: 1,
     payload,
   }));
@@ -44,6 +50,29 @@ async function seedOptimizerState(
   await page.reload();
   await expect(page.locator('[data-season-name]')).toHaveText('KORD BREACH');
 }
+
+test('replaces legacy optimizer cookies with current catalog fingerprints on reload', async ({ page }) => {
+  await openWireframe(page);
+  await page.evaluate((legacyValue) => {
+    document.cookie = `kord-breach-settings=${legacyValue}; Path=/; SameSite=Lax`;
+  }, encodeURIComponent(JSON.stringify({
+      gameDataVersion: 'legacy-version',
+      schemaVersion: 1,
+      payload: { mode: 'pvp', locale: 'en-GB' },
+  })));
+
+  await page.reload();
+  await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
+  const dataFingerprint = await catalogDataFingerprint(page);
+  const optimizerCookies = (await page.context().cookies())
+    .filter((cookie) => cookie.name.startsWith('kord-breach-'));
+  expect(optimizerCookies).toHaveLength(3);
+  for (const cookie of optimizerCookies) {
+    const envelope = JSON.parse(decodeURIComponent(cookie.value)) as Record<string, unknown>;
+    expect(envelope.dataFingerprint).toBe(dataFingerprint);
+    expect(envelope).not.toHaveProperty('gameDataVersion');
+  }
+});
 
 test('offers a raid beside the starting Classified Document redemption option', async ({ page }) => {
   await openWireframe(page);
@@ -429,4 +458,21 @@ test('opens a detailed buyout from the approximate Documents price', async ({ pa
 
   await page.locator('[data-reward-claim-all]').click();
   await expect(buyoutLink).toBeHidden({ timeout: 10_000 });
+});
+
+test('uses only roubles in the Russian buyout tables', async ({ page }) => {
+  await openWireframe(page);
+  await page.locator('.ss-main.language-select').click();
+  await page.locator('.ss-content.language-select .ss-option').filter({
+    has: page.locator('[data-flag-region="ru"]'),
+  }).click();
+  await expect(page.locator('[data-language-select]')).toHaveValue('ru-RU');
+
+  await page.locator('[data-buyout-link]').click();
+  const tables = page.locator('[data-buyout-dialog] [data-buyout-table="tar-coin-packages"]');
+  await expect(tables).toHaveCount(2);
+  for (const table of [tables.nth(0), tables.nth(1)]) {
+    await expect(table).toContainText('₽');
+    await expect(table).not.toContainText('$');
+  }
 });

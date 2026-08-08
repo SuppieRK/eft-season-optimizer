@@ -134,6 +134,7 @@ export interface OptimizerRulesCatalog {
 }
 
 export interface Catalogs {
+  readonly dataFingerprint: string;
   readonly documents: DocumentsCatalog;
   readonly locations: LocationsCatalog;
   readonly battlePass: BattlePassCatalog;
@@ -506,7 +507,14 @@ export function parseCatalogs(raw: Readonly<Record<CatalogKey, unknown>>): Catal
   const battlePass = parseBattlePass(raw.battlePass, documents, localization, issues);
   const optimizerRules = parseRules(raw.optimizerRules, localization, issues);
   if (issues.length > 0) throw new CatalogValidationError(issues);
-  return deepFreeze({ documents, locations, battlePass, optimizerRules, localization });
+  return deepFreeze({
+    dataFingerprint: createDataFingerprint(raw),
+    documents,
+    locations,
+    battlePass,
+    optimizerRules,
+    localization,
+  });
 }
 
 export async function loadCatalogs(baseUrl = import.meta.env.BASE_URL, fetcher: typeof fetch = fetch): Promise<Catalogs> {
@@ -520,12 +528,37 @@ export async function loadCatalogs(baseUrl = import.meta.env.BASE_URL, fetcher: 
   const base = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
   const entries = await Promise.all(
     (Object.entries(paths) as [CatalogKey, string][]).map(async ([key, relativePath]) => {
-      const response = await fetcher(`${base}${relativePath}`);
+      const response = await fetcher(`${base}${relativePath}`, { cache: 'no-store' });
       if (!response.ok) throw new Error(`Unable to load ${key} catalog (${response.status})`);
       return [key, await response.json()] as const;
     }),
   );
   return parseCatalogs(Object.fromEntries(entries) as Record<CatalogKey, unknown>);
+}
+
+function createDataFingerprint(raw: Readonly<Record<CatalogKey, unknown>>): string {
+  const serialized = serializeCanonicalJson(raw);
+  let hash = 0xcbf29ce484222325n;
+  const prime = 0x100000001b3n;
+  for (let index = 0; index < serialized.length; index += 1) {
+    hash ^= BigInt(serialized.charCodeAt(index));
+    hash = BigInt.asUintN(64, hash * prime);
+  }
+  return `catalog-v1-${serialized.length.toString(36)}-${hash.toString(16).padStart(16, '0')}`;
+}
+
+function serializeCanonicalJson(value: unknown): string {
+  if (value === null || typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) return `[${value.map(serializeCanonicalJson).join(',')}]`;
+  if (typeof value === 'object') {
+    return `{${Object.entries(value)
+      .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+      .map(([key, nestedValue]) => `${JSON.stringify(key)}:${serializeCanonicalJson(nestedValue)}`)
+      .join(',')}}`;
+  }
+  throw new TypeError('Catalog data must contain only JSON values');
 }
 
 function deepFreeze<T>(value: T): T {
