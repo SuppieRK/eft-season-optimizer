@@ -135,6 +135,46 @@ test('shows both location documents with one clear farming priority', async ({ p
   expect(priorityOpacity).toBeGreaterThan(optionalOpacity);
 });
 
+test('keeps Focus document artwork and counters fixed across the stacked breakpoint', async ({ page }) => {
+  await openWireframe(page);
+  await expect(page.locator('[data-focus-document]')).toHaveCount(2, { timeout: 10_000 });
+
+  const geometry = new Set<string>();
+  for (const width of [1181, 1180, 1024, 390, 359, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const cards = await page.locator('[data-focus-document]').evaluateAll((documents) =>
+      documents.map((document) => {
+        const image = document.querySelector('.focus-document__image-frame')!.getBoundingClientRect();
+        const counter = document.querySelector('.raid-result-stepper')!.getBoundingClientRect();
+        const controls = [...document.querySelectorAll('.raid-result-stepper > *')].map((control) => {
+          const box = control.getBoundingClientRect();
+          return { width: box.width, height: box.height };
+        });
+        return {
+          image: { x: image.x, right: image.right, width: image.width, height: image.height },
+          counter: { y: counter.y, width: counter.width, height: counter.height },
+          controls,
+        };
+      }),
+    );
+    cards.forEach(({ image, counter, controls }) => geometry.add(JSON.stringify({ image: {
+      width: image.width,
+      height: image.height,
+    }, counter: {
+      width: counter.width,
+      height: counter.height,
+    }, controls })));
+    if (width >= 360) expect(Math.abs(cards[0]!.counter.y - cards[1]!.counter.y)).toBeLessThanOrEqual(1);
+    cards.forEach(({ image }) => {
+      expect(image.x).toBeGreaterThanOrEqual(0);
+      expect(image.right).toBeLessThanOrEqual(width);
+    });
+  }
+
+  expect(geometry.size).toBe(1);
+  expect([...geometry][0]).toContain('"width":140');
+});
+
 test('keeps raid results as drafts until Commit, then updates and persists inventory', async ({ page }) => {
   await openWireframe(page);
   await expect(page.locator('[data-raid-result]')).toHaveCount(2, { timeout: 10_000 });

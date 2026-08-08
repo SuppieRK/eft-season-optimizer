@@ -81,6 +81,39 @@ test('switches to the stacked layout at the desktop minimum without viewport ove
   expect(stackedRegionY[0]).toBeLessThan(stackedRegionY[1]);
 });
 
+test('keeps progress counters beside their labels in the stacked header', async ({ page }) => {
+  await openWireframe(page);
+
+  for (const width of [1180, 1024, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const progressRows = await page.locator('.navigation-progress').evaluateAll((rows) =>
+      rows.map((row) => {
+        const label = (row.querySelector('.navigation-progress__label-line')
+          ?? row.querySelector('.navigation-progress__label'))!.getBoundingClientRect();
+        const counter = row.querySelector('.navigation-progress__value')!.getBoundingClientRect();
+        return { labelY: label.y, counterY: counter.y };
+      }),
+    );
+    progressRows.forEach(({ labelY, counterY }) => expect(Math.abs(labelY - counterY)).toBeLessThanOrEqual(1));
+  }
+});
+
+test('keeps planning selectors on one row below the stacked breakpoint when they fit', async ({ page }) => {
+  await openWireframe(page);
+
+  for (const width of [1180, 1024, 700]) {
+    await page.setViewportSize({ width, height: 900 });
+    const controls = await Promise.all([
+      page.locator('.route-profile-toggle'),
+      page.locator('.ss-main.mode-select'),
+      page.locator('.ss-main.language-select'),
+    ].map((locator) => locator.boundingBox()));
+    expect(controls.every(Boolean)).toBe(true);
+    const centers = controls.map((box) => box!.y + box!.height / 2);
+    expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
+  }
+});
+
 test('stacks the always-available raid workspace without mobile viewport overflow', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await openWireframe(page);
@@ -98,7 +131,10 @@ test('stacks the always-available raid workspace without mobile viewport overflo
     clientWidth: element.clientWidth,
     scrollWidth: element.scrollWidth,
   }));
-  expect(ribbonOverflow.scrollWidth).toBeGreaterThan(ribbonOverflow.clientWidth);
+  expect(ribbonOverflow.scrollWidth).toBeLessThanOrEqual(ribbonOverflow.clientWidth);
+  const counterRows = await page.locator('.document-strip__item').evaluateAll((items) =>
+    new Set(items.map((item) => item.getBoundingClientRect().y)).size);
+  expect(counterRows).toBeGreaterThan(1);
   const mobileNoteGeometry = await Promise.all([
     page.locator('.document-strip'),
     page.locator('[data-document-counter-note]'),

@@ -1776,8 +1776,10 @@
         }
 
         .header-controls {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr);
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: var(--header-control-gap);
           padding: 0;
         }
 
@@ -1791,28 +1793,16 @@
         }
 
         .primary-navigation-slot {
-          grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-        }
-
-        .navigation-progress {
-          grid-template-columns: minmax(0, 1fr);
-          align-items: start;
-        }
-
-        .navigation-progress__value {
-          justify-self: end;
-        }
-
-        .navigation-progress progress {
-          grid-column: 1;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
         }
 
         .route-profile-toggle {
-          inline-size: 100%;
+          inline-size: auto;
         }
 
         .account-slot {
           justify-content: space-between;
+          flex-wrap: wrap;
         }
 
         .reward-rail,
@@ -1847,7 +1837,7 @@
         }
 
         .focus-documents {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(auto-fit, 140px);
           gap: var(--space-m);
         }
 
@@ -1856,22 +1846,23 @@
         }
 
         .document-strip {
-          justify-items: start;
+          justify-items: center;
           max-inline-size: 100%;
-          overflow-x: auto;
+          overflow-x: clip;
         }
 
         .document-strip__notice {
-          position: sticky;
-          inset-inline-start: 0;
-          inline-size: calc(var(--canvas-width) - (2 * var(--space-m)));
-          max-inline-size: calc(100vw - (4 * var(--space-m)));
+          inline-size: 100%;
+          max-inline-size: 100%;
           white-space: normal;
         }
 
         .document-strip__images {
-          justify-content: flex-start;
-          min-inline-size: max-content;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, var(--document-strip-image-size));
+          justify-content: center;
+          inline-size: 100%;
+          min-inline-size: 0;
         }
 
         .schedule-projection-day__columns {
@@ -1895,6 +1886,23 @@
           inline-size: min(12rem, 100%);
           min-block-size: 0;
           block-size: 1px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .document-strip__tooltip,
+        .document-strip__item:last-child .document-strip__tooltip {
+          position: fixed;
+          inset: auto var(--space-m) var(--space-m);
+          inline-size: auto;
+          transform: translateY(var(--space-xs));
+        }
+
+        .document-strip__item:hover .document-strip__tooltip,
+        .document-strip__item:focus-within .document-strip__tooltip,
+        .document-strip__item:last-child:hover .document-strip__tooltip,
+        .document-strip__item:last-child:focus-within .document-strip__tooltip {
+          transform: translateY(0);
         }
       }
 
