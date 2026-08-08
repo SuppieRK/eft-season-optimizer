@@ -32,6 +32,7 @@ export interface LocationAssignment {
   readonly difficultyId: LocationRecord['difficultyId'];
   readonly difficultyRating: number;
   readonly maxRaidTimeMin: number;
+  readonly insurance: boolean;
   readonly documents: readonly DocumentAssignment[];
 }
 
@@ -94,6 +95,7 @@ export interface NextRaidRecommendation {
   readonly difficultyId: LocationRecord['difficultyId'];
   readonly difficultyRating: number;
   readonly maxRaidTimeMin: number;
+  readonly insurance: boolean;
   readonly documents: readonly NextRaidDocument[];
 }
 
@@ -138,6 +140,8 @@ export interface OptimizerResult {
 
 interface RouteCandidate extends RouteResult {
   readonly locationIds: readonly string[];
+  readonly locationsWithoutInsurance: number;
+  readonly totalRaidTimeMin: number;
 }
 
 interface BundleSelection {
@@ -516,7 +520,16 @@ function routeForDeficits(
 ): RouteCandidate {
   const positiveDeficits = sortRecord(Object.fromEntries(Object.entries(deficits).filter(([, quantity]) => quantity > 0)));
   const rawDocumentQuantity = sumValues(positiveDeficits);
-  if (rawDocumentQuantity === 0) return { available: true, locations: [], profileCost: 0, rawDocumentQuantity: 0, deficits: {}, locationIds: [] };
+  if (rawDocumentQuantity === 0) return {
+    available: true,
+    locations: [],
+    profileCost: 0,
+    rawDocumentQuantity: 0,
+    deficits: {},
+    locationIds: [],
+    locationsWithoutInsurance: 0,
+    totalRaidTimeMin: 0,
+  };
   const documents = new Map(catalogs.documents.documents.map((document) => [document.id, document]));
   const locations = [...catalogs.locations.locations].sort((left, right) => left.id.localeCompare(right.id));
   let best: RouteCandidate | undefined;
@@ -531,7 +544,7 @@ function routeForDeficits(
       const source = document?.sourceLocationIds
         .map((sourceId) => locations.find((location) => location.id === sourceId))
         .filter((location): location is LocationRecord => Boolean(location && selectedIds.has(location.id)))
-        .sort((left, right) => Number(left[PROFILE_FACTORS[profile]]) - Number(right[PROFILE_FACTORS[profile]]) || left.id.localeCompare(right.id))[0];
+        .sort((left, right) => compareSourceLocations(left, right, profile))[0];
       if (!source) {
         available = false;
         break;
@@ -542,24 +555,28 @@ function routeForDeficits(
       byLocation.set(source.id, assignments);
     }
     if (!available) continue;
-    const route: RouteCandidate = {
-      available: true,
-      locations: [...byLocation.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([locationId, documentsAtLocation]) => {
-        const location = locations.find((candidate) => candidate.id === locationId)!;
-        return {
+    const routeLocations = [...byLocation.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([locationId, documentsAtLocation]) => {
+      const location = locations.find((candidate) => candidate.id === locationId)!;
+      return {
         locationId,
         difficultyId: location.difficultyId,
         difficultyRating: location.difficultyRating,
         maxRaidTimeMin: location.maxRaidTimeMin,
+        insurance: location.insurance,
         documents: documentsAtLocation.sort((left, right) => left.documentId.localeCompare(right.documentId)),
-        };
-      }),
+      };
+    });
+    const route: RouteCandidate = {
+      available: true,
+      locations: routeLocations,
       profileCost: cost,
       rawDocumentQuantity,
       deficits: positiveDeficits,
       locationIds: [...byLocation.keys()].sort(),
+      locationsWithoutInsurance: routeLocations.filter((location) => !location.insurance).length,
+      totalRaidTimeMin: routeLocations.reduce((total, location) => total + location.maxRaidTimeMin, 0),
     };
-    if (!best || compareRoutes(route, best) < 0) best = route;
+    if (!best || compareRoutes(route, best, profile) < 0) best = route;
   }
   return best ?? {
     available: false,
@@ -569,6 +586,8 @@ function routeForDeficits(
     rawDocumentQuantity,
     deficits: positiveDeficits,
     locationIds: [],
+    locationsWithoutInsurance: Number.POSITIVE_INFINITY,
+    totalRaidTimeMin: Number.POSITIVE_INFINITY,
   };
 }
 
@@ -805,7 +824,7 @@ function bestSource(
   return document?.sourceLocationIds
     .map((locationId) => catalogs.locations.locations.find((location) => location.id === locationId))
     .filter((location): location is LocationRecord => Boolean(location))
-    .sort((left, right) => Number(left[PROFILE_FACTORS[profile]]) - Number(right[PROFILE_FACTORS[profile]]) || left.id.localeCompare(right.id))[0];
+    .sort((left, right) => compareSourceLocations(left, right, profile))[0];
 }
 
 function buildNextRaidRecommendation(
@@ -828,6 +847,7 @@ function buildNextRaidRecommendation(
     difficultyId: location.difficultyId,
     difficultyRating: location.difficultyRating,
     maxRaidTimeMin: location.maxRaidTimeMin,
+    insurance: location.insurance,
     documents,
   };
 }
@@ -837,13 +857,14 @@ function buildStockpileRaidRecommendation(
   catalogs: Catalogs,
 ): NextRaidRecommendation | undefined {
   const primaryFactor = PROFILE_FACTORS[profile];
-  const secondaryFactor = profile === 'fastest' ? 'difficultyRating' : 'maxRaidTimeMin';
   const regularDocuments = catalogs.documents.documents.filter((document) => document.kind === 'regular');
   const location = catalogs.locations.locations
     .filter((candidate) => regularDocuments.some((document) => document.sourceLocationIds.includes(candidate.id)))
-    .sort((left, right) => Number(left[primaryFactor]) - Number(right[primaryFactor])
-      || Number(left[secondaryFactor]) - Number(right[secondaryFactor])
-      || left.id.localeCompare(right.id))[0];
+    .sort((left, right) => profile === 'safest'
+      ? compareSourceLocations(left, right, profile)
+      : Number(left[primaryFactor]) - Number(right[primaryFactor])
+        || left.difficultyRating - right.difficultyRating
+        || left.id.localeCompare(right.id))[0];
   if (!location) return undefined;
   return {
     purpose: 'crate-stockpile',
@@ -851,6 +872,7 @@ function buildStockpileRaidRecommendation(
     difficultyId: location.difficultyId,
     difficultyRating: location.difficultyRating,
     maxRaidTimeMin: location.maxRaidTimeMin,
+    insurance: location.insurance,
     documents: regularDocuments
       .filter((document) => document.sourceLocationIds.includes(location.id))
       .map((document) => ({ documentId: document.id, role: 'stockpile', targetQuantity: 0 })),
@@ -1082,6 +1104,7 @@ function optimizeCrates(input: OptimizerInput, effectiveDailyLimit: number): Opt
             difficultyId: farmingLocation.difficultyId,
             difficultyRating: farmingLocation.difficultyRating,
             maxRaidTimeMin: farmingLocation.maxRaidTimeMin,
+            insurance: farmingLocation.insurance,
             documents: [{ documentId: farmingDocument.id, quantity: regularDocumentsToFarm }],
           }],
           profileCost: regularDocumentsToFarm * Number(farmingLocation[PROFILE_FACTORS[profile]]),
@@ -1129,9 +1152,15 @@ function optimizeCrates(input: OptimizerInput, effectiveDailyLimit: number): Opt
   };
 }
 
-function compareRoutes(left: RouteResult, right: RouteResult): number {
+function compareRoutes(left: RouteCandidate, right: RouteCandidate, profile: OptimizationProfile): number {
   if (left.available !== right.available) return left.available ? -1 : 1;
   if (left.profileCost !== right.profileCost) return left.profileCost - right.profileCost;
+  if (profile === 'safest' && left.locationsWithoutInsurance !== right.locationsWithoutInsurance) {
+    return left.locationsWithoutInsurance - right.locationsWithoutInsurance;
+  }
+  if (profile === 'safest' && left.totalRaidTimeMin !== right.totalRaidTimeMin) {
+    return left.totalRaidTimeMin - right.totalRaidTimeMin;
+  }
   if (left.locations.length !== right.locations.length) return left.locations.length - right.locations.length;
   if (left.rawDocumentQuantity !== right.rawDocumentQuantity) return left.rawDocumentQuantity - right.rawDocumentQuantity;
   return locationIds(left).localeCompare(locationIds(right));
@@ -1150,6 +1179,13 @@ function bestSourceFactor(documentId: string, profile: OptimizationProfile, cata
     return location ? Number(location[PROFILE_FACTORS[profile]]) : Number.POSITIVE_INFINITY;
   }) ?? [];
   return Math.min(...sourceFactors);
+}
+
+function compareSourceLocations(left: LocationRecord, right: LocationRecord, profile: OptimizationProfile): number {
+  const primaryDifference = Number(left[PROFILE_FACTORS[profile]]) - Number(right[PROFILE_FACTORS[profile]]);
+  if (primaryDifference !== 0 || profile === 'fastest') return primaryDifference || left.id.localeCompare(right.id);
+  if (left.insurance !== right.insurance) return left.insurance ? -1 : 1;
+  return left.maxRaidTimeMin - right.maxRaidTimeMin || left.id.localeCompare(right.id);
 }
 
 function takeSurplus(surplus: Record<string, number>, quantity: number): Record<string, number> {

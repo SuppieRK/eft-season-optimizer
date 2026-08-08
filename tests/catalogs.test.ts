@@ -32,20 +32,20 @@ describe('catalogs', () => {
     expect(catalogs.battlePass.endsAt).toBeGreaterThan(0);
     expect(catalogs.battlePass.pages.length).toBeGreaterThan(0);
 
-    expect(Object.fromEntries(catalogs.locations.locations.map((location) => [location.id, [location.difficultyId, location.difficultyRating, location.maxRaidTimeMin]]))).toEqual({
-      'locations.lab.name': ['difficulty.insane', 4, 30],
-      'locations.labyrinth.name': ['difficulty.insane', 4, 30],
-      'locations.icebreaker.name': ['difficulty.insane', 4, 50],
-      'locations.groundZero.name': ['difficulty.hard', 3, 35],
-      'locations.woods.name': ['difficulty.normal', 2, 25],
-      'locations.streets.name': ['difficulty.insane', 4, 50],
-      'locations.factory.name': ['difficulty.easy', 1, 15],
-      'locations.customs.name': ['difficulty.hard', 3, 25],
-      'locations.interchange.name': ['difficulty.hard', 3, 35],
-      'locations.reserve.name': ['difficulty.insane', 4, 27],
-      'locations.lighthouse.name': ['difficulty.insane', 4, 30],
-      'locations.shoreline.name': ['difficulty.hard', 3, 35],
-      'locations.terminal.name': ['difficulty.insane', 4, 45],
+    expect(Object.fromEntries(catalogs.locations.locations.map((location) => [location.id, [location.difficultyId, location.difficultyRating, location.maxRaidTimeMin, location.insurance]]))).toEqual({
+      'locations.lab.name': ['difficulty.insane', 4, 30, false],
+      'locations.labyrinth.name': ['difficulty.insane', 4, 30, false],
+      'locations.icebreaker.name': ['difficulty.insane', 4, 50, false],
+      'locations.groundZero.name': ['difficulty.hard', 3, 35, true],
+      'locations.woods.name': ['difficulty.normal', 2, 25, true],
+      'locations.streets.name': ['difficulty.insane', 4, 50, true],
+      'locations.factory.name': ['difficulty.easy', 1, 15, true],
+      'locations.customs.name': ['difficulty.hard', 3, 25, true],
+      'locations.interchange.name': ['difficulty.hard', 3, 35, true],
+      'locations.reserve.name': ['difficulty.insane', 4, 27, true],
+      'locations.lighthouse.name': ['difficulty.insane', 4, 30, true],
+      'locations.shoreline.name': ['difficulty.hard', 3, 35, true],
+      'locations.terminal.name': ['difficulty.insane', 4, 45, true],
     });
 
     expect(catalogs.documents.documents.find((document) => document.id === 'documents.medical.name')?.sourceLocationIds).toContain('locations.labyrinth.name');

@@ -173,7 +173,7 @@ Opt-in route bundle selection SHALL first improve the route objective and SHALL 
 - **THEN** the optimizer selects the combination using the stated deterministic tie-breaking order
 
 ### Requirement: Fastest and Safest route objectives
-For remaining document deficits, the optimizer SHALL produce a Fastest profile that minimizes `sum(assigned documents × maxRaidTimeMin)` and a Safest profile that minimizes `sum(assigned documents × difficultyRating)`. Each profile SHALL break ties by fewer distinct locations, lower raw farming quantity, and stable location identifier order. Location factors SHALL remain identical across PvE, PvP, and PvP Seasonal; the selected mode affects scheduling through its daily limit only.
+For remaining document deficits, the optimizer SHALL produce a Fastest profile that minimizes `sum(assigned documents × maxRaidTimeMin)` and a Safest profile that minimizes `sum(assigned documents × difficultyRating)`. When Safest candidates have equal difficulty cost, it SHALL first prefer fewer selected locations without equipment insurance and then lower total `maxRaidTimeMin`. After profile-specific comparisons, each profile SHALL break ties by fewer distinct locations, lower raw farming quantity, and stable location identifier order. Location factors SHALL remain identical across PvE, PvP, and PvP Seasonal; the selected mode affects scheduling through its daily limit only.
 
 #### Scenario: Fastest and Safest differ
 - **WHEN** one complete route has lower maximum-raid-time cost and another has lower difficulty-rating cost
@@ -182,6 +182,10 @@ For remaining document deficits, the optimizer SHALL produce a Fastest profile t
 #### Scenario: Shared location wins a profile tie
 - **WHEN** candidate routes tie on a profile's route cost but one uses fewer distinct locations because multiple documents share that location
 - **THEN** that profile selects the route with fewer locations
+
+#### Scenario: Equipment insurance breaks a Safest tie
+- **WHEN** Safest candidate routes have equal difficulty cost and one uses fewer locations where equipment insurance is unavailable
+- **THEN** the optimizer selects the route with better equipment-insurance availability before comparing maximum raid time
 
 #### Scenario: Complete tie
 - **WHEN** candidates tie on profile cost, location count, and raw quantity
@@ -196,7 +200,7 @@ For remaining document deficits, the optimizer SHALL produce a Fastest profile t
 - **THEN** that profile is marked unavailable with a reason and no partial assignment
 
 ### Requirement: Location routing factors
-The optimizer SHALL read each recommended location's `maxRaidTimeMin`, `difficultyId`, and `difficultyRating` from `locations.json` and SHALL return the applicable factor values with every route result. It SHALL NOT derive different location factors from the selected game mode.
+The optimizer SHALL read each recommended location's `maxRaidTimeMin`, `difficultyId`, `difficultyRating`, and equipment `insurance` availability from `locations.json` and SHALL return the applicable factor values with every route result. It SHALL NOT derive different location factors from the selected game mode.
 
 #### Scenario: Factory routing factors
 - **WHEN** Factory is evaluated in PvE, PvP, or PvP Seasonal
@@ -247,7 +251,7 @@ For an available selected profile, the optimizer SHALL expose a next-raid recomm
 #### Scenario: Stockpile after covering the pass
 - **WHEN** every remaining reward requirement is covered but one or more rewards remain unchecked
 - **THEN** the result keeps the all-unclaimed-rewards goal and returns an optional crate-stockpile raid
-- **AND** Fastest orders eligible locations by maximum raid time, Safest orders them by difficulty rating, and both use the other factor then stable location ID as tie-breakers
+- **AND** Fastest orders eligible locations by maximum raid time, while Safest orders them by difficulty rating, equipment-insurance availability, maximum raid time, and stable location ID
 
 #### Scenario: Commit raid results
 - **WHEN** the player commits non-negative quantities obtained for either document available at the recommended location

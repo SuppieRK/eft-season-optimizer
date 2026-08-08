@@ -76,6 +76,8 @@
       "factorField": "difficultyRating",
       "tieBreakOrder": [
         "profileCost",
+        "insurance",
+        "maxRaidTimeMin",
         "distinctLocations",
         "rawDocumentQuantity",
         "locationId"

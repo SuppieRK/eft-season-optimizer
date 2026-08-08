@@ -2,7 +2,7 @@
 
 The repository currently contains the KORD BREACH screenshots and OpenSpec scaffolding but no application. The change introduces a client-only TypeScript optimizer for GitHub Pages. Players provide their game mode, document inventory, claimed rewards, Classified Documents, and TarCoin policy; the application combines those inputs with screenshot-reconstructed Battle Pass data to recommend farming locations and a reward-progressing daily plan.
 
-The optimizer must distinguish the selected game mode's daily document limit from location routing factors. PvE, PvP, and PvP Seasonal use different daily limits, but they share the same location difficulty and size characteristics. `difficultyRating` is the numeric form of the official in-game `difficultyId` and drives Safest routing, while `maxRaidTimeMin` acts as a transparent map-size and speed proxy for Fastest routing.
+The optimizer must distinguish the selected game mode's daily document limit from location routing factors. PvE, PvP, and PvP Seasonal use different daily limits, but they share the same location difficulty, insurance availability, and size characteristics. `difficultyRating` is the numeric form of the official in-game `difficultyId` and drives Safest routing, while `insurance` records whether insured player equipment can return from the location and `maxRaidTimeMin` acts as a transparent map-size and speed proxy for Fastest routing.
 
 ## Goals / Non-Goals
 
@@ -13,7 +13,7 @@ The optimizer must distinguish the selected game mode's daily document limit fro
 - Produce deterministic plans and a legal recommended redemption sequence for every unclaimed reward, or a chosen number of Black Division crates after all rewards are claimed.
 - Consume matching regular inventory first, maximize owned Classified Document consumption across all remaining rewards, then use useful `5:1` exchanges of surplus regular documents before farming or optional purchases.
 - Optionally model TarCoin-funded Classified Document bundles without making TarCoin spending the default.
-- Present Fastest and Safest route alternatives using maximum raid time and official difficulty rating, with deterministic low-hop tie-breaking and mode-specific daily-limit schedules.
+- Present Fastest and Safest route alternatives using maximum raid time, official difficulty rating, and equipment-insurance availability, with deterministic low-hop tie-breaking and mode-specific daily-limit schedules.
 - Persist player state in cookies and allow a complete reset to catalog defaults.
 - Present a green-toned, Tarkov Battle Pass-inspired interface that remains accessible and clearly unofficial.
 - Show the remaining season time from canonical metadata and stop cleanly when the season ends.
@@ -131,7 +131,7 @@ Human-authored textual descriptions for every item, displayed item image, and di
 The runtime data will be split into:
 
 - `documents.json`: regular and Classified Document identifiers, `kind`, descriptions and image alternatives, and source location identifiers. Each document's canonical `id` is its name localization ID. Farmability, crate-exchange eligibility, and Classified-backfill eligibility are derived from `kind`; the catalog does not duplicate them as booleans.
-- `locations.json`: location identifiers, `difficultyId`, matching numeric `difficultyRating`, and `maxRaidTimeMin`. Each location's canonical `id` is its name localization ID.
+- `locations.json`: location identifiers, `difficultyId`, matching numeric `difficultyRating`, `maxRaidTimeMin`, and an `insurance` boolean that records whether insured player equipment can return from the location. Each location's canonical `id` is its name localization ID.
 - `battle-pass.json`: top-level season `id` and `endsAt` metadata, game-data version, ordered pages, rewards, document requirements, and TarCoin grants. The initial canonical `gameDataVersion` is `1.1.0.0.46657.8.6.2026`, combining the current game version and evidence date supplied by the user.
 - `optimizer-rules.json`: mode daily limits, `5:1` regular-document and `10:1` crate exchange ratios, Classified Document bundles, screenshot-priced TarCoin purchase packages, and deterministic optimization tie-breaking rules.
 - `localization.json`: default and supported locale metadata plus ID-centered text and structured local-price entries; each entry has an `id` and a `localizations` object containing the values for every declared language side by side.
@@ -193,32 +193,32 @@ Each purchasable package references a structured locale-dependent price in `loca
 
 ### 9. Produce Fastest and Safest route alternatives
 
-Each location has two global routing factors shared by PvE, PvP, and PvP Seasonal. `maxRaidTimeMin` roughly tracks map size and acts as the Fastest profile's speed proxy: a longer maximum raid time implies a larger, slower location. `difficultyId` resolves the official in-game difficulty label, and `difficultyRating` stores its numeric routing value using `Easy = 1`, `Normal = 2`, `Hard = 3`, and `Insane = 4` for the Safest profile. Keeping these factors mode-independent avoids unsupported assumptions that PvE materially changes location difficulty or that PvP Seasonal differs from PvP.
+Each location has global routing factors shared by PvE, PvP, and PvP Seasonal. `maxRaidTimeMin` roughly tracks map size and acts as the Fastest profile's speed proxy: a longer maximum raid time implies a larger, slower location. `difficultyId` resolves the official in-game difficulty label, and `difficultyRating` stores its numeric routing value using `Easy = 1`, `Normal = 2`, `Hard = 3`, and `Insane = 4` for the Safest profile. The `insurance` boolean records whether insured player equipment can return after death on that location; it does not describe or alter documents. Keeping these factors mode-independent avoids unsupported assumptions that PvE materially changes location difficulty or that PvP Seasonal differs from PvP.
 
 The initial catalog is:
 
-| Location | Difficulty | Difficulty rating | Maximum raid time (min) |
-|---|---:|---:|---:|
-| The Lab | Insane | 4 | 30 |
-| The Labyrinth | Insane | 4 | 30 |
-| Ice Breaker | Insane | 4 | 50 |
-| Ground Zero | Hard | 3 | 35 |
-| Woods | Normal | 2 | 25 |
-| Streets of Tarkov | Insane | 4 | 50 |
-| Factory | Easy | 1 | 15 |
-| Customs | Hard | 3 | 25 |
-| Interchange | Hard | 3 | 35 |
-| Reserve | Insane | 4 | 27 |
-| Lighthouse | Insane | 4 | 30 |
-| Shoreline | Hard | 3 | 35 |
-| Terminal | Insane | 4 | 45 |
+| Location | Difficulty | Difficulty rating | Maximum raid time (min) | Insurance |
+|---|---:|---:|---:|---:|
+| The Lab | Insane | 4 | 30 | No |
+| The Labyrinth | Insane | 4 | 30 | No |
+| Ice Breaker | Insane | 4 | 50 | No |
+| Ground Zero | Hard | 3 | 35 | Yes |
+| Woods | Normal | 2 | 25 | Yes |
+| Streets of Tarkov | Insane | 4 | 50 | Yes |
+| Factory | Easy | 1 | 15 | Yes |
+| Customs | Hard | 3 | 25 | Yes |
+| Interchange | Hard | 3 | 35 | Yes |
+| Reserve | Insane | 4 | 27 | Yes |
+| Lighthouse | Insane | 4 | 30 | Yes |
+| Shoreline | Hard | 3 | 35 | Yes |
+| Terminal | Insane | 4 | 45 | Yes |
 
 The optimizer evaluates the complete Classified allocation and farming assignment independently for two profiles:
 
 - **Fastest** minimizes `sum(assigned documents × maxRaidTimeMin)`.
-- **Safest** minimizes `sum(assigned documents × difficultyRating)`.
+- **Safest** minimizes `sum(assigned documents × difficultyRating)`, then prefers routes whose selected locations support equipment insurance, then lower total maximum raid time.
 
-Each profile breaks ties by fewer distinct locations, lower raw farming quantity, then stable location identifier order. Shared document availability is therefore handled directly by the assignment. The number of known locations is small enough to enumerate candidate location subsets deterministically without an external solver.
+After the profile-specific tie-breakers, each profile prefers fewer distinct locations, lower raw farming quantity, then stable location identifier order. Shared document availability is therefore handled directly by the assignment. The number of known locations is small enough to enumerate candidate location subsets deterministically without an external solver.
 
 The header presents one persisted Fastest/Safest toggle in its right control section, defaulting to Safest, and renders only the selected profile. The selected result explains its locations through maximum raid time and official difficulty without showing abstract profile cost. If both profiles produce the same assignment, the selected view identifies the coincidence. If catalog eligibility makes a profile impossible, the result explains why that option is unavailable rather than returning a partial route. Once every reward is claimed, the toggle disappears and the single Fastest Black Division crate plan is shown.
 
@@ -238,7 +238,7 @@ The daily limit affects only the projected schedule and estimated number of days
 
 When every reward is marked claimed, the all-unclaimed-rewards plan switches to a crate-count control with a default of one. The engine first applies the player's regular-document inventory, identified by `kind: "regular"`, toward the 10:1 crate requirement, then assigns any shortage to the eligible farming location with the lowest `maxRaidTimeMin`. A larger user-selected crate count scales the requirement. If the requested crate quantity is already covered, the next raid remains available as an optional stockpile recommendation for another crate.
 
-While rewards remain unchecked but current inventory already covers every remaining requirement, the goal stays `all-unclaimed-rewards` and the reward rail remains visible. The next raid alone switches to optional crate-stockpile purpose. Fastest chooses the eligible location by `maxRaidTimeMin`, Safest chooses by `difficultyRating`, and each uses the other factor followed by stable location ID as deterministic tie-breakers.
+While rewards remain unchecked but current inventory already covers every remaining requirement, the goal stays `all-unclaimed-rewards` and the reward rail remains visible. The next raid alone switches to optional crate-stockpile purpose. Fastest chooses the eligible location by `maxRaidTimeMin`. Safest chooses by `difficultyRating`, then equipment-insurance availability, then `maxRaidTimeMin`, followed by stable location ID.
 
 Classified Documents and Classified bundle purchases are excluded because Classified Documents cannot be exchanged. If the player already owns enough regular documents, the result recommends immediate exchanges before any farming.
 

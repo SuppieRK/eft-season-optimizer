@@ -9,79 +9,92 @@
       "id": "locations.lab.name",
       "difficultyId": "difficulty.insane",
       "maxRaidTimeMin": 30,
-      "difficultyRating": 4
+      "difficultyRating": 4,
+      "insurance": false
     },
     {
       "id": "locations.labyrinth.name",
       "difficultyId": "difficulty.insane",
       "maxRaidTimeMin": 30,
-      "difficultyRating": 4
+      "difficultyRating": 4,
+      "insurance": false
     },
     {
       "id": "locations.icebreaker.name",
       "difficultyId": "difficulty.insane",
       "maxRaidTimeMin": 50,
-      "difficultyRating": 4
+      "difficultyRating": 4,
+      "insurance": false
     },
     {
       "id": "locations.groundZero.name",
       "difficultyId": "difficulty.hard",
       "maxRaidTimeMin": 35,
-      "difficultyRating": 3
+      "difficultyRating": 3,
+      "insurance": true
     },
     {
       "id": "locations.woods.name",
       "difficultyId": "difficulty.normal",
       "maxRaidTimeMin": 25,
-      "difficultyRating": 2
+      "difficultyRating": 2,
+      "insurance": true
     },
     {
       "id": "locations.streets.name",
       "difficultyId": "difficulty.insane",
       "maxRaidTimeMin": 50,
-      "difficultyRating": 4
+      "difficultyRating": 4,
+      "insurance": true
     },
     {
       "id": "locations.factory.name",
       "difficultyId": "difficulty.easy",
       "maxRaidTimeMin": 15,
-      "difficultyRating": 1
+      "difficultyRating": 1,
+      "insurance": true
     },
     {
       "id": "locations.customs.name",
       "difficultyId": "difficulty.hard",
       "maxRaidTimeMin": 25,
-      "difficultyRating": 3
+      "difficultyRating": 3,
+      "insurance": true
     },
     {
       "id": "locations.interchange.name",
       "difficultyId": "difficulty.hard",
       "maxRaidTimeMin": 35,
-      "difficultyRating": 3
+      "difficultyRating": 3,
+      "insurance": true
     },
     {
       "id": "locations.reserve.name",
       "difficultyId": "difficulty.insane",
       "maxRaidTimeMin": 27,
-      "difficultyRating": 4
+      "difficultyRating": 4,
+      "insurance": true
     },
     {
       "id": "locations.lighthouse.name",
       "difficultyId": "difficulty.insane",
       "maxRaidTimeMin": 30,
-      "difficultyRating": 4
+      "difficultyRating": 4,
+      "insurance": true
     },
     {
       "id": "locations.shoreline.name",
       "difficultyId": "difficulty.hard",
       "maxRaidTimeMin": 35,
-      "difficultyRating": 3
+      "difficultyRating": 3,
+      "insurance": true
     },
     {
       "id": "locations.terminal.name",
       "difficultyId": "difficulty.insane",
       "maxRaidTimeMin": 45,
-      "difficultyRating": 4
+      "difficultyRating": 4,
+      "insurance": true
     }
   ]
 }

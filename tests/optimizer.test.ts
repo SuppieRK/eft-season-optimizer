@@ -222,6 +222,35 @@ describe('optimizer', () => {
     expect(fastestLocation.maxRaidTimeMin).toBe(25);
   });
 
+  it('prefers equipment insurance before raid time when Safest locations have equal difficulty', () => {
+    const catalogs = structuredClone(loadCatalogs()) as Catalogs;
+    const iceBreaker = catalogs.locations.locations.find((location) => location.id === 'locations.icebreaker.name') as {
+      maxRaidTimeMin: number;
+    };
+    iceBreaker.maxRaidTimeMin = 1;
+    const requiredDocuments = catalogs.battlePass.pages
+      .flatMap((page) => page.rewards)
+      .flatMap((reward) => reward.requirements)
+      .reduce<Record<string, number>>((totals, requirement) => {
+        totals[requirement.documentId] = (totals[requirement.documentId] ?? 0) + requirement.quantity;
+        return totals;
+      }, {});
+    const ownedDocuments = Object.fromEntries(Object.entries(requiredDocuments)
+      .map(([documentId, quantity]) => [documentId, documentId === 'documents.pmc.name' ? 0 : quantity]));
+    const result = optimize(input(catalogs, { ownedDocuments, mode: 'pvp-seasonal' }));
+
+    expect(result.profiles.fastest.nextRaid).toMatchObject({
+      locationId: 'locations.icebreaker.name',
+      insurance: false,
+    });
+    expect(result.profiles.safest.nextRaid).toMatchObject({
+      locationId: 'locations.reserve.name',
+      difficultyRating: 4,
+      maxRaidTimeMin: 27,
+      insurance: true,
+    });
+  });
+
   it('returns an unavailable profile instead of a partial assignment', () => {
     const catalogs = structuredClone(loadCatalogs()) as Catalogs;
     const financial = catalogs.documents.documents.find((document) => document.id === 'documents.financial.name') as { sourceLocationIds: string[] };

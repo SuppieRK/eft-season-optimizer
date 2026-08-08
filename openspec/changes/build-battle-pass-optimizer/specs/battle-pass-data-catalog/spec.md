@@ -57,7 +57,7 @@ Each document thumbnail SHALL be authored after comparing its occurrences across
 - **THEN** a side-by-side review confirms its document artwork matches the contributing screenshot evidence outside the removed overlay and its catalog entry exposes only the final cleaned asset path
 
 ### Requirement: Location catalog routing factors
-The location catalog SHALL define each location's official in-game difficulty through `difficultyId`, its matching numeric `difficultyRating`, and its `maxRaidTimeMin`. Each location's canonical `id` SHALL equal its name localization ID, and the catalog SHALL NOT define a parallel short identifier or `nameId`. `difficultyRating` SHALL map `Easy` to `1`, `Normal` to `2`, `Hard` to `3`, and `Insane` to `4`. `maxRaidTimeMin` SHALL be a positive integer used as a transparent map-size and speed proxy. These factors SHALL be shared by PvE, PvP, and PvP Seasonal; game mode SHALL affect the daily document limit rather than location routing factors.
+The location catalog SHALL define each location's official in-game difficulty through `difficultyId`, its matching numeric `difficultyRating`, its `maxRaidTimeMin`, and an `insurance` boolean that records whether insured player equipment can return from that location. Each location's canonical `id` SHALL equal its name localization ID, and the catalog SHALL NOT define a parallel short identifier or `nameId`. `difficultyRating` SHALL map `Easy` to `1`, `Normal` to `2`, `Hard` to `3`, and `Insane` to `4`. `maxRaidTimeMin` SHALL be a positive integer used as a transparent map-size and speed proxy. Insurance SHALL NOT describe or modify documents. These factors SHALL be shared by PvE, PvP, and PvP Seasonal; game mode SHALL affect the daily document limit rather than location routing factors.
 
 #### Scenario: Official initial location values
 - **WHEN** the initial location catalog is loaded
@@ -70,9 +70,14 @@ The location catalog SHALL define each location's official in-game difficulty th
 - **WHEN** the initial location catalog is loaded
 - **THEN** The Lab, The Labyrinth, Ice Breaker, Ground Zero, Woods, Streets of Tarkov, Factory, Customs, Interchange, Reserve, Lighthouse, Shoreline, and Terminal have `maxRaidTimeMin` values `30, 30, 50, 35, 25, 50, 15, 25, 35, 27, 30, 35, 45` respectively
 
+#### Scenario: Initial equipment-insurance availability
+- **WHEN** the initial location catalog is loaded
+- **THEN** The Lab, The Labyrinth, and Ice Breaker have `insurance: false`
+- **AND** every other configured location has `insurance: true`
+
 #### Scenario: Game mode does not alter location factors
 - **WHEN** the player changes between PvE, PvP, and PvP Seasonal
-- **THEN** every location retains the same `difficultyRating` and `maxRaidTimeMin`
+- **THEN** every location retains the same `difficultyRating`, `maxRaidTimeMin`, and `insurance` value
 
 ### Requirement: Screenshot-backed Battle Pass inventory
 The Battle Pass catalog SHALL define season pages, reward identifiers, prerequisite relationships, document requirements, and TarCoin grants for every reconstructed reward. Each season and reward `id` SHALL equal its name localization ID, and the catalog SHALL NOT define a parallel short identifier, `nameId` field, or raw `sourceTitle` value. Reward display names SHALL be resolved from `localization.json` using the canonical reward `id`. The reward `kind` field SHALL be the sole type indicator; crate rewards SHALL use `kind: "crate"`, and the catalog SHALL NOT duplicate that classification with a `blackDivisionGearCrate` flag. Every reward requirement SHALL reference the canonical document `id` from `documents.json`. Screenshot evidence used for reconstruction is authoring-only and SHALL NOT be required by the runtime catalog.

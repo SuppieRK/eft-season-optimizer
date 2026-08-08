@@ -1,7 +1,7 @@
 ## 1. Create the JSON Catalogs First
 
 - [x] 1.1 Create `public/data/documents.json` with every regular and Classified Document using its name localization ID as the single canonical ID, plus descriptions, image references, source locations, and `kind`; derive farmability, crate-exchange eligibility, and Classified-backfill eligibility from `kind` without storing redundant flags.
-- [x] 1.2 Create `public/data/locations.json` with every location using its name localization ID as the single canonical ID, plus `difficultyId`, matching `difficultyRating`, and `maxRaidTimeMin` shared across game modes.
+- [x] 1.2 Create `public/data/locations.json` with every location using its name localization ID as the single canonical ID, plus `difficultyId`, matching `difficultyRating`, `maxRaidTimeMin`, and equipment `insurance` availability shared across game modes.
 - [x] 1.3 Create `public/data/battle-pass.json` with game-data version `1.1.0.0.46657.8.6.2026`, top-level season `id` and `endsAt: 1796634000`, pages, rewards, prerequisites, document requirements, and TarCoin grants.
 - [x] 1.4 Create `public/data/optimizer-rules.json` with `dailyDocumentLimits` of `10`/`15`/`25` for PvE/PvP/PvP Seasonal, the regular-document `5:1` and Black Division `10:1` exchanges, the complete Classified Document bundles, the six screenshot-priced purchasable TarCoin packages and their local-price IDs, and deterministic tie-break ordering; exclude the unpriced `2,000` TarCoin “RECEIVED” offer from purchase calculations.
 - [x] 1.5 Create `public/data/localization.json` with locale metadata and ID-centered `{ id, localizations }` text and structured local-price entries for the default development locale, including every ID referenced by the other four catalogs and screenshot-backed English numeric prices plus ISO currency codes for the six TarCoin packages.
@@ -21,7 +21,7 @@
 
 ## 3. Validate and Load Catalog Data
 
-- [x] 3.1 Define TypeScript types and runtime parsers for all five JSON catalogs, including localization-backed canonical entity IDs, rejection of parallel `nameId` fields, kind-derived document behavior without redundant boolean flags, and location `difficultyId`, `difficultyRating`, and `maxRaidTimeMin` records.
+- [x] 3.1 Define TypeScript types and runtime parsers for all five JSON catalogs, including localization-backed canonical entity IDs, rejection of parallel `nameId` fields, kind-derived document behavior without redundant boolean flags, and location `difficultyId`, `difficultyRating`, `maxRaidTimeMin`, and equipment `insurance` records.
 - [x] 3.2 Implement catalog loading that returns normalized immutable domain data and actionable validation failures before optimizer startup.
 - [x] 3.3 Validate duplicate IDs, numeric ranges, text and structured-price localization references, document/location references, kind-derived document behavior and source invariants, absence of redundant behavior flags, ordered pages and the implicit previous-page-minus-one unlock rule, reward prerequisites, dependency cycles, redeemability, exchange ratios, bundle and TarCoin package values, asset paths, and season metadata.
 - [x] 3.4 Add catalog tests for game version `1.1.0.0.46657.8.6.2026`, timestamp `1796634000`, difficulty ID/rating mappings, maximum raid times, mode limits, `5:1` regular-document and `10:1` Black Division exchange ratios, six purchasable TarCoin packages, and their exact English local prices.
@@ -180,3 +180,4 @@
 - [x] 16.38 Select the informational buyout's Classified Document bundle plan against the combined remaining-pass deficit before staging its purchases through legal reward progression, so volume bundles are compared against repeated small purchases.
 - [x] 16.39 Remove editable and persisted TarCoin inventory, derive informational TarCoins from claimed Battle Pass rewards, use one Classified Document balance during buyout simulation, and cover remaining deficits from 500 to zero with bundle-selection regressions.
 - [x] 16.40 Make informational Classified bundle selection fill the remaining deficit from largest bundle to smallest without exceeding it, allow a farmable uncovered remainder, and add the confirmed 450, 350, and 71 examples to regressions.
+- [x] 16.41 Add equipment-insurance availability to location data, prefer insured locations before maximum raid time when Safest difficulty costs tie, keep Fastest behavior unchanged, and add catalog plus optimizer regressions.

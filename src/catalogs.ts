@@ -60,6 +60,7 @@ export interface LocationRecord {
   readonly difficultyId: DifficultyId;
   readonly maxRaidTimeMin: number;
   readonly difficultyRating: number;
+  readonly insurance: boolean;
 }
 
 export interface LocationsCatalog {
@@ -326,6 +327,7 @@ function parseLocations(raw: unknown, localization: LocalizationCatalog, issues:
       difficultyId,
       maxRaidTimeMin: asInteger(location.maxRaidTimeMin, `${id}.maxRaidTimeMin`, issues, 1),
       difficultyRating,
+      insurance: asBoolean(location.insurance, `${id}.insurance`, issues),
     };
   });
   requireUnique(locations.map((location) => location.id), 'locations.locations', issues);
