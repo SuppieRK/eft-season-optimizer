@@ -2539,7 +2539,10 @@
       refreshRewardRail = () => {
         const claimedRewards = new Set(state.claimedRewardIds);
         const allRewardsClaimed = rewards.every((reward) => claimedRewards.has(reward.id));
-        rewardPages.replaceChildren(...(allRewardsClaimed ? [crateReward] : pageViews.map(({ pageSection }) => pageSection)));
+        const accordionIsMounted = pageViews.every(({ pageSection }) => pageSection.parentElement === rewardPages);
+        const crateIsMounted = crateReward.parentElement === rewardPages;
+        if (allRewardsClaimed && !crateIsMounted) rewardPages.replaceChildren(crateReward);
+        else if (!allRewardsClaimed && !accordionIsMounted) rewardPages.replaceChildren(...pageViews.map(({ pageSection }) => pageSection));
         claimAllButton.disabled = allRewardsClaimed;
         pageViews.forEach(({ page, pageSection, trigger, panel, redeemableCount, claimedCount, rewardInputs }) => {
           const selected = page.page === state.selectedPage;

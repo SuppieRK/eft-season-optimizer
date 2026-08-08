@@ -323,6 +323,30 @@ describe('optimizer', () => {
     expect(result.buyout.grossTarCoinsSpent).toBe(tarCoins);
   });
 
+  it('keeps the localized buyout currency stable as document requirements change', () => {
+    const raw = readRaw();
+    const sourceReward = (raw.battlePass as { pages: Array<{ rewards: Array<Record<string, unknown>> }> })
+      .pages.flatMap((page) => page.rewards)[0];
+    const battlePass = structuredClone(raw.battlePass) as Record<string, unknown>;
+    battlePass.pages = [{
+      page: 1,
+      rewards: [{
+        ...sourceReward,
+        requirements: [{ documentId: 'documents.financial.name', quantity: 500 }],
+      }],
+    }];
+    const catalogs = parseCatalogs({ ...raw, battlePass });
+
+    for (const remaining of [500, 250, 50]) {
+      const result = optimize(input(catalogs, {
+        classifiedDocuments: 500 - remaining,
+        locale: 'ru-RU',
+      }));
+      expect(result.buyout.localEstimate?.currency).toBe('RUB');
+      expect(result.buyout.keepBattlePassTarCoinsLocalEstimate?.currency).toBe('RUB');
+    }
+  });
+
   it('does not consume Classified Documents when there is no redeemable reward', () => {
     const catalogs = loadCatalogs();
     const result = optimize(input(catalogs, {

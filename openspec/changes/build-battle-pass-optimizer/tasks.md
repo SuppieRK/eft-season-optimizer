@@ -184,3 +184,5 @@
 - [x] 16.43 Match the full-schedule Regular-document exchanges heading to the amber exchange warning and match all Day headings to the estimated-days season accent, with Chromium style regressions.
 - [x] 16.44 Remove optional TarCoin route purchases from optimizer inputs and results, application state, cookies, setup controls, schedule output, catalog policy, localization, tests, and documentation while preserving the informational buyout; remove the inactive schedule exchange icon from layout with `display: none`.
 - [x] 16.45 Let the desktop main workspace consume all vertical space left between the fixed header and intrinsic footer within the viewport-height shell, while retaining content-driven height below the stacked breakpoint.
+- [x] 16.46 Preserve the reward accordion's scroll position when individual rewards change by keeping its page nodes mounted, while still replacing the rail when entering or leaving the all-rewards crate fallback.
+- [x] 16.47 Correct the first Russian TarCoin package currency to RUB and add optimizer coverage proving that changing remaining document requirements cannot switch the localized buyout between USD and RUB.

@@ -15,6 +15,7 @@ const tarCoinsReward = 'rewards.tarcoins50-01.name';
 const burnPosterReward = 'rewards.burn-poster.name';
 const crateReward = 'rewards.bd-crate01.name';
 const blackWoodReward = 'rewards.black-wood-ceiling.name';
+const norincoReward = 'rewards.norinco-cq-a1.name';
 
 test('keeps one accordion page open and persists the selected page', async ({ page }) => {
   await openWireframe(page);
@@ -30,6 +31,21 @@ test('keeps one accordion page open and persists the selected page', async ({ pa
   await expect(page.locator('.reward-page__panel:visible')).toHaveCount(1);
   await page.reload();
   await expect(page.locator('.reward-page__trigger[aria-expanded="true"]')).toHaveAttribute('id', 'reward-page-trigger-2');
+});
+
+test('keeps the accordion scroll position when a lower reward is tracked', async ({ page }) => {
+  await openWireframe(page);
+
+  const accordion = page.locator('[data-reward-pages]');
+  await page.locator('#reward-page-trigger-12').click();
+  const reward = rewardRow(page, norincoReward);
+  await reward.scrollIntoViewIfNeeded();
+  const scrollTop = await accordion.evaluate((element) => element.scrollTop);
+  expect(scrollTop).toBeGreaterThan(0);
+
+  await reward.locator('label').click();
+  await expect(page.locator(`[data-reward-id="${norincoReward}"]`)).toBeChecked();
+  expect(await accordion.evaluate((element) => element.scrollTop)).toBe(scrollTop);
 });
 
 test('uses alternative-option redeemable counts from the same inventory snapshot', async ({ page }) => {
