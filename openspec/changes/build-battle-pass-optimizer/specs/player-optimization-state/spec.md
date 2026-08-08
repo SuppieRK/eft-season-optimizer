@@ -334,9 +334,14 @@ The application SHALL persist player-controlled progress, optimizer settings, lo
 - **THEN** the affected state falls back safely to catalog defaults
 
 #### Scenario: Refresh state after catalog data changes
-- **WHEN** the player reloads with an optimizer cookie that has no catalog fingerprint or has a fingerprint different from the freshly loaded catalogs
+- **WHEN** the player reloads with an optimizer cookie whose catalog fingerprint differs from the freshly loaded catalogs
 - **THEN** the application deletes every optimizer cookie and immediately writes fresh defaults with the current fingerprint
 - **AND** no manual catalog version update is required
+
+#### Scenario: Migrate legacy state without data loss
+- **WHEN** the player reloads with older cookie envelopes that have no catalog fingerprint and have a game-data version matching the loaded Battle Pass
+- **THEN** the application restores the sanitized player progress, settings, locale, selected page, route profile, and notice state
+- **AND** the application rewrites all optimizer cookies with the current catalog fingerprint
 
 ### Requirement: Cookie-storage notice
 The application SHALL show a non-blocking dismissible toast on first use explaining that cookies store planner selections on the device, and SHALL persist the dismissal.

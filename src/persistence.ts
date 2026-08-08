@@ -28,6 +28,12 @@ interface Envelope<T> {
   readonly payload: T;
 }
 
+interface LegacyEnvelope<T> {
+  readonly gameDataVersion: string;
+  readonly schemaVersion: number;
+  readonly payload: T;
+}
+
 interface ProgressPayload {
   readonly claimedRewardIds: readonly string[];
   readonly ownedDocuments: Readonly<Record<string, number>>;
@@ -87,14 +93,16 @@ export function restoreState(
     ),
   };
   const dataFingerprint = catalogs.dataFingerprint;
-  if (hasDataFingerprintMismatch(cookies, dataFingerprint)) {
+  const compatibility = getCookieCompatibility(cookies, catalogs);
+  if (compatibility === 'reset') {
     clearPersistedState(cookies);
     saveState(defaults, cookies, catalogs);
     return defaults;
   }
-  const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress, dataFingerprint);
-  const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings, dataFingerprint);
-  const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui, dataFingerprint);
+  const legacyGameDataVersion = compatibility === 'migrate' ? catalogs.battlePass.gameDataVersion : undefined;
+  const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress, dataFingerprint, legacyGameDataVersion);
+  const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings, dataFingerprint, legacyGameDataVersion);
+  const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui, dataFingerprint, legacyGameDataVersion);
   const restored = {
     ...defaults,
     ...(progress ? sanitizeProgress(progress, defaults, catalogs) : {}),
@@ -106,7 +114,9 @@ export function restoreState(
     ?.rewards.some((reward) => !restored.claimedRewardIds.includes(reward.id))
     ? restored.selectedPage
     : getDefaultRewardPage(catalogs, restored.claimedRewardIds);
-  return { ...restored, selectedPage };
+  const result = { ...restored, selectedPage };
+  if (compatibility === 'migrate') saveState(result, cookies, catalogs);
+  return result;
 }
 
 export function resetPersistedState(cookies: CookieAdapter, catalogs: Catalogs, confirmed: boolean): AppState | undefined {
@@ -125,28 +135,42 @@ function writeEnvelope<T>(cookies: CookieAdapter, name: string, payload: T, data
   cookies.write(name, value, 60 * 60 * 24 * 365);
 }
 
-function readEnvelope<T>(cookies: CookieAdapter, name: string, dataFingerprint: string): T | undefined {
+function readEnvelope<T>(
+  cookies: CookieAdapter,
+  name: string,
+  dataFingerprint: string,
+  legacyGameDataVersion?: string,
+): T | undefined {
   const raw = cookies.read(name);
   if (!raw) return undefined;
   try {
-    const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<T>>;
-    return envelope.dataFingerprint === dataFingerprint && envelope.schemaVersion === COOKIE_SCHEMA_VERSION ? envelope.payload : undefined;
+    const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<T> & LegacyEnvelope<T>>;
+    const compatibleData = envelope.dataFingerprint === dataFingerprint
+      || (legacyGameDataVersion !== undefined && envelope.gameDataVersion === legacyGameDataVersion);
+    return compatibleData && envelope.schemaVersion === COOKIE_SCHEMA_VERSION ? envelope.payload : undefined;
   } catch {
     return undefined;
   }
 }
 
-function hasDataFingerprintMismatch(cookies: CookieAdapter, dataFingerprint: string): boolean {
-  return Object.values(COOKIE_NAMES).some((name) => {
+function getCookieCompatibility(cookies: CookieAdapter, catalogs: Catalogs): 'current' | 'migrate' | 'reset' {
+  let legacyCookieFound = false;
+  for (const name of Object.values(COOKIE_NAMES)) {
     const raw = cookies.read(name);
-    if (!raw) return false;
+    if (!raw) continue;
     try {
-      const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<unknown>>;
-      return envelope.dataFingerprint !== dataFingerprint;
+      const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<unknown> & LegacyEnvelope<unknown>>;
+      if (typeof envelope.dataFingerprint === 'string') {
+        if (envelope.dataFingerprint !== catalogs.dataFingerprint) return 'reset';
+      } else if (typeof envelope.gameDataVersion === 'string') {
+        if (envelope.gameDataVersion !== catalogs.battlePass.gameDataVersion) return 'reset';
+        legacyCookieFound = true;
+      }
     } catch {
-      return false;
+      // Malformed segments fall back independently during restoration.
     }
-  });
+  }
+  return legacyCookieFound ? 'migrate' : 'current';
 }
 
 function sanitizeProgress(payload: ProgressPayload, defaults: AppState, catalogs: Catalogs): Partial<AppState> {

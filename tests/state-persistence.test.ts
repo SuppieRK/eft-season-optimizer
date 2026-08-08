@@ -178,16 +178,52 @@ describe('state and cookie persistence', () => {
     expect(() => saveState({ ...defaults, claimedRewardIds: Array.from({ length: 1000 }, (_, index) => `unknown-${index}`) }, cookies, catalog)).toThrow(/cookie size limit/);
   });
 
-  it('replaces legacy cookies that do not contain a data fingerprint on reload', () => {
+  it('migrates legacy cookies to a data fingerprint without losing player state', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
+    const expected = {
+      ...createDefaultState(catalog),
+      mode: 'pvp' as const,
+      claimedRewardIds: ['rewards.dogtag01.name'],
+      ownedDocuments: {
+        ...createDefaultState(catalog).ownedDocuments,
+        'documents.financial.name': 12,
+        'documents.medical.name': 3,
+      },
+      classifiedDocuments: 4,
+      crateCount: 2,
+      locale: 'ru-RU',
+      selectedPage: 2,
+      selectedProfile: 'fastest' as const,
+      cookieNoticeDismissed: true,
+    };
+    cookies.values['kord-breach-progress'] = encodeURIComponent(JSON.stringify({
+      gameDataVersion: catalog.battlePass.gameDataVersion,
+      schemaVersion: 1,
+      payload: {
+        claimedRewardIds: expected.claimedRewardIds,
+        ownedDocuments: expected.ownedDocuments,
+        classifiedDocuments: expected.classifiedDocuments,
+        crateCount: expected.crateCount,
+      },
+    }));
     cookies.values['kord-breach-settings'] = encodeURIComponent(JSON.stringify({
       gameDataVersion: catalog.battlePass.gameDataVersion,
       schemaVersion: 1,
-      payload: { mode: 'pvp' },
+      payload: { mode: expected.mode, locale: expected.locale },
+    }));
+    cookies.values['kord-breach-ui'] = encodeURIComponent(JSON.stringify({
+      gameDataVersion: catalog.battlePass.gameDataVersion,
+      schemaVersion: 1,
+      payload: {
+        selectedPage: expected.selectedPage,
+        selectedProfile: expected.selectedProfile,
+        cookieNoticeDismissed: expected.cookieNoticeDismissed,
+      },
     }));
 
-    expect(restoreState(cookies, catalog)).toEqual(createDefaultState(catalog));
+    const restored = restoreState(cookies, catalog);
+    expect(restored).toEqual(expected);
     expect(Object.keys(cookies.values)).toHaveLength(3);
     for (const raw of Object.values(cookies.values)) {
       const envelope = JSON.parse(decodeURIComponent(raw)) as Record<string, unknown>;

@@ -51,18 +51,35 @@ async function seedOptimizerState(
   await expect(page.locator('[data-season-name]')).toHaveText('KORD BREACH');
 }
 
-test('replaces legacy optimizer cookies with current catalog fingerprints on reload', async ({ page }) => {
+test('migrates legacy optimizer cookies without losing player state on reload', async ({ page }) => {
   await openWireframe(page);
-  await page.evaluate((legacyValue) => {
-    document.cookie = `kord-breach-settings=${legacyValue}; Path=/; SameSite=Lax`;
-  }, encodeURIComponent(JSON.stringify({
-      gameDataVersion: 'legacy-version',
+  const gameDataVersion = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/battle-pass.json', document.baseURI), { cache: 'no-store' });
+    return ((await response.json()) as { gameDataVersion: string }).gameDataVersion;
+  });
+  await page.evaluate(({ version }) => {
+    const envelope = (payload: object) => encodeURIComponent(JSON.stringify({
+      gameDataVersion: version,
       schemaVersion: 1,
-      payload: { mode: 'pvp', locale: 'en-GB' },
-  })));
+      payload,
+    }));
+    document.cookie = `kord-breach-progress=${envelope({
+      claimedRewardIds: [],
+      ownedDocuments: { 'documents.financial.name': 12 },
+      classifiedDocuments: 4,
+      crateCount: 1,
+    })}; Path=/; SameSite=Lax`;
+    document.cookie = `kord-breach-settings=${envelope({ mode: 'pvp', locale: 'en-GB' })}; Path=/; SameSite=Lax`;
+    document.cookie = `kord-breach-ui=${envelope({
+      selectedPage: 1,
+      selectedProfile: 'fastest',
+      cookieNoticeDismissed: true,
+    })}; Path=/; SameSite=Lax`;
+  }, { version: gameDataVersion });
 
   await page.reload();
-  await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
+  await expect(documentQuantity(page, 'documents.financial.name')).toHaveValue('12');
+  await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('4');
   const dataFingerprint = await catalogDataFingerprint(page);
   const optimizerCookies = (await page.context().cookies())
     .filter((cookie) => cookie.name.startsWith('kord-breach-'));
@@ -72,6 +89,9 @@ test('replaces legacy optimizer cookies with current catalog fingerprints on rel
     expect(envelope.dataFingerprint).toBe(dataFingerprint);
     expect(envelope).not.toHaveProperty('gameDataVersion');
   }
+  const settingsCookie = optimizerCookies.find((cookie) => cookie.name === 'kord-breach-settings');
+  const settingsEnvelope = JSON.parse(decodeURIComponent(settingsCookie!.value)) as { payload: { mode: string } };
+  expect(settingsEnvelope.payload.mode).toBe('pvp');
 });
 
 test('offers a raid beside the starting Classified Document redemption option', async ({ page }) => {
