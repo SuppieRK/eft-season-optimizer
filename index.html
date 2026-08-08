@@ -57,6 +57,7 @@
         --document-border: #95d6bc;
         --action-surface: #3f5960;
         --purchase-accent: #af8a45;
+        --exchange-warning: #f2c94c;
         --classified-frame: #8d5155;
         --reward-opportunity: var(--purchase-accent);
         --reward-complete-background:
@@ -672,6 +673,10 @@
       }
 
       .focus-heading__actions button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--section-eyebrow-gap);
         block-size: var(--section-action-height);
         padding: 0 var(--section-action-inline-padding);
         border: 1px solid var(--line-muted);
@@ -691,6 +696,22 @@
       .focus-heading__actions [data-commit-raid] {
         border-color: var(--action-surface);
         background: var(--action-surface);
+      }
+
+      .schedule-exchange-warning__icon {
+        flex: none;
+        inline-size: 1.25em;
+        block-size: 1.25em;
+        color: var(--exchange-warning);
+        visibility: hidden;
+      }
+
+      [data-view-route-schedule].view-route-schedule--exchange-required {
+        border-color: color-mix(in srgb, var(--exchange-warning) 64%, var(--line-muted));
+      }
+
+      .view-route-schedule--exchange-required .schedule-exchange-warning__icon {
+        visibility: visible;
       }
 
       .focus-heading__actions button:hover,
@@ -1060,6 +1081,10 @@
         margin-block-start: var(--space-m);
       }
 
+      .schedule-action-group--exchange h4 {
+        color: var(--exchange-warning);
+      }
+
       .schedule-projection-day {
         display: grid;
         gap: var(--space-s);
@@ -1074,6 +1099,7 @@
       }
 
       .schedule-projection-day h3 {
+        color: var(--season-accent);
         font-size: var(--font-size-label);
       }
 
@@ -2146,7 +2172,7 @@
     <script type="module">
       import SlimSelect from 'slim-select';
       import 'slim-select/styles';
-      import { CircleHelp, X, createElement as createIconElement } from 'lucide';
+      import { ArrowLeftRight, CircleHelp, X, createElement as createIconElement } from 'lucide';
       import flagIconUrls from 'virtual:locale-flags';
       import { loadCatalogs } from './src/catalogs.ts';
       import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber, getCompleteLocales, getLocaleRegion, hyphenateForLocale } from './src/localization.ts';
@@ -2632,6 +2658,25 @@
         return element;
       };
 
+      const renderScheduleButton = (exchangeCount = 0) => {
+        const label = localizer.text('ui.viewFullSchedule');
+        const warning = localizer.text('ui.exchange', {
+          count: formatNumber(exchangeCount, localizer.locale),
+        });
+        const icon = createUiIcon(ArrowLeftRight, 'schedule-exchange-warning__icon');
+        icon.dataset.exchangeWarning = '';
+        viewRouteScheduleButton.replaceChildren(createElement('span', '', label), icon);
+        viewRouteScheduleButton.classList.toggle('view-route-schedule--exchange-required', exchangeCount > 0);
+        viewRouteScheduleButton.setAttribute('aria-label', exchangeCount > 0 ? `${label}. ${warning}` : label);
+        if (exchangeCount > 0) {
+          viewRouteScheduleButton.title = warning;
+          viewRouteScheduleButton.dataset.exchangeCount = String(exchangeCount);
+        } else {
+          viewRouteScheduleButton.removeAttribute('title');
+          delete viewRouteScheduleButton.dataset.exchangeCount;
+        }
+      };
+
       const documentAssetUrl = (imagePath) => `${import.meta.env.BASE_URL}${imagePath.replace(/^\//u, '')}`;
 
       const renderScheduleProjection = (profile) => {
@@ -2646,7 +2691,7 @@
           const actions = createElement('section', 'schedule-plan-actions');
           actions.append(createElement('h3', '', localizer.text('ui.planActions')));
           if (profile.exchanges.length > 0) {
-            const group = createElement('div', 'schedule-action-group');
+            const group = createElement('div', 'schedule-action-group schedule-action-group--exchange');
             const list = document.createElement('ul');
             group.append(createElement('h4', '', localizer.text('ui.regularExchanges')));
             profile.exchanges.forEach((exchange) => {
@@ -2958,7 +3003,7 @@
         currentProfile = profile;
         currentOptimizerResult = result;
         refreshBuyoutLink(result);
-        viewRouteScheduleButton.textContent = localizer.text('ui.viewFullSchedule');
+        renderScheduleButton(profile.exchanges.length);
         viewRouteScheduleButton.disabled = !(
           profile.schedule.length > 0
           || profile.projectedImmediateRewardIds.length > 0
@@ -3006,7 +3051,7 @@
         focusEyebrow.textContent = localizer.text('ui.nextRaid');
         focusHeading.textContent = localizer.text('ui.nextRaid');
         focusContent.replaceChildren(createElement('p', 'focus-loading', '…'));
-        viewRouteScheduleButton.textContent = localizer.text('ui.viewFullSchedule');
+        renderScheduleButton();
         commitRaidButton.textContent = localizer.text('ui.commitRaidResult');
         buyoutLink.hidden = true;
       };
@@ -3044,6 +3089,7 @@
           focusEyebrow.textContent = localizer.text('ui.nextRaid');
           focusHeading.textContent = localizer.text('optimizer.noRoute');
           focusContent.replaceChildren(createElement('p', 'focus-message', data.error));
+          renderScheduleButton();
           viewRouteScheduleButton.disabled = true;
           commitRaidButton.disabled = true;
           buyoutLink.hidden = true;

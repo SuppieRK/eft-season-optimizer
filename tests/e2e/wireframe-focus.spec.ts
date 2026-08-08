@@ -214,6 +214,12 @@ test('accepts a zero-yield Commit and exposes the projected schedule on demand',
   await expect(dialog).toBeVisible();
   await expect(dialog.locator('[data-route-schedule-estimate]')).toHaveText(/Estimated days: \d+/u);
   await expect(dialog.locator('.schedule-projection-day')).not.toHaveCount(0);
+  const [estimatedDaysColor, dayHeadingColor] = await Promise.all([
+    dialog.locator('[data-route-schedule-estimate]').evaluate((element) => getComputedStyle(element).color),
+    dialog.locator('.schedule-projection-day h3').first().evaluate((element) => getComputedStyle(element).color),
+  ]);
+  expect(dayHeadingColor).toBe(estimatedDaysColor);
+  expect(dayHeadingColor).toBe('rgb(66, 140, 115)');
   await expect(dialog.locator('.schedule-day-column--raids')).not.toHaveCount(0);
   await expect(dialog.locator('.schedule-day-column--rewards')).not.toHaveCount(0);
   await expect(dialog.getByRole('heading', { name: 'Raids' }).first()).toBeVisible();
@@ -323,10 +329,20 @@ test('keeps required exchanges and Classified purchases visible in the full sche
     claimedRewardIds: claimedExceptDogtag,
     ownedDocuments: { 'documents.project.name': 5 },
   });
-  await page.getByRole('button', { name: 'View full schedule' }).click();
+  let scheduleButton = page.locator('[data-view-route-schedule]');
+  const exchangeWarning = scheduleButton.locator('[data-exchange-warning]');
+  await expect(scheduleButton).toHaveClass(/view-route-schedule--exchange-required/u);
+  await expect(scheduleButton).toHaveAttribute('data-exchange-count', '1');
+  await expect(scheduleButton).toHaveAttribute('title', 'Regular-document exchanges: 1');
+  await expect(scheduleButton).toHaveAttribute('aria-label', 'View full schedule. Regular-document exchanges: 1');
+  await expect(exchangeWarning).toBeVisible();
+  await expect(exchangeWarning).toHaveCSS('color', 'rgb(242, 201, 76)');
+  await scheduleButton.click();
   let dialog = page.locator('[data-route-schedule-dialog]');
   await expect(dialog.getByRole('heading', { name: 'Plan actions' })).toBeVisible();
-  await expect(dialog.getByRole('heading', { name: 'Regular-document exchanges' })).toBeVisible();
+  const exchangeHeading = dialog.getByRole('heading', { name: 'Regular-document exchanges' });
+  await expect(exchangeHeading).toBeVisible();
+  await expect(exchangeHeading).toHaveCSS('color', 'rgb(242, 201, 76)');
   await expect(dialog.locator('.schedule-plan-actions')).toContainText(/Project documentation × 5.*Financial documents/su);
   await dialog.getByRole('button', { name: 'Close' }).click();
 
@@ -334,7 +350,12 @@ test('keeps required exchanges and Classified purchases visible in the full sche
     claimedRewardIds: claimedExceptDogtag,
     spendTarCoinsOnClassifiedDocuments: true,
   });
-  await page.getByRole('button', { name: 'View full schedule' }).click();
+  scheduleButton = page.locator('[data-view-route-schedule]');
+  await expect(scheduleButton).not.toHaveClass(/view-route-schedule--exchange-required/u);
+  await expect(scheduleButton.locator('[data-exchange-warning]')).toBeHidden();
+  await expect(scheduleButton).not.toHaveAttribute('data-exchange-count');
+  await expect(scheduleButton).not.toHaveAttribute('title');
+  await scheduleButton.click();
   dialog = page.locator('[data-route-schedule-dialog]');
   await expect(dialog.getByRole('heading', { name: 'Classified Document purchases' })).toBeVisible();
   await expect(dialog.locator('.schedule-plan-actions')).toContainText('20 Classified Documents × 1');

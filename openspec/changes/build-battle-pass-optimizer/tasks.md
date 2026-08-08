@@ -181,3 +181,5 @@
 - [x] 16.39 Remove editable and persisted TarCoin inventory, derive informational TarCoins from claimed Battle Pass rewards, use one Classified Document balance during buyout simulation, and cover remaining deficits from 500 to zero with bundle-selection regressions.
 - [x] 16.40 Make informational Classified bundle selection fill the remaining deficit from largest bundle to smallest without exceeding it, allow a farmable uncovered remainder, and add the confirmed 450, 350, and 71 examples to regressions.
 - [x] 16.41 Add equipment-insurance availability to location data, prefer insured locations before maximum raid time when Safest difficulty costs tie, keep Fastest behavior unchanged, and add catalog plus optimizer regressions.
+- [x] 16.42 Add a reserved bright amber exchange icon, localized accessible exchange count, and hover warning to View full schedule when the selected profile requires regular-document exchanges, with Chromium regression coverage.
+- [x] 16.43 Match the full-schedule Regular-document exchanges heading to the amber exchange warning and match all Day headings to the estimated-days season accent, with Chromium style regressions.
