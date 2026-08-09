@@ -1,8 +1,172 @@
 import { expect, test } from '@playwright/test';
 
-import { documentQuantity, openWireframe, setDocumentQuantity } from './wireframe-helpers';
+import { documentQuantity, openWireframe, setDocumentQuantity, trackRewardWithoutInventoryChange } from './wireframe-helpers';
 
 const dogtagReward = 'rewards.dogtag01.name';
+
+type MutableCatalog = Record<string, unknown>;
+
+interface CatalogMutation {
+  readonly fileName: 'documents.json' | 'locations.json' | 'battle-pass.json' | 'optimizer-rules.json' | 'localization.json';
+  readonly scenario: 'add entry' | 'remove entry' | 'modify entry';
+  readonly mutate: (catalog: MutableCatalog) => void;
+}
+
+function catalogEntries(catalog: MutableCatalog, key: string): MutableCatalog[] {
+  const value = catalog[key];
+  if (!Array.isArray(value)) throw new Error(`${key} must be an array`);
+  return value as MutableCatalog[];
+}
+
+function catalogObject(catalog: MutableCatalog, key: string): MutableCatalog {
+  const value = catalog[key];
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${key} must be an object`);
+  return value as MutableCatalog;
+}
+
+function catalogEntry(entries: MutableCatalog[], id: string): MutableCatalog {
+  const entry = entries.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Missing catalog entry ${id}`);
+  return entry;
+}
+
+const catalogMutations: readonly CatalogMutation[] = [
+  {
+    fileName: 'documents.json',
+    scenario: 'add entry',
+    mutate: (catalog) => catalogEntries(catalog, 'documents').push({
+      id: 'rewards.dogtag01.name',
+      kind: 'regular',
+      descriptionId: 'documents.financial.description',
+      imageAltId: 'documents.financial.alt',
+      imagePath: '/assets/documents/financial.webp',
+      sourceLocationIds: ['locations.factory.name'],
+    }),
+  },
+  {
+    fileName: 'documents.json',
+    scenario: 'remove entry',
+    mutate: (catalog) => {
+      const financial = catalogEntry(catalogEntries(catalog, 'documents'), 'documents.financial.name');
+      (financial.sourceLocationIds as string[]).pop();
+    },
+  },
+  {
+    fileName: 'documents.json',
+    scenario: 'modify entry',
+    mutate: (catalog) => {
+      const financial = catalogEntry(catalogEntries(catalog, 'documents'), 'documents.financial.name');
+      financial.sourceLocationIds = [...(financial.sourceLocationIds as string[])].reverse();
+    },
+  },
+  {
+    fileName: 'locations.json',
+    scenario: 'add entry',
+    mutate: (catalog) => catalogEntries(catalog, 'locations').push({
+      id: 'documents.classified.name',
+      difficultyId: 'difficulty.easy',
+      maxRaidTimeMin: 10,
+      difficultyRating: 1,
+      insurance: true,
+    }),
+  },
+  {
+    fileName: 'locations.json',
+    scenario: 'remove entry',
+    mutate: (catalog) => {
+      const locations = catalogEntries(catalog, 'locations');
+      const index = locations.findIndex((location) => location.id === 'locations.terminal.name');
+      if (index < 0) throw new Error('Missing Terminal entry');
+      locations.splice(index, 1);
+    },
+  },
+  {
+    fileName: 'locations.json',
+    scenario: 'modify entry',
+    mutate: (catalog) => {
+      catalogEntry(catalogEntries(catalog, 'locations'), 'locations.terminal.name').maxRaidTimeMin = 44;
+    },
+  },
+  {
+    fileName: 'battle-pass.json',
+    scenario: 'add entry',
+    mutate: (catalog) => {
+      const pages = catalogEntries(catalog, 'pages');
+      catalogEntries(pages.at(-1)!, 'rewards').push({
+        id: 'documents.classified.name',
+        kind: 'cosmetic',
+        requirements: [{ documentId: 'documents.financial.name', quantity: 1 }],
+      });
+    },
+  },
+  {
+    fileName: 'battle-pass.json',
+    scenario: 'remove entry',
+    mutate: (catalog) => {
+      const pages = catalogEntries(catalog, 'pages');
+      catalogEntries(pages.at(-1)!, 'rewards').pop();
+    },
+  },
+  {
+    fileName: 'battle-pass.json',
+    scenario: 'modify entry',
+    mutate: (catalog) => {
+      const pages = catalogEntries(catalog, 'pages');
+      const rewards = catalogEntries(pages.at(-1)!, 'rewards');
+      const requirements = catalogEntries(rewards.at(-1)!, 'requirements');
+      requirements[0].quantity = Number(requirements[0].quantity) + 1;
+    },
+  },
+  {
+    fileName: 'optimizer-rules.json',
+    scenario: 'add entry',
+    mutate: (catalog) => catalogEntries(catalogObject(catalog, 'classifiedDocuments'), 'bundles').push({
+      classifiedDocuments: 10,
+      tarCoins: 275,
+    }),
+  },
+  {
+    fileName: 'optimizer-rules.json',
+    scenario: 'remove entry',
+    mutate: (catalog) => {
+      catalogEntries(catalogObject(catalog, 'classifiedDocuments'), 'bundles').pop();
+    },
+  },
+  {
+    fileName: 'optimizer-rules.json',
+    scenario: 'modify entry',
+    mutate: (catalog) => {
+      const bundles = catalogEntries(catalogObject(catalog, 'classifiedDocuments'), 'bundles');
+      bundles.at(-1)!.tarCoins = Number(bundles.at(-1)!.tarCoins) + 1;
+    },
+  },
+  {
+    fileName: 'localization.json',
+    scenario: 'add entry',
+    mutate: (catalog) => catalogEntries(catalog, 'entries').push({
+      id: 'test.catalogMutation',
+      localizations: { 'en-GB': 'Catalog mutation', 'ru-RU': 'Изменение каталога' },
+    }),
+  },
+  {
+    fileName: 'localization.json',
+    scenario: 'remove entry',
+    mutate: (catalog) => {
+      const entries = catalogEntries(catalog, 'entries');
+      const index = entries.findIndex((entry) => entry.id === 'ui.warning');
+      if (index < 0) throw new Error('Missing warning localization entry');
+      entries.splice(index, 1);
+    },
+  },
+  {
+    fileName: 'localization.json',
+    scenario: 'modify entry',
+    mutate: (catalog) => {
+      const warning = catalogEntry(catalogEntries(catalog, 'entries'), 'ui.warning');
+      catalogObject(warning, 'localizations')['en-GB'] = 'Warning changed: {text}';
+    },
+  },
+];
 
 async function catalogDataFingerprint(page: Parameters<typeof openWireframe>[0]): Promise<string> {
   return page.evaluate(async () => {
@@ -90,6 +254,38 @@ test('migrates legacy optimizer cookies without losing player state on reload', 
   const settingsEnvelope = JSON.parse(decodeURIComponent(settingsCookie!.value)) as { payload: { mode: string } };
   expect(settingsEnvelope.payload.mode).toBe('pvp');
 });
+
+for (const mutation of catalogMutations) {
+  test(`preserves player state when ${mutation.fileName} receives a ${mutation.scenario}`, async ({ page }) => {
+    await openWireframe(page);
+    await setDocumentQuantity(page, 'documents.financial.name', 12);
+    await trackRewardWithoutInventoryChange(page, dogtagReward);
+    const originalFingerprint = await catalogDataFingerprint(page);
+    const changedCatalog = await page.evaluate(async (fileName) => {
+      const response = await fetch(new URL(`data/${fileName}`, document.baseURI), { cache: 'no-store' });
+      return await response.json() as MutableCatalog;
+    }, mutation.fileName);
+    mutation.mutate(changedCatalog);
+    const consoleErrors: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(message.text());
+    });
+    await page.route(`**/data/${mutation.fileName}`, (route) => route.fulfill({ json: changedCatalog }));
+
+    await page.reload();
+    await expect(page.locator('.wireframe-shell')).toHaveAttribute('aria-busy', 'false');
+    await expect(page.locator('[data-app-error]')).toBeHidden();
+    await expect(documentQuantity(page, 'documents.financial.name')).toHaveValue('12');
+    await expect(page.locator(`[data-reward-id="${dogtagReward}"]`)).toBeChecked();
+    const changedFingerprint = await catalogDataFingerprint(page);
+    expect(changedFingerprint).not.toBe(originalFingerprint);
+    for (const cookie of (await page.context().cookies()).filter((candidate) => candidate.name.startsWith('kord-breach-'))) {
+      const envelope = JSON.parse(decodeURIComponent(cookie.value)) as { dataFingerprint: string };
+      expect(envelope.dataFingerprint).toBe(changedFingerprint);
+    }
+    expect(consoleErrors).toEqual([]);
+  });
+}
 
 test('offers a raid beside the starting Classified Document redemption option', async ({ page }) => {
   await openWireframe(page);

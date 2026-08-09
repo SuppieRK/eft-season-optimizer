@@ -249,7 +249,7 @@ describe('state and cookie persistence', () => {
     }
   });
 
-  it('replaces all cookies when any catalog value changes', () => {
+  it('refreshes all cookies after a catalog change without losing valid player state', () => {
     const raw = readCatalogs();
     const originalCatalog = parseCatalogs(raw);
     const changedRaw = structuredClone(raw);
@@ -259,14 +259,20 @@ describe('state and cookie persistence', () => {
     localization.priceEntries[0].localizations['en-GB'].price += 1;
     const changedCatalog = parseCatalogs(changedRaw);
     const cookies = memoryCookies();
-    saveState({
+    const previousState = {
       ...createDefaultState(originalCatalog),
       mode: 'pvp',
+      claimedRewardIds: ['rewards.dogtag01.name'],
       ownedDocuments: { 'documents.financial.name': 12 },
-    }, cookies, originalCatalog);
+    } as const;
+    saveState(previousState, cookies, originalCatalog);
 
     expect(changedCatalog.dataFingerprint).not.toBe(originalCatalog.dataFingerprint);
-    expect(restoreState(cookies, changedCatalog)).toEqual(createDefaultState(changedCatalog));
+    const restored = restoreState(cookies, changedCatalog);
+    expect(restored.mode).toBe('pvp');
+    expect(restored.ownedDocuments['documents.financial.name']).toBe(12);
+    expect(restored.classifiedDocuments).toBe(previousState.classifiedDocuments);
+    expect(restored.claimedRewardIds).toEqual(previousState.claimedRewardIds);
     for (const rawCookie of Object.values(cookies.values)) {
       const envelope = JSON.parse(decodeURIComponent(rawCookie)) as Record<string, unknown>;
       expect(envelope.dataFingerprint).toBe(changedCatalog.dataFingerprint);

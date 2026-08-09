@@ -96,9 +96,10 @@ export function restoreState(
     return defaults;
   }
   const legacyGameDataVersion = compatibility === 'migrate' ? catalogs.battlePass.gameDataVersion : undefined;
-  const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress, dataFingerprint, legacyGameDataVersion);
-  const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings, dataFingerprint, legacyGameDataVersion);
-  const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui, dataFingerprint, legacyGameDataVersion);
+  const acceptStaleFingerprint = compatibility === 'refresh';
+  const progress = readEnvelope<ProgressPayload>(cookies, COOKIE_NAMES.progress, dataFingerprint, legacyGameDataVersion, acceptStaleFingerprint);
+  const settings = readEnvelope<SettingsPayload>(cookies, COOKIE_NAMES.settings, dataFingerprint, legacyGameDataVersion, acceptStaleFingerprint);
+  const ui = readEnvelope<UiPayload>(cookies, COOKIE_NAMES.ui, dataFingerprint, legacyGameDataVersion, acceptStaleFingerprint);
   const restored = {
     ...defaults,
     ...(progress ? sanitizeProgress(progress, defaults, catalogs) : {}),
@@ -111,7 +112,7 @@ export function restoreState(
     ? restored.selectedPage
     : getNextUnredeemedRewardPage(catalogs, restored.claimedRewardIds, restored.selectedPage);
   const result = { ...restored, selectedPage };
-  if (compatibility === 'migrate') saveState(result, cookies, catalogs);
+  if (compatibility === 'migrate' || compatibility === 'refresh') saveState(result, cookies, catalogs);
   return result;
 }
 
@@ -136,12 +137,14 @@ function readEnvelope<T>(
   name: string,
   dataFingerprint: string,
   legacyGameDataVersion?: string,
+  acceptStaleFingerprint = false,
 ): T | undefined {
   const raw = cookies.read(name);
   if (!raw) return undefined;
   try {
     const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<T> & LegacyEnvelope<T>>;
     const compatibleData = envelope.dataFingerprint === dataFingerprint
+      || (acceptStaleFingerprint && typeof envelope.dataFingerprint === 'string')
       || (legacyGameDataVersion !== undefined && envelope.gameDataVersion === legacyGameDataVersion);
     return compatibleData && envelope.schemaVersion === COOKIE_SCHEMA_VERSION ? envelope.payload : undefined;
   } catch {
@@ -149,15 +152,16 @@ function readEnvelope<T>(
   }
 }
 
-function getCookieCompatibility(cookies: CookieAdapter, catalogs: Catalogs): 'current' | 'migrate' | 'reset' {
+function getCookieCompatibility(cookies: CookieAdapter, catalogs: Catalogs): 'current' | 'migrate' | 'refresh' | 'reset' {
   let legacyCookieFound = false;
+  let staleFingerprintFound = false;
   for (const name of Object.values(COOKIE_NAMES)) {
     const raw = cookies.read(name);
     if (!raw) continue;
     try {
       const envelope = JSON.parse(decodeURIComponent(raw)) as Partial<Envelope<unknown> & LegacyEnvelope<unknown>>;
       if (typeof envelope.dataFingerprint === 'string') {
-        if (envelope.dataFingerprint !== catalogs.dataFingerprint) return 'reset';
+        if (envelope.dataFingerprint !== catalogs.dataFingerprint) staleFingerprintFound = true;
       } else if (typeof envelope.gameDataVersion === 'string') {
         if (envelope.gameDataVersion !== catalogs.battlePass.gameDataVersion) return 'reset';
         legacyCookieFound = true;
@@ -166,6 +170,7 @@ function getCookieCompatibility(cookies: CookieAdapter, catalogs: Catalogs): 'cu
       // Malformed segments fall back independently during restoration.
     }
   }
+  if (staleFingerprintFound) return 'refresh';
   return legacyCookieFound ? 'migrate' : 'current';
 }
 

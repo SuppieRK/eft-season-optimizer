@@ -357,8 +357,10 @@ The application SHALL persist player-controlled progress, optimizer settings, lo
 - **THEN** the affected state falls back safely to catalog defaults
 
 #### Scenario: Refresh state after catalog data changes
-- **WHEN** the player reloads with an optimizer cookie whose catalog fingerprint differs from the freshly loaded catalogs
-- **THEN** the application deletes every optimizer cookie and immediately writes fresh defaults with the current fingerprint
+- **WHEN** the player reloads with an optimizer cookie whose catalog fingerprint differs because an entry was added, removed, or modified in any of the five freshly loaded catalogs
+- **THEN** the application sanitizes and preserves compatible inventory, claims, settings, locale, selected page, and route profile values
+- **AND** removed or invalid catalog references fall back safely to current defaults
+- **AND** the application immediately rewrites every optimizer cookie with the current fingerprint
 - **AND** no manual catalog version update is required
 
 #### Scenario: Migrate legacy state without data loss
