@@ -5,7 +5,7 @@
     "en-GB",
     "ru-RU"
   ],
-  "releaseStatus": "development-only; Russian localization and human-reviewed descriptions require review",
+  "releaseStatus": "release",
   "entries": [
     {
       "id": "app.title",

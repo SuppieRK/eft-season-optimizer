@@ -87,8 +87,8 @@
 
 ## 11. Complete Additional Localizations Last
 
-- [ ] 11.1 Add the user-supplied additional language values to each existing `localization.json` entry and expose only languages with complete coverage in the selector.
-- [ ] 11.2 Replace every development placeholder with reviewed human-authored item names and descriptions, image alternatives, screenshot descriptions, UI text, TarCoin price and buyout messages, requirement abbreviations, and route factor labels for every release locale.
+- [x] 11.1 Add the user-supplied additional language values to each existing `localization.json` entry and expose only languages with complete coverage in the selector.
+- [x] 11.2 Replace every development placeholder with reviewed human-authored item names and descriptions, image alternatives, screenshot descriptions, UI text, TarCoin price and buyout messages, requirement abbreviations, and route factor labels for every release locale.
 - [x] 11.3 Add production release-gate validation that rejects missing language values, missing or orphaned IDs, placeholders, absent descriptions, incomplete selectable locales, and untranslated assistive text.
 - [x] 11.5 Run strict OpenSpec validation, all unit and DOM tests, accessibility checks, catalog validation, and the GitHub Pages production build; document any publication blockers without bypassing localization or UI/UX approval gates.
 - [x] 11.6 Add complete best-effort `ru-RU` text coverage, preserve every interpolation placeholder, expose the locale through its generated Russian flag asset, retain explicit screenshot-backed USD prices until regional prices are reviewed, and keep Russian terminology review as a release blocker.
@@ -184,7 +184,7 @@
 - [x] 16.52 Advance the reward accordion from a newly completed page to the next later unredeemed page before wrapping to earlier incomplete pages, and add state plus Chromium regressions.
 - [x] 16.53 Add optional production-only Cloudflare Web Analytics from a GitHub Actions repository variable, omit it from development and unconfigured builds, validate the exact external beacon, document setup and privacy behavior, and add build-configuration regressions.
 - [x] 16.54 Add a shared site configuration, independently indexable English-root and Russian `/ru/` static pages, canonical and reciprocal language metadata, a crawlable shell and catalog-derived About dialog, a two-URL sitemap, social and structured metadata, responsive document images, optional Search Console verification, repository discovery metadata, and deterministic browser/build regressions.
-- [ ] 16.55 Configure post-deployment search discovery in Google Search Console and Bing Webmaster Tools.
+- [x] 16.55 Configure post-deployment search discovery in Google Search Console and Bing Webmaster Tools.
   - Add the canonical URL-prefix property to Google Search Console.
   - Set the `GOOGLE_SITE_VERIFICATION` repository variable. Then redeploy and complete verification.
   - Submit the sitemap. Then request indexing for both locale URLs.
