@@ -32,10 +32,12 @@ function validateLocalePage(route) {
   const document = new JSDOM(html).window.document;
   const canonicalUrl = new URL(route.path, site.canonicalUrl).href;
   const text = (id) => localizationEntries.get(id)?.[route.locale];
+  const description = text('seo.description');
 
   assert.equal(document.documentElement.lang, route.locale, `${route.locale} has the wrong html lang`);
   assert.equal(document.title, text('seo.title'), `${route.locale} has the wrong title`);
-  assert.equal(meta(document, 'name', 'description'), text('seo.description'), `${route.locale} has the wrong description`);
+  assert.ok([...description].length >= 25 && [...description].length <= 160, `${route.locale} description must contain 25 to 160 characters`);
+  assert.equal(meta(document, 'name', 'description'), description, `${route.locale} has the wrong description`);
   assert.equal(meta(document, 'name', 'robots'), 'max-image-preview:large', `${route.locale} has the wrong robots metadata`);
   assert.doesNotMatch(meta(document, 'name', 'robots'), /noindex|nofollow/iu);
   assert.equal(document.querySelector('link[rel="canonical"]')?.href, canonicalUrl, `${route.locale} has the wrong canonical`);
