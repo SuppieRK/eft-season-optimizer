@@ -5,12 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Plan the fastest or safest Escape from Tarkov Battle Pass document farming route."
+      content="Optimize Escape from Tarkov KORD BREACH Battle Pass document farming. Track rewards, compare the fastest or safest locations, and plan Classified Document use."
     />
-    <title>KORD BREACH Optimizer</title>
+    <meta name="robots" content="max-image-preview:large" />
+    <link rel="canonical" href="https://suppierk.github.io/eft-season-optimizer/" />
+    <link rel="alternate" hreflang="en" href="https://suppierk.github.io/eft-season-optimizer/" />
+    <link rel="alternate" hreflang="ru" href="https://suppierk.github.io/eft-season-optimizer/ru/" />
+    <link rel="alternate" hreflang="x-default" href="https://suppierk.github.io/eft-season-optimizer/" />
+    <meta property="og:title" content="Escape from Tarkov KORD BREACH Battle Pass Optimizer" />
+    <meta property="og:description" content="Optimize Escape from Tarkov KORD BREACH Battle Pass document farming. Track rewards, compare the fastest or safest locations, and plan Classified Document use." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://suppierk.github.io/eft-season-optimizer/" />
+    <meta property="og:site_name" content="EFT Season Optimizer" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta property="og:image" content="https://suppierk.github.io/eft-season-optimizer/assets/social/eft-season-optimizer.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="EFT Season Optimizer: KORD BREACH Battle Pass farming planner" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Escape from Tarkov KORD BREACH Battle Pass Optimizer" />
+    <meta name="twitter:description" content="Optimize Escape from Tarkov KORD BREACH Battle Pass document farming. Track rewards, compare the fastest or safest locations, and plan Classified Document use." />
+    <meta name="twitter:image" content="https://suppierk.github.io/eft-season-optimizer/assets/social/eft-season-optimizer.png" />
+    <meta name="twitter:image:alt" content="EFT Season Optimizer: KORD BREACH Battle Pass farming planner" />
+    <title>Escape from Tarkov KORD BREACH Battle Pass Optimizer</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./src/typography.css" />
     <link rel="stylesheet" href="./src/spacing.css" />
+    <script type="application/ld+json" data-structured-data>{"@context":"https://schema.org","@type":"WebApplication","name":"EFT Season Optimizer","alternateName":"KORD BREACH Optimizer","url":"https://suppierk.github.io/eft-season-optimizer/","description":"Optimize Escape from Tarkov KORD BREACH Battle Pass document farming. Track rewards, compare the fastest or safest locations, and plan Classified Document use.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript and a modern web browser.","isAccessibleForFree":true,"offers":{"@type":"Offer","price":0,"priceCurrency":"USD"},"inLanguage":"en-GB","image":"https://suppierk.github.io/eft-season-optimizer/assets/social/eft-season-optimizer.png","sameAs":"https://github.com/SuppieRK/eft-season-optimizer","about":{"@type":"VideoGame","name":"Escape from Tarkov"}}</script>
     <style>
       :root {
         --canvas-width: 94vw;
@@ -227,6 +250,7 @@
       }
 
       .season-name {
+        margin: 0;
         overflow: hidden;
         font-size: var(--header-body-font-size);
         letter-spacing: 0.08em;
@@ -622,8 +646,13 @@
         border-block-end-style: solid;
       }
 
-      .wireframe-shell[data-app-pending] {
-        display: none;
+      .app-error {
+        margin: 0;
+        padding: var(--space-m);
+        border: 1px solid var(--classified-frame);
+        color: var(--label);
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-body);
       }
 
       .focus-heading,
@@ -904,7 +933,8 @@
       }
 
       .route-schedule-dialog,
-      .buyout-dialog {
+      .buyout-dialog,
+      .about-dialog {
         inline-size: min(900px, calc(100vw - (2 * var(--space-xl))));
         max-block-size: min(760px, calc(100dvh - (2 * var(--space-xl))));
         padding: 0;
@@ -916,18 +946,21 @@
       }
 
       .route-schedule-dialog[open],
-      .buyout-dialog[open] {
+      .buyout-dialog[open],
+      .about-dialog[open] {
         display: flex;
         flex-direction: column;
       }
 
       .route-schedule-dialog::backdrop,
-      .buyout-dialog::backdrop {
+      .buyout-dialog::backdrop,
+      .about-dialog::backdrop {
         background: rgb(0 0 0 / 72%);
       }
 
       .route-schedule-dialog > header,
-      .buyout-dialog > header {
+      .buyout-dialog > header,
+      .about-dialog > header {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -937,7 +970,8 @@
       }
 
       .route-schedule-dialog h2,
-      .buyout-dialog h2 {
+      .buyout-dialog h2,
+      .about-dialog h2 {
         margin: 0;
         font-size: var(--font-size-heading);
       }
@@ -950,7 +984,8 @@
       }
 
       .route-schedule-dialog header button,
-      .buyout-dialog header button {
+      .buyout-dialog header button,
+      .about-dialog header button {
         display: grid;
         place-items: center;
         inline-size: var(--section-action-height);
@@ -974,13 +1009,79 @@
       }
 
       [data-route-schedule-content],
-      [data-buyout-content] {
+      [data-buyout-content],
+      [data-about-content] {
         min-block-size: 0;
         padding: 0 var(--space-m);
         overflow: auto;
         scrollbar-color: var(--line) var(--surface);
         scrollbar-width: thin;
         scrollbar-gutter: stable;
+      }
+
+      [data-about-content] {
+        display: grid;
+        gap: var(--space-l);
+        padding-block: var(--space-m);
+      }
+
+      .about-summary,
+      .about-location-note,
+      .about-rules p {
+        margin: 0;
+        color: var(--label-muted);
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-body);
+      }
+
+      .about-rules {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-m) var(--space-l);
+      }
+
+      .about-rules article {
+        padding-block-start: var(--space-s);
+        border-block-start: 1px solid var(--line-muted);
+      }
+
+      .about-rules h3,
+      .about-table-section h3 {
+        margin: 0 0 var(--space-xs);
+        color: var(--season-accent);
+        font-size: var(--font-size-label);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .about-table-scroll {
+        max-inline-size: 100%;
+        overflow-x: auto;
+      }
+
+      .about-table {
+        inline-size: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-body);
+      }
+
+      .about-table th,
+      .about-table td {
+        padding: var(--space-xs) var(--space-s);
+        border-block-end: 1px solid var(--line-muted);
+        text-align: start;
+        vertical-align: top;
+      }
+
+      .about-table thead th {
+        color: var(--label);
+      }
+
+      .about-table tbody th,
+      .about-table tbody td {
+        color: var(--label-muted);
+        font-weight: 400;
       }
 
       .schedule-plan-actions,
@@ -1739,7 +1840,8 @@
         background: var(--line-muted);
       }
 
-      .wireframe-footer__reset {
+      .wireframe-footer__reset,
+      .wireframe-footer__about {
         flex: 0 0 auto;
         padding: 0;
         border: 0;
@@ -1754,11 +1856,13 @@
         cursor: pointer;
       }
 
-      .wireframe-footer__reset:hover {
+      .wireframe-footer__reset:hover,
+      .wireframe-footer__about:hover {
         color: var(--label);
       }
 
-      .wireframe-footer__reset:focus-visible {
+      .wireframe-footer__reset:focus-visible,
+      .wireframe-footer__about:focus-visible {
         outline: 2px solid var(--label);
         outline-offset: var(--space-xxs);
       }
@@ -1778,8 +1882,13 @@
           min-height: 0;
         }
 
-        .buyout-dialog {
+        .buyout-dialog,
+        .about-dialog {
           inline-size: calc(100vw - (2 * var(--space-m)));
+        }
+
+        .about-rules {
+          grid-template-columns: minmax(0, 1fr);
         }
 
         .wireframe-shell {
@@ -1916,6 +2025,10 @@
       }
 
       @media (max-width: 600px) {
+        .wireframe-header {
+          min-block-size: 301px;
+        }
+
         .document-strip__tooltip,
         .document-strip__item:last-child .document-strip__tooltip {
           position: fixed;
@@ -1935,93 +2048,100 @@
     </style>
   </head>
   <body>
-    <div class="wireframe-shell" data-app-pending>
-      <header class="wireframe-header" aria-label="Header">
-        <section class="slot header-slot header-summary" aria-label="Season and progress">
-          <div class="season-slot" aria-label="Season identity">
+    <div class="wireframe-shell" data-app-pending aria-busy="true">
+      <header class="wireframe-header" aria-label="Header" data-static-i18n-aria-label="static.header">
+        <section class="slot header-slot header-summary" aria-label="Season and progress" data-static-i18n-aria-label="static.seasonAndProgress">
+          <div class="season-slot" aria-label="Season identity" data-static-i18n-aria-label="static.seasonIdentity">
             <span class="season-number" aria-label="Season 1">S1</span>
             <div class="season-details">
-              <strong class="season-name" data-season-name>…</strong>
-              <time class="season-timer" data-season-timer>…</time>
+              <h1 class="season-name" data-season-name>KORD BREACH</h1>
+              <time class="season-timer" data-season-timer data-static-i18n="static.countdownLoading">Loading countdown</time>
             </div>
             <div class="season-help">
               <button class="season-help__trigger" type="button" aria-describedby="season-help-tooltip" data-season-help-trigger></button>
               <div class="season-help__tooltip" id="season-help-tooltip" role="tooltip" data-season-help-tooltip></div>
             </div>
           </div>
-          <div class="primary-navigation-slot" aria-label="Battle Pass progress">
+          <div class="primary-navigation-slot" aria-label="Battle Pass progress" data-static-i18n-aria-label="static.battlePassProgress">
             <div class="navigation-progress">
               <div class="navigation-progress__label-line">
-                <span class="navigation-progress__label" data-document-progress-label>…</span>
+                <span class="navigation-progress__label" data-document-progress-label data-static-i18n="battlePass.documents">Documents</span>
                 <button class="navigation-progress__buyout" type="button" data-buyout-link hidden></button>
               </div>
               <strong class="navigation-progress__value">
-                <span data-document-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-document-progress-total>…</span>
+                <span data-document-progress-current>1</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-document-progress-total>501</span>
               </strong>
               <progress data-document-progress value="0" max="1"></progress>
             </div>
             <div class="navigation-progress">
-              <span class="navigation-progress__label" data-reward-progress-label>…</span>
+              <span class="navigation-progress__label" data-reward-progress-label data-static-i18n="battlePass.rewards">Rewards</span>
               <strong class="navigation-progress__value">
-                <span data-reward-progress-current>…</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-reward-progress-total>…</span>
+                <span data-reward-progress-current>0</span><span class="navigation-progress__separator" aria-hidden="true">/</span><span data-reward-progress-total>53</span>
               </strong>
               <progress data-reward-progress value="0" max="1"></progress>
             </div>
           </div>
         </section>
-        <section class="slot header-slot header-controls" aria-label="Planning controls">
+        <section class="slot header-slot header-controls" aria-label="Planning controls" data-static-i18n-aria-label="static.planningControls">
           <fieldset class="route-profile-toggle">
-            <legend class="visually-hidden" data-route-profile-label>…</legend>
+            <legend class="visually-hidden" data-route-profile-label data-static-i18n="ui.routePreference">Route preference</legend>
             <label class="route-profile-option">
               <input type="radio" name="route-profile" value="fastest" aria-describedby="fastest-profile-tooltip" />
-              <span class="route-profile-option__label" data-fastest-label>…</span>
-              <span class="route-profile-option__tooltip" id="fastest-profile-tooltip" role="tooltip" data-fastest-tooltip></span>
+              <span class="route-profile-option__label" data-fastest-label data-static-i18n="optimizer.fastest">Fastest</span>
+              <span class="route-profile-option__tooltip" id="fastest-profile-tooltip" role="tooltip" data-fastest-tooltip data-static-i18n="optimizer.fastestTooltip">Prioritizes raids with lower maximum time.</span>
             </label>
             <label class="route-profile-option">
               <input type="radio" name="route-profile" value="safest" aria-describedby="safest-profile-tooltip" checked />
-              <span class="route-profile-option__label" data-safest-label>…</span>
-              <span class="route-profile-option__tooltip" id="safest-profile-tooltip" role="tooltip" data-safest-tooltip></span>
+              <span class="route-profile-option__label" data-safest-label data-static-i18n="optimizer.safest">Safest</span>
+              <span class="route-profile-option__tooltip" id="safest-profile-tooltip" role="tooltip" data-safest-tooltip data-static-i18n="optimizer.safestTooltip">Prioritizes raids with easier difficulty.</span>
             </label>
           </fieldset>
           <div class="account-slot">
             <div class="header-select-shell mode-select-shell">
-              <select class="header-select mode-select" data-mode-select></select>
+              <select class="header-select mode-select" data-mode-select aria-label="Game mode">
+                <option selected>PvP Seasonal · 25 / day</option>
+              </select>
             </div>
             <div class="header-select-shell language-select-shell">
-              <select class="header-select language-select" data-language-select></select>
+              <select class="header-select language-select" data-language-select aria-label="Language">
+                <option selected>English</option>
+              </select>
             </div>
           </div>
         </section>
       </header>
 
-      <main class="wireframe-workspace" aria-label="Battle Pass workspace">
+      <main class="wireframe-workspace" aria-label="Battle Pass workspace" data-static-i18n-aria-label="static.battlePassWorkspace">
         <section class="region reward-rail" aria-labelledby="reward-rail-heading">
           <div class="slot section-heading reward-heading">
-            <h2 id="reward-rail-heading" data-reward-heading></h2>
+            <h2 id="reward-rail-heading" data-reward-heading data-static-i18n="battlePass.rewards">Rewards</h2>
             <div class="reward-heading__actions">
-              <button type="button" data-reward-claim-all></button>
-              <button type="button" data-reward-clear-all></button>
+              <button type="button" data-reward-claim-all data-static-i18n="battlePass.claimAll">Claim all</button>
+              <button type="button" data-reward-clear-all data-static-i18n="battlePass.clearAll">Clear all</button>
             </div>
           </div>
-          <div class="slot detail-content reward-content" data-reward-pages></div>
+          <div class="slot detail-content reward-content" data-reward-pages>
+            <p class="focus-loading" data-reward-loading data-static-i18n="static.rewardsLoading">Loading Battle Pass rewards…</p>
+          </div>
         </section>
 
         <section class="region focus-stage" aria-labelledby="focus-stage-heading">
           <div class="slot section-heading focus-heading">
             <div>
-              <span class="focus-heading__eyebrow" data-focus-eyebrow></span>
-              <h2 id="focus-stage-heading" data-focus-heading></h2>
+              <span class="focus-heading__eyebrow" data-focus-eyebrow data-static-i18n="ui.nextRaid">Next raid</span>
+              <h2 id="focus-stage-heading" data-focus-heading data-static-i18n="static.routeLoading">Calculating a farming route…</h2>
             </div>
             <div class="focus-heading__actions">
-              <button type="button" data-view-route-schedule disabled></button>
-              <button type="button" data-commit-raid disabled></button>
+              <button type="button" data-view-route-schedule disabled data-static-i18n="ui.viewFullSchedule">View full schedule</button>
+              <button type="button" data-commit-raid disabled data-static-i18n="ui.commitRaidResult">Commit</button>
             </div>
           </div>
           <div class="slot primary-content focus-content" data-focus-content aria-live="polite">
-            <p class="focus-loading">…</p>
+            <p class="focus-loading" data-static-i18n="static.optimizerLoading">Loading optimizer…</p>
+            <p class="app-error" data-app-error data-static-i18n="ui.applicationLoadError" hidden>The optimizer could not load its data. Reload the page or try again later.</p>
           </div>
           <section class="document-strip" aria-label="Document strip">
-            <p class="document-strip__notice" data-document-counter-note></p>
+            <p class="document-strip__notice" data-document-counter-note data-static-i18n="ui.documentCounterDisclaimer">Document counters are independent from reward claims. Reset them separately.</p>
             <div class="document-strip__images">
             <figure class="document-strip__item" data-document-id="documents.financial.name">
               <figcaption class="document-strip__title" data-document-title></figcaption>
@@ -2145,44 +2265,111 @@
         </section>
       </main>
       <footer class="wireframe-footer">
-        <p class="wireframe-footer__disclaimer" data-asset-disclaimer></p>
+        <p class="wireframe-footer__disclaimer" data-asset-disclaimer data-static-i18n="footer.disclaimer">Escape from Tarkov and all game assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool.</p>
         <span class="wireframe-footer__separator" aria-hidden="true"></span>
-        <button class="wireframe-footer__reset" type="button" data-reset-cookie-state></button>
+        <button class="wireframe-footer__about" type="button" data-about-open data-static-i18n="ui.aboutOptimizer">About this optimizer</button>
+        <span class="wireframe-footer__separator" aria-hidden="true"></span>
+        <button class="wireframe-footer__reset" type="button" data-reset-cookie-state data-static-i18n="ui.resetCookieStorage">Reset cookie storage</button>
       </footer>
     </div>
     <dialog class="route-schedule-dialog" data-route-schedule-dialog aria-labelledby="route-schedule-title">
       <header>
         <div>
-          <h2 id="route-schedule-title"></h2>
+          <h2 id="route-schedule-title" data-static-i18n="ui.fullSchedule">Full schedule</h2>
           <strong data-route-schedule-estimate></strong>
         </div>
-        <button type="button" data-close-route-schedule></button>
+        <button type="button" data-close-route-schedule data-static-i18n-aria-label="ui.close" aria-label="Close"></button>
       </header>
       <div data-route-schedule-content></div>
     </dialog>
     <dialog class="buyout-dialog" data-buyout-dialog aria-labelledby="buyout-title">
       <header>
-        <h2 id="buyout-title"></h2>
-        <button type="button" data-close-buyout></button>
+        <h2 id="buyout-title" data-static-i18n="ui.buyout">Battle Pass buyout</h2>
+        <button type="button" data-close-buyout data-static-i18n-aria-label="ui.close" aria-label="Close"></button>
       </header>
       <div data-buyout-content></div>
+    </dialog>
+    <dialog class="about-dialog" data-about-dialog aria-labelledby="about-title">
+      <header>
+        <h2 id="about-title" data-static-i18n="ui.aboutOptimizer">About this optimizer</h2>
+        <button type="button" data-close-about data-static-i18n-aria-label="ui.close" aria-label="Close"></button>
+      </header>
+      <div data-about-content>
+        <p class="about-summary" data-about-summary></p>
+        <section class="about-rules" data-static-i18n-aria-label="about.rulesHeading" aria-label="Optimization rules">
+          <article>
+            <h3 data-static-i18n="about.pageUnlocksHeading">Page unlocks</h3>
+            <p data-static-i18n="about.pageUnlocks">Each page after Page 1 requires all but one reward from the previous page.</p>
+          </article>
+          <article>
+            <h3 data-static-i18n="about.dailyLimitsHeading">Daily limits</h3>
+            <p data-static-i18n="about.dailyLimits">PvE allows 10 documents per day, PvP allows 15, and PvP Seasonal allows 25.</p>
+          </article>
+          <article>
+            <h3 data-static-i18n="about.exchangesHeading">Regular exchanges</h3>
+            <p data-static-i18n="about.exchanges">Five surplus regular documents can be exchanged for one needed regular document.</p>
+          </article>
+          <article>
+            <h3 data-static-i18n="about.classifiedHeading">Classified backfill</h3>
+            <p data-static-i18n="about.classified">Classified Documents fill missing reward requirements after matching regular documents are used.</p>
+          </article>
+          <article>
+            <h3 data-static-i18n="about.fastestHeading">Fastest</h3>
+            <p data-static-i18n="about.fastest">Fastest prioritizes routes with lower projected maximum raid time.</p>
+          </article>
+          <article>
+            <h3 data-static-i18n="about.safestHeading">Safest</h3>
+            <p data-static-i18n="about.safest">Safest prioritizes easier locations, then equipment insurance and projected raid time.</p>
+          </article>
+        </section>
+        <section class="about-table-section">
+          <h3 data-static-i18n="about.documentTableHeading">Full-pass document requirements</h3>
+          <p class="about-location-note" data-static-i18n="about.locationsNote">Locations are maps where documents can appear. They are not individual spawn points.</p>
+          <div class="about-table-scroll">
+            <table class="about-table">
+              <thead>
+                <tr>
+                  <th scope="col" data-static-i18n="about.documentColumn">Document</th>
+                  <th scope="col" data-static-i18n="about.totalColumn">Total</th>
+                  <th scope="col" data-static-i18n="about.locationsColumn">Farming locations</th>
+                </tr>
+              </thead>
+              <tbody data-about-table-body></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
     </dialog>
     <script type="module">
       import SlimSelect from 'slim-select';
       import 'slim-select/styles';
       import { ArrowLeftRight, CircleHelp, X, createElement as createIconElement } from 'lucide';
       import flagIconUrls from 'virtual:locale-flags';
-      import { loadCatalogs } from './src/catalogs.ts';
-      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber, getCompleteLocales, getLocaleRegion, hyphenateForLocale } from './src/localization.ts';
-      import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from './src/persistence.ts';
-      import { countPageRedeemableRewards, planRewardRedemption } from './src/redeemable.ts';
-      import { isBattlePassPageUnlocked } from './src/page-unlocks.ts';
-      import { getClassifiedDocumentMinimum, reduceState } from './src/state.ts';
+      import { loadCatalogs } from '/src/catalogs.ts';
+      import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber, getCompleteLocales, getLocaleRegion, hyphenateForLocale, loadHyphenator } from '/src/localization.ts';
+      import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from '/src/persistence.ts';
+      import { countPageRedeemableRewards, planRewardRedemption } from '/src/redeemable.ts';
+      import { isBattlePassPageUnlocked } from '/src/page-unlocks.ts';
+      import { getDefaultLocaleRoute, getLocalePath, getLocaleRoute, getLocaleRouteForPath } from '/src/site.ts';
+      import { getClassifiedDocumentMinimum, reduceState } from '/src/state.ts';
 
       const initialize = async () => {
       const catalogs = await loadCatalogs();
       let state = restoreState(browserCookieAdapter, catalogs, navigator.languages);
+      const route = getLocaleRouteForPath(window.location.pathname) ?? getDefaultLocaleRoute();
+      if (route.default && state.locale !== route.locale) {
+        const preferredRoute = getLocaleRoute(state.locale);
+        if (preferredRoute && !preferredRoute.default) {
+          window.location.replace(getLocalePath(preferredRoute.locale));
+          return false;
+        }
+      }
+      if (state.locale !== route.locale) {
+        state = reduceState(state, { type: 'set-locale', locale: route.locale }, catalogs);
+        saveState(state, browserCookieAdapter, catalogs);
+      }
       const localizer = createLocalizer(catalogs.localization, state.locale);
+      await loadHyphenator(localizer.locale);
       document.documentElement.lang = localizer.locale;
       document.documentElement.dir = localizer.direction;
       const name = document.querySelector('[data-season-name]');
@@ -2206,6 +2393,9 @@
       const buyoutTitle = document.querySelector('#buyout-title');
       const buyoutContent = document.querySelector('[data-buyout-content]');
       const closeBuyoutButton = document.querySelector('[data-close-buyout]');
+      const aboutDialog = document.querySelector('[data-about-dialog]');
+      const openAboutButton = document.querySelector('[data-about-open]');
+      const closeAboutButton = document.querySelector('[data-close-about]');
       const endsAt = catalogs.battlePass.endsAt;
       const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
       const rewardPageById = new Map(catalogs.battlePass.pages.flatMap((page) =>
@@ -2238,7 +2428,7 @@
         'stroke-width': 2,
       });
       document.querySelector('[data-season-help-trigger]').replaceChildren(createUiIcon(CircleHelp, 'season-help__icon'));
-      [closeRouteScheduleButton, closeBuyoutButton].forEach((button) => {
+      [closeRouteScheduleButton, closeBuyoutButton, closeAboutButton].forEach((button) => {
         button.replaceChildren(createUiIcon(X, 'dialog-close__icon'));
         button.setAttribute('aria-label', localizer.text('ui.close'));
         button.title = localizer.text('ui.close');
@@ -2359,6 +2549,7 @@
       const claimAllButton = document.querySelector('[data-reward-claim-all]');
       const clearAllButton = document.querySelector('[data-reward-clear-all]');
       const rewardPages = document.querySelector('[data-reward-pages]');
+      rewardPages.querySelector('[data-reward-loading]')?.remove();
       const documentNames = Object.fromEntries(catalogs.documents.documents.map((documentRecord) => [documentRecord.id, localizer.text(documentRecord.id)]));
       const documentAbbreviations = Object.fromEntries(Object.entries(documentNames).map(([documentId, documentName]) => [documentId, documentName.trim().split(/\s+/u)[0]]));
       const redemptionDialog = document.createElement('dialog');
@@ -2601,13 +2792,15 @@
         tile.querySelector('[data-document-tooltip-description]').textContent = localizer.text(documentRecord.descriptionId);
 
         if (documentRecord.sourceLocationIds.length > 0) {
-          const locationList = document.createElement('ul');
+          const locationList = tile.querySelector('[data-document-tooltip-locations]') ?? document.createElement('ul');
+          locationList.dataset.documentTooltipLocations = '';
+          locationList.replaceChildren();
           documentRecord.sourceLocationIds.forEach((locationId) => {
             const location = document.createElement('li');
             location.textContent = localizer.text(locationId);
             locationList.append(location);
           });
-          tooltip.append(locationList);
+          if (!locationList.parentElement) tooltip.append(locationList);
         }
 
         const quantityLabel = localizer.text('ui.quantity');
@@ -2678,6 +2871,7 @@
       };
 
       const documentAssetUrl = (imagePath) => `${import.meta.env.BASE_URL}${imagePath.replace(/^\//u, '')}`;
+      const documentAssetVariantUrl = (imagePath, size) => documentAssetUrl(imagePath.replace(/\.webp$/u, `-${size}.webp`));
 
       const renderScheduleProjection = (profile) => {
         routeScheduleTitle.textContent = localizer.text('ui.fullSchedule');
@@ -2913,6 +3107,34 @@
       };
 
       const renderRaidDocuments = (nextRaid) => {
+        const recommendationKey = `${nextRaid.locationId}|${nextRaid.documents.map(({ documentId, role }) => `${documentId}:${role}`).join(',')}`;
+        if (focusContent.dataset.staticNextRaid === recommendationKey) {
+          const inlineCommitButton = focusContent.querySelector('[data-commit-raid-inline]');
+          if (inlineCommitButton) inlineCommitButton.disabled = false;
+          inlineCommitButton?.addEventListener('click', () => commitRaidButton.click());
+          nextRaid.documents.forEach((recommendation) => {
+            const figure = focusContent.querySelector(`[data-focus-document="${recommendation.documentId}"]`);
+            const input = figure?.querySelector('[data-raid-result]');
+            const [decrement, increment] = figure?.querySelectorAll('.raid-result-stepper button') ?? [];
+            if (!input || !decrement || !increment) return;
+            input.disabled = false;
+            decrement.disabled = false;
+            increment.disabled = false;
+            const updateDraft = (quantity) => {
+              input.value = String(Math.max(0, Math.trunc(quantity)));
+              input.setCustomValidity('');
+            };
+            decrement.addEventListener('click', () => updateDraft(Number(input.value) - 1));
+            increment.addEventListener('click', () => updateDraft(Number(input.value) + 1));
+            input.addEventListener('input', () => input.setCustomValidity(''));
+            input.addEventListener('change', () => {
+              const quantity = Number(input.value);
+              if (Number.isInteger(quantity) && quantity >= 0) updateDraft(quantity);
+            });
+          });
+          delete focusContent.dataset.staticNextRaid;
+          return;
+        }
         const instruction = createElement('p', 'focus-instruction');
         const commitMarker = '\uFFFC';
         const instructionText = localizer.text('ui.enterRaidResult', { commit: commitMarker });
@@ -2945,9 +3167,13 @@
           const imageFrame = createElement('div', 'focus-document__image-frame');
           const image = document.createElement('img');
           image.src = documentAssetUrl(documentRecord.imagePath);
+          image.srcset = `${documentAssetVariantUrl(documentRecord.imagePath, 192)} 192w, ${documentAssetVariantUrl(documentRecord.imagePath, 384)} 384w, ${documentAssetUrl(documentRecord.imagePath)} 1254w`;
+          image.sizes = '140px';
           image.alt = localizer.text(documentRecord.imageAltId);
           image.width = 1254;
           image.height = 1254;
+          image.decoding = 'async';
+          image.fetchPriority = 'high';
           imageFrame.append(image);
           const caption = document.createElement('figcaption');
           caption.append(createElement('strong', '', documentAbbreviations[documentRecord.id]));
@@ -3026,12 +3252,14 @@
 
       const showOptimizerLoading = () => {
         optimizerPending = true;
-        focusStage.classList.add('focus-stage--loading');
+        const hasStaticRecommendation = Boolean(focusContent.dataset.staticNextRaid);
+        focusStage.classList.toggle('focus-stage--loading', !hasStaticRecommendation);
         focusStage.setAttribute('aria-busy', 'true');
         viewRouteScheduleButton.disabled = true;
         commitRaidButton.disabled = true;
         buyoutLink.disabled = true;
         if (currentOptimizerResult) return;
+        if (hasStaticRecommendation) return;
         focusEyebrow.textContent = localizer.text('ui.nextRaid');
         focusHeading.textContent = localizer.text('ui.nextRaid');
         focusContent.replaceChildren(createElement('p', 'focus-loading', '…'));
@@ -3138,6 +3366,11 @@
       buyoutDialog.addEventListener('click', (event) => {
         if (event.target === buyoutDialog) buyoutDialog.close();
       });
+      openAboutButton.addEventListener('click', () => aboutDialog.showModal());
+      closeAboutButton.addEventListener('click', () => aboutDialog.close());
+      aboutDialog.addEventListener('click', (event) => {
+        if (event.target === aboutDialog) aboutDialog.close();
+      });
 
       const modeData = [
         ['pvp-seasonal', 'mode.pvpSeasonal'],
@@ -3210,7 +3443,7 @@
             if (!locale || locale === state.locale) return;
             state = reduceState(state, { type: 'set-locale', locale }, catalogs);
             saveState(state, browserCookieAdapter, catalogs);
-            window.location.reload();
+            window.location.assign(getLocalePath(locale));
           },
         },
       });
@@ -3243,12 +3476,29 @@
           if (!updateTimer()) window.clearInterval(timerId);
         }, 1000);
       }
+      return true;
       };
 
       const appShell = document.querySelector('.wireframe-shell');
       void initialize()
-        .catch((error) => console.error(error))
-        .finally(() => appShell.removeAttribute('data-app-pending'));
+        .then((initialized) => {
+          if (!initialized) return;
+          appShell.removeAttribute('data-app-pending');
+          document.querySelectorAll('[data-pending-control]').forEach((control) => {
+            control.removeAttribute('data-pending-control');
+            control.removeAttribute('inert');
+          });
+          appShell.setAttribute('aria-busy', 'false');
+        })
+        .catch((error) => {
+          console.error(error);
+          appShell.querySelectorAll('button, input, select').forEach((control) => {
+            control.disabled = true;
+          });
+          appShell.querySelector('[data-app-error]').hidden = false;
+          appShell.removeAttribute('data-app-pending');
+          appShell.setAttribute('aria-busy', 'false');
+        });
     </script>
   </body>
 </html>

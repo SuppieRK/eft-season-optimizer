@@ -1,15 +1,15 @@
 ## ADDED Requirements
 
 ### Requirement: Framework-free static interface
-The application SHALL render as semantic HTML and CSS with TypeScript compiled to browser JavaScript, without requiring a UI framework, backend, account, or server-side API. The reviewed Battle Pass workspace SHALL be the sole production `index.html` entry, and the build SHALL NOT expose a separate `wireframe.html` application page.
+The application SHALL render as semantic HTML and CSS with TypeScript compiled to browser JavaScript, without requiring a UI framework, backend, account, or server-side API. The reviewed Battle Pass workspace SHALL be the sole source HTML template. The build SHALL emit configured localized `index.html` entries that load one application bundle and SHALL NOT expose a separate `wireframe.html` application page.
 
 #### Scenario: Production site loads from static assets
 - **WHEN** the GitHub Pages production build is opened
 - **THEN** the interface and optimizer load from generated static HTML, CSS, JavaScript, image, and JSON assets
 
-#### Scenario: One application entry is built
-- **WHEN** local development, Playwright, or the production deployment opens the repository base URL
-- **THEN** it loads the reviewed Battle Pass workspace from `index.html`
+#### Scenario: One application template is built
+- **WHEN** local development, Playwright, or the production deployment opens a configured locale URL
+- **THEN** it loads the reviewed Battle Pass workspace from a localized `index.html`
 - **AND** no alternate `wireframe.html` page is available in the build
 
 ### Requirement: Optional production web analytics

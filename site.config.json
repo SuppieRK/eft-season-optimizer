@@ -1,0 +1,20 @@
+{
+  "basePath": "/eft-season-optimizer/",
+  "canonicalUrl": "https://suppierk.github.io/eft-season-optimizer/",
+  "repositoryUrl": "https://github.com/SuppieRK/eft-season-optimizer",
+  "locales": [
+    {
+      "locale": "en-GB",
+      "path": "",
+      "hreflang": "en",
+      "ogLocale": "en_GB",
+      "default": true
+    },
+    {
+      "locale": "ru-RU",
+      "path": "ru/",
+      "hreflang": "ru",
+      "ogLocale": "ru_RU"
+    }
+  ]
+}

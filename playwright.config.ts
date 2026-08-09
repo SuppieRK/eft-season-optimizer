@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 
-const localBaseUrl = 'http://127.0.0.1:4173/eft-season-optimizer/';
+const siteConfig = JSON.parse(readFileSync(new URL('./site.config.json', import.meta.url), 'utf8')) as { basePath: string };
+const localBaseUrl = new URL(siteConfig.basePath, 'http://127.0.0.1:4173').href;
 const baseURL = process.env.PLAYWRIGHT_TEST_BASE_URL ?? localBaseUrl;
 
 export default defineConfig({

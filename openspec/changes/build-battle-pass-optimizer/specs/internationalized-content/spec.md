@@ -68,15 +68,19 @@ Development builds MAY render conspicuous missing-ID markers for unfinished cont
 - **THEN** publication is blocked
 
 ### Requirement: Locale selection persistence and fallback
-The application SHALL persist the selected locale in versioned UI-state cookies and SHALL fall back to the configured default when a stored or browser-preferred locale is unsupported.
+The application SHALL persist the selected locale in versioned UI-state cookies and SHALL navigate to that locale's configured static URL. An explicit locale URL SHALL override a conflicting stored locale. On the unprefixed English root only, the application SHALL select a supported stored locale first, then an exact or unambiguous browser-preferred locale, and SHALL replace the root URL when that result uses a non-default locale. Unsupported values SHALL fall back to the configured default.
 
 #### Scenario: First visit matches a supported browser locale
 - **WHEN** no valid locale cookie exists and the browser's ordered locale preferences contain an exact supported locale or an unambiguous supported variant of the same language
-- **THEN** the application uses that supported locale
+- **THEN** the application navigates from the unprefixed root to that supported locale's configured URL when it is not the default
 
 #### Scenario: Restore supported locale
 - **WHEN** the stored locale is complete and supported
-- **THEN** the application restores it on the next visit
+- **THEN** the application restores it through its configured locale URL on the next unprefixed-root visit
+
+#### Scenario: Explicit locale URL conflicts with stored locale
+- **WHEN** the player opens a configured locale URL that differs from the stored locale
+- **THEN** the application uses the URL locale and updates only the stored locale
 
 #### Scenario: Stored locale is no longer supported
 - **WHEN** the stored locale is absent from the supported complete locales

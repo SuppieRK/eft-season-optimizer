@@ -1,4 +1,4 @@
-import type { BattlePassPage, RewardRecord } from './catalogs';
+import type { BattlePassPage, RewardRecord } from './catalogs.ts';
 
 export interface RewardRedemptionPlan {
   readonly canRedeem: boolean;

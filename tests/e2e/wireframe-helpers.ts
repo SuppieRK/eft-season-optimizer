@@ -16,6 +16,7 @@ export async function openWireframe(page: Page): Promise<void> {
   await page.goto('./');
   await expect(page.locator('[data-season-name]')).toHaveText('KORD BREACH');
   await expect(page.locator('.reward-page')).toHaveCount(12);
+  await expect(page.locator('.focus-stage')).toHaveAttribute('aria-busy', 'false', { timeout: 10_000 });
 }
 
 export function documentTile(page: Page, documentId: string): Locator {

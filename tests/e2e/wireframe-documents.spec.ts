@@ -75,6 +75,7 @@ test('wraps Russian document titles at language-correct hyphenation points', asy
     .filter({ has: page.locator('[data-flag-region="ru"]') })
     .click();
   await expect(page.locator('html')).toHaveAttribute('lang', /^ru(?:-|$)/u);
+  await expect(page.locator('.wireframe-shell')).toHaveAttribute('aria-busy', 'false');
 
   const layout = await page.locator('[data-document-id]').evaluateAll((tiles) => tiles.map((tile) => {
     const title = tile.querySelector<HTMLElement>('[data-document-title]')!;
@@ -163,7 +164,9 @@ test('shows the centered asset disclaimer and resets cookie-backed state', async
   await expect(focus.locator('.document-strip')).toHaveCount(1);
   await expect(strip.locator('.wireframe-footer')).toHaveCount(0);
   await expect(focus.locator('.wireframe-footer')).toHaveCount(0);
-  await expect(footer.locator('.wireframe-footer__separator')).toBeVisible();
+  const separators = footer.locator('.wireframe-footer__separator');
+  await expect(separators).toHaveCount(2);
+  await expect(separators.first()).toBeVisible();
   const [focusBox, shellBox, stripBox, imagesBox, footerBox] = await Promise.all([focus, shell, strip, images, footer].map((element) => element.boundingBox()));
   expect(focusBox).not.toBeNull();
   expect(shellBox).not.toBeNull();
@@ -173,7 +176,7 @@ test('shows the centered asset disclaimer and resets cookie-backed state', async
   expect(stripBox!.y + stripBox!.height).toBeLessThanOrEqual(focusBox!.y + focusBox!.height + 1);
   expect(footerBox!.y - (focusBox!.y + focusBox!.height)).toBeGreaterThanOrEqual(8);
   expect(Math.abs(footerBox!.x + footerBox!.width / 2 - (shellBox!.x + shellBox!.width / 2))).toBeLessThanOrEqual(1);
-  const [disclaimerBox, resetBox, separatorBox] = await Promise.all([disclaimer, reset, footer.locator('.wireframe-footer__separator')].map((element) => element.boundingBox()));
+  const [disclaimerBox, resetBox, separatorBox] = await Promise.all([disclaimer, reset, separators.first()].map((element) => element.boundingBox()));
   expect(disclaimerBox).not.toBeNull();
   expect(resetBox).not.toBeNull();
   expect(separatorBox).not.toBeNull();
@@ -203,7 +206,7 @@ test('shows the centered asset disclaimer and resets cookie-backed state', async
 
   await page.setViewportSize({ width: 700, height: 900 });
   await expect(footer).toHaveCSS('flex-direction', 'column');
-  const [narrowDisclaimerBox, narrowResetBox, narrowSeparatorBox] = await Promise.all([disclaimer, reset, footer.locator('.wireframe-footer__separator')].map((element) => element.boundingBox()));
+  const [narrowDisclaimerBox, narrowResetBox, narrowSeparatorBox] = await Promise.all([disclaimer, reset, separators.first()].map((element) => element.boundingBox()));
   expect(narrowDisclaimerBox).not.toBeNull();
   expect(narrowResetBox).not.toBeNull();
   expect(narrowSeparatorBox).not.toBeNull();

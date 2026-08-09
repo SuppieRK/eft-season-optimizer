@@ -2,6 +2,10 @@
 
 EFT Season Optimizer is a fan-made farming planner for the Escape from Tarkov KORD BREACH Battle Pass.
 
+**Open the optimizer:** [English](https://suppierk.github.io/eft-season-optimizer/) · [Русский](https://suppierk.github.io/eft-season-optimizer/ru/)
+
+![EFT Season Optimizer: KORD BREACH Battle Pass farming planner](public/assets/social/eft-season-optimizer.png)
+
 The site recommends the next location to farm. It uses owned documents, claimed rewards, the route preference, and the daily mode limit.
 
 The current catalog targets game-data version `1.1.0.0.46657.8.6.2026`.
@@ -229,6 +233,8 @@ The daily schedule divides the remaining regular Document quantity by the select
 
 4. Open `http://localhost:5173/eft-season-optimizer/`.
 
+The Russian page is available at `http://localhost:5173/eft-season-optimizer/ru/`.
+
 ## Validation
 
 Run all automated checks before you submit a change.
@@ -253,6 +259,14 @@ Use the Playwright interface to examine browser tests:
 npm run test:e2e:ui
 ```
 
+Run three mobile and three desktop Lighthouse audits against a production preview:
+
+```sh
+npm run audit:lighthouse
+```
+
+The command writes each JSON report to `.tmp/lighthouse`. It prints the median scores, LCP, and CLS for each mode.
+
 ## Data catalogs
 
 The application reads its game data from JSON files in [`public/data`](public/data).
@@ -274,7 +288,9 @@ The localization catalog contains `en-GB` and a best-effort `ru-RU` draft. The R
 | Path | Purpose |
 | --- | --- |
 | [`index.html`](index.html) | Application markup and the primary layout styles |
+| [`site.config.json`](site.config.json) | Base path, canonical URL, repository URL, and locale routes |
 | [`src`](src) | TypeScript logic and shared style files |
+| [`scripts`](scripts) | SEO page generation, asset generation, release checks, and build checks |
 | [`public`](public) | Static data and document image assets |
 | [`tests`](tests) | Unit, catalog, render, release, and Playwright tests |
 | [`openspec`](openspec) | Product requirements and implementation decisions |
@@ -284,11 +300,47 @@ The localization catalog contains `en-GB` and a best-effort `ru-RU` draft. The R
 
 The `main` branch deploys through GitHub Actions. Pull requests run the same validation without a deployment.
 
-The Vite base path is `/eft-season-optimizer/`. If the repository name changes, update these files:
+The build reads the Pages base path and canonical URL from `site.config.json`. Update this file if the repository URL changes.
 
-- `vite.config.ts`
-- `playwright.config.ts`
-- `scripts/check-build.cjs`
+The build creates one static HTML file for each configured locale route. English uses the root URL. Russian uses `/ru/`.
+
+The language selector stores the selected locale and opens its locale URL. All locale routes use the same optimizer cookies.
+
+On the English root, a saved or browser Russian locale redirects to `/ru/`. An explicit locale URL remains authoritative.
+
+## Search discovery
+
+The production build creates localized canonical metadata, language links, social metadata, structured data, and `sitemap.xml`.
+
+The repository cannot publish a valid project-level `robots.txt`. A robots file applies only at the hostname root.
+
+To configure Google Search Console:
+
+1. Add a URL-prefix property for `https://suppierk.github.io/eft-season-optimizer/`.
+2. Copy the HTML verification value from Search Console.
+3. Open the GitHub repository settings.
+4. Select **Secrets and variables**, **Actions**, and **Variables**.
+5. Add a repository variable named `GOOGLE_SITE_VERIFICATION`.
+6. Set its value to the verification value.
+7. Run the GitHub Pages workflow again.
+8. Submit `https://suppierk.github.io/eft-season-optimizer/sitemap.xml`.
+9. Request indexing for the English and Russian URLs.
+
+You can import the verified property into Bing Webmaster Tools. Submit the same sitemap after the import.
+
+For a local verification build, set `VITE_GOOGLE_SITE_VERIFICATION` in `.env.local`. The build omits the tag when this value is empty.
+
+## Generated images
+
+The original document images remain in `public/assets/documents`. The asset script creates 192-pixel and 384-pixel WebP variants.
+
+The same script creates the social PNG from its SVG source. Run the script after a source image changes:
+
+```sh
+npm run generate:assets
+```
+
+Upload `public/assets/social/eft-season-optimizer.png` manually as the GitHub repository social preview.
 
 ## Web analytics
 

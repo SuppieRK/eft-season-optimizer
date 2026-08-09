@@ -5,7 +5,7 @@ Escape from Tarkov players currently have to manually reconcile Battle Pass rewa
 ## What Changes
 
 - Add an optimization-only, framework-free HTML and CSS website with TypeScript compiled to browser JavaScript for static hosting on GitHub Pages, with no backend dependency.
-- Promote the reviewed Battle Pass workspace to the sole production `index.html` entry and remove the separate `wireframe.html` preview so local development, tests, builds, and GitHub Pages expose one application page.
+- Promote the reviewed Battle Pass workspace to the sole source HTML template and remove the separate `wireframe.html` preview. Generate localized English-root and Russian `/ru/` HTML entries that load one application bundle and share player state.
 - Add a restrained green-toned interface derived from the supplied Battle Pass screens: a slim two-part header with season identity and total progress on the left and route-profile, locale, and compact setup controls on the right; a left single-page reward rail; one expanded Focus region containing the current next raid and the persistent owned-document ribbon; and a centered credits footer. The regions share one continuous stage instead of nesting bordered cards inside panels.
 - Keep all normal-content geometry and typography sizing in one small editable CSS layout map within the sole production entry, separate from shared typography and spacing token files. Use explicit named cells for route summaries and location factors, and place document names and deficits in fixed bands below their images so text placement is predictable and directly adjustable.
 - Add auditable JSON catalogs for document types and source locations; location difficulty ratings and maximum raid times; Battle Pass pages, rewards, prerequisites and document requirements reconstructed from the supplied screenshots; cleaned document thumbnails extracted from those screenshots with quantity overlays removed; configurable optimizer rules; and a dedicated `localization.json` catalog for translated text, descriptions, and local prices. The Battle Pass catalog carries game-data version `1.1.0.0.46657.8.6.2026`.
@@ -23,6 +23,7 @@ Escape from Tarkov players currently have to manually reconcile Battle Pass rewa
 - Add internationalization infrastructure for every user-facing string, item label and description, image alternative, and displayed screenshot description. `localization.json` keeps each stable text ID and all of its language variants together in one object. Human-authored textual descriptions and complete localizations are required before release.
 - Add a feedback action that lets the player review a compact, privacy-conscious report and opens GitHub's prefilled new-issue composer for final submission.
 - Add optional production-only Cloudflare Web Analytics through a GitHub Actions repository variable, without adding analytics cookies or sending optimizer state.
+- Add localized static search content, canonical and language-alternate metadata, a two-URL sitemap, social sharing metadata, WebApplication structured data, responsive document images, Search Console verification support, and repository discovery metadata.
 - Keep general Battle Pass guidance and detailed in-map navigation outside the scope of the site; supplied screenshots remain the backed-up source of truth for reconstructing and auditing optimizer data.
 
 ## Capabilities
@@ -34,6 +35,7 @@ Escape from Tarkov players currently have to manually reconcile Battle Pass rewa
 - `farming-route-optimization`: Computes a Page-12-first legal reward sequence followed by complete-pass cleanup, regular inventory and `5:1` regular exchange use, maximum owned Classified consumption, a non-mutating remaining-pass Classified buyout estimate that accounts for earned TarCoins and local TarCoin package prices, Fastest-by-raid-time and Safest-by-difficulty low-hop route alternatives, rolling next-raid recommendations, projected daily schedules, and the Black Division crate fallback strategy.
 - `github-feedback`: Provides a user-reviewed feedback flow that opens a prefilled GitHub issue without embedding repository credentials or silently transmitting optimizer state.
 - `internationalized-content`: Defines the dedicated ID-centered `localization.json` catalog, regional BCP 47 locale keys, browser-default selection, data-driven flag assets, locale persistence, translation coverage, locale-aware formatting, human-authored item/image/screenshot descriptions, fallback behavior, and release-blocking content validation.
+- `search-discoverability`: Defines localized static HTML at the English root and Russian `/ru/` route, canonical and reciprocal language metadata, crawlable shell and About content, sitemap and social metadata, structured data, responsive images, Search Console support, and deterministic SEO validation.
 
 ### Modified Capabilities
 
@@ -45,4 +47,5 @@ Escape from Tarkov players currently have to manually reconcile Battle Pass rewa
 - Uses the supplied screenshots as authoring evidence for data reconstruction and validation; optimizer behavior reads normalized JSON rather than image content at runtime.
 - Stores player-specific selections locally in cookies and does not require accounts or an application server; optional production analytics uses Cloudflare's public beacon.
 - Adds a dedicated localization catalog and build-time content-completeness checks; publication is blocked until the configured release locales and textual descriptions are complete.
+- Adds one shared site configuration for GitHub Pages paths, canonical locale URLs, repository metadata, build checks, and browser tests.
 - Establishes implementation constraints for the frontend toolchain, JSON validation, optimizer ordering, cookie schema and migration, and responsive presentation.

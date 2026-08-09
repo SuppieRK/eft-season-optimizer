@@ -122,6 +122,7 @@ test('orders and persists game modes while keeping the language selector icon-on
   await languageMenu.locator('.ss-option').filter({ has: page.locator('[data-flag-region="ru"]') }).click();
 
   await expect(page.locator('[data-language-select]')).toHaveValue('ru-RU');
+  await expect(page.locator('.wireframe-shell')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('.ss-main.language-select .locale-choice__flag[data-flag-region="ru"]')).toBeVisible();
   await expect(page.locator('[data-mode-select]')).toHaveValue('pvp');
   await expect(page.locator('.ss-main.mode-select')).toContainText('PvP · 15 / день');
