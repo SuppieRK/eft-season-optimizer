@@ -1661,17 +1661,39 @@
       }
 
       .document-strip__title {
-        display: grid;
-        place-items: center;
-        min-block-size: calc(var(--font-size-label) * 1.75);
+        display: flex;
+        align-content: center;
+        align-items: baseline;
+        justify-content: center;
+        column-gap: var(--space-xxs);
+        block-size: calc(var(--font-size-label) * 2.52);
         color: var(--label);
         font-size: var(--font-size-label);
         font-weight: 700;
-        hyphens: manual;
+        flex-wrap: wrap;
         line-height: 0.84;
         letter-spacing: 0;
         text-align: center;
         white-space: normal;
+      }
+
+      .document-strip__title-name {
+        flex: 0 0 100%;
+        min-inline-size: 0;
+        max-inline-size: 100%;
+        hyphens: manual;
+      }
+
+      .document-strip__need {
+        flex: 0 0 100%;
+        color: var(--label-muted);
+        font-size: var(--font-size-caption);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .document-strip__need--enough {
+        color: var(--season-accent);
       }
 
       .document-strip__image-frame {
@@ -1786,6 +1808,15 @@
         margin: 0;
         font-size: var(--font-size-label);
         line-height: var(--line-height-body);
+      }
+
+      .document-strip__tooltip-need {
+        margin-block-end: var(--space-xs) !important;
+        color: var(--purchase-accent);
+      }
+
+      .document-strip__tooltip-need--enough {
+        color: var(--season-accent);
       }
 
       .document-strip__tooltip ul {
@@ -2350,6 +2381,7 @@
       import { ArrowLeftRight, CircleHelp, X, createElement as createIconElement } from 'lucide';
       import flagIconUrls from 'virtual:locale-flags';
       import { loadCatalogs } from '/src/catalogs.ts';
+      import { calculateDocumentNeeds } from '/src/document-needs.ts';
       import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber, getCompleteLocales, getLocaleRegion, hyphenateForLocale, loadHyphenator } from '/src/localization.ts';
       import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from '/src/persistence.ts';
       import { countPageRedeemableRewards, planRewardRedemption } from '/src/redeemable.ts';
@@ -2782,18 +2814,32 @@
         if (!documentRecord) throw new Error(`Unknown wireframe document: ${documentId}`);
 
         const fullName = localizer.text(documentRecord.id);
+        const title = tile.querySelector('[data-document-title]');
+        const titleName = title.querySelector('[data-document-title-name]') ?? document.createElement('span');
+        const needElement = title.querySelector('[data-document-need]') ?? document.createElement('span');
         const tooltip = tile.querySelector('.document-strip__tooltip');
+        const tooltipName = tile.querySelector('[data-document-tooltip-name]');
+        const tooltipNeed = tooltip.querySelector('[data-document-tooltip-need]') ?? document.createElement('p');
         const quantityInput = tile.querySelector('[data-document-quantity]');
         const decrementButton = tile.querySelector('[data-document-decrement]');
         const incrementButton = tile.querySelector('[data-document-increment]');
         const tooltipId = `document-strip-tooltip-${index}`;
+        titleName.className = 'document-strip__title-name';
+        titleName.dataset.documentTitleName = '';
+        needElement.className = 'document-strip__need';
+        needElement.dataset.documentNeed = '';
+        needElement.setAttribute('aria-hidden', 'true');
+        if (!titleName.parentElement || !needElement.parentElement) title.replaceChildren(titleName, needElement);
+        tooltipNeed.className = 'document-strip__tooltip-need';
+        tooltipNeed.dataset.documentTooltipNeed = '';
+        if (!tooltipNeed.parentElement) tooltipName.after(tooltipNeed);
         tooltip.id = tooltipId;
-        tile.querySelector('[data-document-title]').textContent = hyphenateForLocale(
+        titleName.textContent = hyphenateForLocale(
           fullName.trim().split(/\s+/u)[0],
           localizer.locale,
         );
         tile.querySelector('img').alt = localizer.text(documentRecord.imageAltId);
-        tile.querySelector('[data-document-tooltip-name]').textContent = fullName;
+        tooltipName.textContent = fullName;
         tile.querySelector('[data-document-tooltip-description]').textContent = localizer.text(documentRecord.descriptionId);
 
         if (documentRecord.sourceLocationIds.length > 0) {
@@ -2844,13 +2890,64 @@
           const quantity = Number(quantityInput.value);
           setQuantity(Number.isFinite(quantity) ? quantity : 0);
         });
-        documentQuantityViews.push({ quantityInput, readMinimumQuantity, readQuantity });
+        documentQuantityViews.push({
+          documentRecord,
+          fullName,
+          needElement,
+          quantityInput,
+          readMinimumQuantity,
+          readQuantity,
+          title,
+          tooltipNeed,
+        });
       });
 
       refreshDocumentQuantities = () => {
-        documentQuantityViews.forEach(({ quantityInput, readMinimumQuantity, readQuantity }) => {
+        const needs = calculateDocumentNeeds(catalogs, state.claimedRewardIds, state.ownedDocuments);
+        const allRewardsClaimed = rewards.every((reward) => state.claimedRewardIds.includes(reward.id));
+        documentQuantityViews.forEach(({
+          documentRecord,
+          fullName,
+          needElement,
+          quantityInput,
+          readMinimumQuantity,
+          readQuantity,
+          title,
+          tooltipNeed,
+        }) => {
           quantityInput.min = String(readMinimumQuantity());
           quantityInput.value = String(readQuantity());
+          const needIsVisible = documentRecord.kind === 'regular' && !allRewardsClaimed;
+          needElement.hidden = !needIsVisible;
+          tooltipNeed.hidden = !needIsVisible;
+          needElement.classList.remove('document-strip__need--enough');
+          tooltipNeed.classList.remove('document-strip__tooltip-need--enough');
+          if (!needIsVisible) {
+            needElement.textContent = '';
+            tooltipNeed.textContent = '';
+            title.setAttribute('aria-label', fullName);
+            return;
+          }
+
+          const need = needs[documentRecord.id] ?? 0;
+          if (need > 0) {
+            const count = formatNumber(need, localizer.locale);
+            needElement.textContent = `(${count})`;
+            tooltipNeed.textContent = localizer.text('ui.documentNeed', { count });
+            title.setAttribute('aria-label', localizer.text('ui.documentNeedAccessible', {
+              document: fullName,
+              count,
+            }));
+            return;
+          }
+
+          needElement.textContent = '(✓)';
+          needElement.classList.add('document-strip__need--enough');
+          tooltipNeed.textContent = localizer.text('ui.documentEnough');
+          tooltipNeed.classList.add('document-strip__tooltip-need--enough');
+          title.setAttribute('aria-label', localizer.text('ui.documentEnoughAccessible', {
+            document: fullName,
+          }));
         });
       };
       refreshDocumentQuantities();

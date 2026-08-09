@@ -1030,6 +1030,34 @@
       }
     },
     {
+      "id": "ui.documentNeed",
+      "localizations": {
+        "en-GB": "{count} still needed",
+        "ru-RU": "Осталось: {count}"
+      }
+    },
+    {
+      "id": "ui.documentEnough",
+      "localizations": {
+        "en-GB": "No longer needed",
+        "ru-RU": "Больше не требуется"
+      }
+    },
+    {
+      "id": "ui.documentNeedAccessible",
+      "localizations": {
+        "en-GB": "{document}: {count} still needed",
+        "ru-RU": "{document}: осталось {count}"
+      }
+    },
+    {
+      "id": "ui.documentEnoughAccessible",
+      "localizations": {
+        "en-GB": "{document}: no longer needed",
+        "ru-RU": "{document}: больше не требуется"
+      }
+    },
+    {
       "id": "ui.invalidQuantity",
       "localizations": {
         "en-GB": "Enter a non-negative whole number.",

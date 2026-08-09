@@ -118,6 +118,14 @@ function validateLocalePage(route) {
     assert.equal(image.getAttribute('loading'), 'lazy');
     assert.equal(image.getAttribute('decoding'), 'async');
   }
+  const documentNeeds = [...document.querySelectorAll('[data-document-need]')];
+  assert.equal(documentNeeds.length, 9, `${route.locale} must render one requirement status per document tile`);
+  assert.equal(documentNeeds.filter((element) => !element.hidden).length, 8, `${route.locale} must show requirements for regular documents only`);
+  assert.ok(
+    documentNeeds.filter((element) => !element.hidden).every((element) => /^\([\d\s,.]+\)$/u.test(element.textContent ?? '')),
+    `${route.locale} must render catalog-derived parenthetical requirements`,
+  );
+  assert.equal(document.querySelectorAll('[data-document-tooltip-need]').length, 8, `${route.locale} must explain every regular-document requirement`);
 }
 
 function validateBuiltUrl(value) {

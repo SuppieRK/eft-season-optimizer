@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
 
-import { documentIds, documentQuantity, documentTile, openWireframe, setDocumentQuantity } from './wireframe-helpers';
+import {
+  documentIds,
+  documentQuantity,
+  documentTile,
+  openWireframe,
+  setDocumentQuantity,
+  trackRewardWithoutInventoryChange,
+} from './wireframe-helpers';
 
 const documentTitles = ['Financial', 'PMC', 'Project', 'Blueprints', 'Test', 'User', 'Medical', 'Technical', 'Classified'];
 
@@ -9,7 +16,7 @@ test('renders the square document artwork in source-of-truth order', async ({ pa
 
   await expect(page.locator('[data-document-id]')).toHaveCount(documentIds.length);
   expect(await page.locator('[data-document-id]').evaluateAll((tiles) => tiles.map((tile) => (tile as HTMLElement).dataset.documentId))).toEqual(documentIds);
-  const renderedTitles = await page.locator('[data-document-title]').allTextContents();
+  const renderedTitles = await page.locator('[data-document-title-name]').allTextContents();
   expect(renderedTitles.map((title) => title.replaceAll('\u00AD', ''))).toEqual(documentTitles);
   expect(renderedTitles.some((title) => title.includes('\u00AD'))).toBe(true);
 
@@ -17,12 +24,19 @@ test('renders the square document artwork in source-of-truth order', async ({ pa
     const tile = documentTile(page, documentId);
     const frame = await tile.locator('.document-strip__image-frame').boundingBox();
     const title = await tile.locator('[data-document-title]').boundingBox();
+    const titleName = await tile.locator('[data-document-title-name]').boundingBox();
+    const need = await tile.locator('[data-document-need]').boundingBox();
     const quantity = await tile.locator('.document-strip__quantity').boundingBox();
     expect(frame).not.toBeNull();
     expect(title).not.toBeNull();
+    expect(titleName).not.toBeNull();
     expect(quantity).not.toBeNull();
     expect(Math.abs(frame!.width - frame!.height)).toBeLessThanOrEqual(1);
     expect(title!.y + title!.height).toBeLessThanOrEqual(frame!.y);
+    if (documentId !== 'documents.classified.name') {
+      expect(need).not.toBeNull();
+      expect(titleName!.y + titleName!.height).toBeLessThanOrEqual(need!.y + 1);
+    }
     expect(frame!.y + frame!.height).toBeLessThanOrEqual(quantity!.y);
     const image = tile.locator('img');
     await expect(image).toHaveAttribute('alt', /\S+/u);
@@ -105,7 +119,7 @@ test('shows full document details and spawn locations in tooltips', async ({ pag
     const tile = documentTile(page, documentId);
     const tooltip = tile.getByRole('tooltip');
     await expect(tooltip.locator('strong')).toHaveText(/\S+/u);
-    await expect(tooltip.locator('p')).toHaveText(/\S+/u);
+    await expect(tooltip.locator('[data-document-tooltip-description]')).toHaveText(/\S+/u);
     await expect(tooltip.locator('li')).not.toHaveCount(0);
   }
 
@@ -143,6 +157,55 @@ test('updates quantities, progress, boundaries, and cookie-restored values toget
   await expect(documentQuantity(page, 'documents.project.name')).toHaveValue('7');
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
   await expect(page.locator('[data-document-progress-current]')).toHaveText('10');
+});
+
+test('shows exact remaining requirements beside document titles', async ({ page }) => {
+  await openWireframe(page);
+
+  const expectedNeeds = new Map(Object.entries(await page.evaluate(async () => {
+    const response = await fetch(new URL('data/battle-pass.json', document.baseURI));
+    const battlePass = await response.json() as {
+      pages: Array<{ rewards: Array<{ requirements: Array<{ documentId: string; quantity: number }> }> }>;
+    };
+    const totals: Record<string, number> = {};
+    for (const requirement of battlePass.pages.flatMap((battlePassPage) => (
+      battlePassPage.rewards.flatMap((reward) => reward.requirements)
+    ))) {
+      totals[requirement.documentId] = (totals[requirement.documentId] ?? 0) + requirement.quantity;
+    }
+    return totals;
+  })));
+  const needTexts = async () => page.locator('[data-document-need]').allTextContents();
+
+  for (const [documentId, need] of expectedNeeds) {
+    const tile = documentTile(page, documentId);
+    await expect(tile.locator('[data-document-need]')).toHaveText(`(${need})`);
+    await expect(tile.locator('[data-document-title]')).toHaveAttribute('aria-label', new RegExp(`${need} still needed$`, 'u'));
+    await expect(tile.locator('[data-document-tooltip-need]')).toHaveText(`${need} still needed`);
+  }
+  await expect(documentTile(page, 'documents.classified.name').locator('[data-document-need]')).toBeHidden();
+
+  const financialNeed = expectedNeeds.get('documents.financial.name')!;
+  await setDocumentQuantity(page, 'documents.financial.name', financialNeed);
+  await expect(documentTile(page, 'documents.financial.name').locator('[data-document-need]')).toHaveText('(✓)');
+  await expect(documentTile(page, 'documents.financial.name').locator('[data-document-tooltip-need]')).toHaveText('No longer needed');
+  await setDocumentQuantity(page, 'documents.financial.name', financialNeed - 1);
+  await expect(documentTile(page, 'documents.financial.name').locator('[data-document-need]')).toHaveText('(1)');
+
+  await setDocumentQuantity(page, 'documents.financial.name', 0);
+  await trackRewardWithoutInventoryChange(page, 'rewards.dogtag01.name');
+  await expect(documentTile(page, 'documents.financial.name').locator('[data-document-need]')).toHaveText(`(${financialNeed - 1})`);
+
+  const beforePreferences = await needTexts();
+  await page.locator('.route-profile-option').filter({ hasText: 'Fastest' }).click();
+  await page.locator('.ss-main.mode-select').click();
+  await page.locator('.ss-content.mode-select .ss-option').filter({ hasText: 'PvE · 10 / day' }).click();
+  expect(await needTexts()).toEqual(beforePreferences);
+
+  await page.locator('[data-reward-claim-all]').click();
+  await expect(page.locator('[data-document-need]:visible')).toHaveCount(0);
+  await page.locator('[data-reward-clear-all]').click();
+  await expect(documentTile(page, 'documents.financial.name').locator('[data-document-need]')).toHaveText(`(${financialNeed})`);
 });
 
 test('clamps direct inventory values instead of rejecting them', async ({ page }) => {

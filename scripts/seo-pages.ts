@@ -5,6 +5,7 @@ import { JSDOM } from 'jsdom';
 import type { Plugin } from 'vite';
 
 import type { Catalogs } from '../src/catalogs.ts';
+import { calculateDocumentNeeds } from '../src/document-needs.ts';
 import { createLocalizer, formatLocalPrice, formatNumber, getTextDirection } from '../src/localization.ts';
 import { optimize, type NextRaidRecommendation } from '../src/optimizer.ts';
 import type { LocaleRoute, SiteConfig } from '../src/site.ts';
@@ -180,6 +181,8 @@ function defaultRoute(config: SiteConfig): LocaleRoute {
 function populateDocumentStrip(document: Document, catalogs: Catalogs, locale: string, basePath: string): void {
   const localizer = createLocalizer(catalogs.localization, locale);
   const locations = new Map(catalogs.locations.locations.map((location) => [location.id, localizer.text(location.id)]));
+  const defaultState = createDefaultState(catalogs);
+  const needs = calculateDocumentNeeds(catalogs, defaultState.claimedRewardIds, defaultState.ownedDocuments);
   for (const documentRecord of catalogs.documents.documents) {
     const figure = document.querySelector<HTMLElement>(`[data-document-id="${documentRecord.id}"]`);
     if (!figure) continue;
@@ -189,7 +192,37 @@ function populateDocumentStrip(document: Document, catalogs: Catalogs, locale: s
     const image = figure.querySelector<HTMLImageElement>('img');
     const tooltipName = figure.querySelector<HTMLElement>('[data-document-tooltip-name]');
     const tooltipDescription = figure.querySelector<HTMLElement>('[data-document-tooltip-description]');
-    if (title) title.textContent = firstWord;
+    if (title) {
+      const titleName = document.createElement('span');
+      titleName.className = 'document-strip__title-name';
+      titleName.dataset.documentTitleName = '';
+      titleName.textContent = firstWord;
+      const need = document.createElement('span');
+      need.className = 'document-strip__need';
+      need.dataset.documentNeed = '';
+      need.setAttribute('aria-hidden', 'true');
+      if (documentRecord.kind === 'regular') {
+        const quantity = needs[documentRecord.id] ?? 0;
+        if (quantity > 0) {
+          const count = formatNumber(quantity, locale);
+          need.textContent = `(${count})`;
+          title.setAttribute('aria-label', localizer.text('ui.documentNeedAccessible', {
+            document: fullName,
+            count,
+          }));
+        } else {
+          need.textContent = '(✓)';
+          need.classList.add('document-strip__need--enough');
+          title.setAttribute('aria-label', localizer.text('ui.documentEnoughAccessible', {
+            document: fullName,
+          }));
+        }
+      } else {
+        need.hidden = true;
+        title.setAttribute('aria-label', fullName);
+      }
+      title.replaceChildren(titleName, need);
+    }
     if (image) {
       image.alt = localizer.text(documentRecord.imageAltId);
       const source = `${basePath}${documentRecord.imagePath.replace(/^\//u, '')}`;
@@ -201,6 +234,22 @@ function populateDocumentStrip(document: Document, catalogs: Catalogs, locale: s
     }
     if (tooltipName) tooltipName.textContent = fullName;
     if (tooltipDescription) tooltipDescription.textContent = localizer.text(documentRecord.descriptionId);
+    figure.querySelector('[data-document-tooltip-need]')?.remove();
+    if (documentRecord.kind === 'regular' && tooltipName) {
+      const quantity = needs[documentRecord.id] ?? 0;
+      const tooltipNeed = document.createElement('p');
+      tooltipNeed.className = 'document-strip__tooltip-need';
+      tooltipNeed.dataset.documentTooltipNeed = '';
+      if (quantity > 0) {
+        tooltipNeed.textContent = localizer.text('ui.documentNeed', {
+          count: formatNumber(quantity, locale),
+        });
+      } else {
+        tooltipNeed.textContent = localizer.text('ui.documentEnough');
+        tooltipNeed.classList.add('document-strip__tooltip-need--enough');
+      }
+      tooltipName.after(tooltipNeed);
+    }
     figure.querySelector('[data-document-tooltip-locations]')?.remove();
     if (documentRecord.sourceLocationIds.length > 0) {
       const locationList = document.createElement('ul');

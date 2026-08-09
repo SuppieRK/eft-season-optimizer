@@ -101,6 +101,11 @@ The application SHALL use locale-aware number, date, time, plural, and message f
 - **WHEN** a document quantity is displayed
 - **THEN** it is formatted using the active locale without changing its numeric value
 
+#### Scenario: Explain a document requirement suffix
+- **WHEN** a regular-document title shows a numeric requirement or completion check mark
+- **THEN** its tooltip and accessible name explain the state with complete localized messages
+- **AND** the visible parenthetical suffix remains language-neutral and compact
+
 #### Scenario: Render a TarCoin price
 - **WHEN** a Classified bundle subtotal, Battle Pass TarCoin contribution, or TarCoin package total is displayed
 - **THEN** its invariant integer amount is formatted with the active locale's number rules and inserted into a dedicated localized TarCoin price message
@@ -135,4 +140,3 @@ Publication SHALL be blocked until the configured default locale and every selec
 #### Scenario: All release content is complete
 - **WHEN** every required entry has reviewed values for every selectable locale and no placeholders remain
 - **THEN** the localization content gate passes
-

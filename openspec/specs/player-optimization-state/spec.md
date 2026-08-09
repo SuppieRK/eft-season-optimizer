@@ -306,7 +306,22 @@ The header's left summary section SHALL present total-based document progress an
 - **THEN** the center column explains that the profile is unavailable and does not show a partial route
 
 ### Requirement: Focus document inventory
-The bottom of the expanded Focus region SHALL provide one contiguous in-game-inspired document-ribbon section containing an inventory tile for every regular and Classified Document. Each tile SHALL keep its localized title separate above square artwork and a separate quantity-control row containing decrement, direct numeric entry, and increment actions. Every tile, artwork frame, and quantity-control row SHALL use the same shared dimensions, and intrinsic title width SHALL NOT enlarge them. Document names SHALL NOT be positioned over artwork. The ribbon SHALL use one centered horizontal row on desktop and SHALL scroll internally at narrow widths rather than increasing page height. A separate sibling credits footer SHALL appear below the workspace with spacing and a dividing rule; the disclaimer SHALL NOT be part of the document section.
+The bottom of the expanded Focus region SHALL provide one contiguous in-game-inspired document-ribbon section containing an inventory tile for every regular and Classified Document. Each tile SHALL keep its localized title separate above square artwork and a separate quantity-control row containing decrement, direct numeric entry, and increment actions. While rewards remain, each regular-document title SHALL show the exact outstanding same-type requirement in parentheses on a dedicated line below the name, matching the compact requirement notation in the Rewards section. The outstanding requirement SHALL equal requirements from all unclaimed rewards minus owned documents of that type, clamped to zero, without applying Classified backfill, regular-document exchanges, game mode, or route profile. A fulfilled regular-document requirement SHALL replace its number with a check mark. Classified Documents SHALL NOT show a requirement suffix. All requirement suffixes SHALL disappear after every reward is claimed. Every tile, artwork frame, title area, and quantity-control row SHALL use the same shared dimensions, and intrinsic title width SHALL NOT enlarge them. A parenthetical suffix SHALL remain an unbroken unit while localized title words may wrap at language-correct points. Document names and requirement suffixes SHALL NOT be positioned over artwork. The ribbon SHALL use one centered horizontal row on desktop and SHALL scroll internally at narrow widths rather than increasing page height. A separate sibling credits footer SHALL appear below the workspace with spacing and a dividing rule; the disclaimer SHALL NOT be part of the document section.
+
+#### Scenario: Show outstanding requirements for all document types
+- **WHEN** one or more rewards remain unclaimed
+- **THEN** every regular-document title shows its exact outstanding same-type requirement in parentheses
+- **AND** the value updates immediately after an owned quantity or claimed reward changes
+- **AND** mode and Fastest or Safest selection do not change it
+
+#### Scenario: A document type is no longer required
+- **WHEN** owned documents cover all remaining requirements of one regular type
+- **THEN** that title shows a parenthetical check mark instead of a numeric requirement
+
+#### Scenario: Every reward is claimed
+- **WHEN** every Battle Pass reward is claimed
+- **THEN** no document title shows a requirement suffix
+- **AND** clearing or unclaiming rewards restores the applicable suffixes
 
 #### Scenario: Enter an owned quantity directly
 - **WHEN** the player enters a valid non-negative integer for a document
