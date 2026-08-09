@@ -14,6 +14,7 @@ import {
   getLocaleRegion,
   getTextDirection,
   hyphenateForLocale,
+  loadHyphenator,
   pluralCategory,
   resolvePreferredLocale,
   resolveStoredLocale,
@@ -39,6 +40,7 @@ describe('localization', () => {
     const runtimeSourcePaths = [
       'index.html',
       ...readdirSync(resolve('src')).filter((fileName) => fileName.endsWith('.ts')).map((fileName) => `src/${fileName}`),
+      ...readdirSync(resolve('scripts')).filter((fileName) => /\.(?:cjs|ts)$/u.test(fileName)).map((fileName) => `scripts/${fileName}`),
       'public/data/battle-pass.json',
       'public/data/documents.json',
       'public/data/locations.json',
@@ -98,7 +100,9 @@ describe('localization', () => {
     expect(getLocaleRegion('fr-CA')).toBe('ca');
   });
 
-  it('inserts language-correct soft hyphens for supported interface locales', () => {
+  it('inserts language-correct soft hyphens for supported interface locales', async () => {
+    await loadHyphenator('en-GB');
+    await loadHyphenator('ru-RU');
     expect(hyphenateForLocale('Blueprints', 'en-GB')).toBe('Blue\u00ADprints');
     expect(hyphenateForLocale('Эксплуатационная', 'ru-RU')).toBe('Экс\u00ADплу\u00ADа\u00ADта\u00ADци\u00ADон\u00ADная');
     expect(hyphenateForLocale('Document', 'fr-FR')).toBe('Document');

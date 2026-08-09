@@ -6,8 +6,8 @@ import type {
   GameMode,
   LocationRecord,
   RewardRecord,
-} from './catalogs';
-import { countUnlockedPages } from './page-unlocks';
+} from './catalogs.ts';
+import { countUnlockedPages } from './page-unlocks.ts';
 
 export type OptimizationProfile = 'fastest' | 'safest';
 

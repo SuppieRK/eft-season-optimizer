@@ -487,6 +487,7 @@ test('uses only roubles in the Russian buyout tables', async ({ page }) => {
     has: page.locator('[data-flag-region="ru"]'),
   }).click();
   await expect(page.locator('[data-language-select]')).toHaveValue('ru-RU');
+  await expect(page.locator('.wireframe-shell')).toHaveAttribute('aria-busy', 'false');
 
   await page.locator('[data-buyout-link]').click();
   const tables = page.locator('[data-buyout-dialog] [data-buyout-table="tar-coin-packages"]');

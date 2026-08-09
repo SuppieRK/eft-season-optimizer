@@ -1,9 +1,9 @@
-import type { Catalogs, GameMode } from './catalogs';
-import { getCompleteLocales } from './localization';
-import type { OptimizationProfile } from './optimizer';
-import { planRewardRedemption } from './redeemable';
+import type { Catalogs, GameMode } from './catalogs.ts';
+import { getCompleteLocales } from './localization.ts';
+import type { OptimizationProfile } from './optimizer.ts';
+import { planRewardRedemption } from './redeemable.ts';
 
-export type { GameMode } from './catalogs';
+export type { GameMode } from './catalogs.ts';
 
 export interface AppState {
   readonly mode: GameMode;

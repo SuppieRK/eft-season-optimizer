@@ -1,4 +1,4 @@
-import type { BattlePassPage } from './catalogs';
+import type { BattlePassPage } from './catalogs.ts';
 
 export function countUnlockedPages(
   pages: readonly BattlePassPage[],

@@ -1,16 +1,10 @@
-import { hyphenateSync as hyphenateEnGb } from 'hyphen/en-gb';
-import { hyphenateSync as hyphenateRu } from 'hyphen/ru';
-
-import type { LocalizationCatalog, LocalPrice, Requirement } from './catalogs';
+import type { LocalizationCatalog, LocalPrice, Requirement } from './catalogs.ts';
 
 export type Locale = string;
 export type MessageValue = string | number;
 
 const RTL_LOCALES = new Set(['ar', 'fa', 'he', 'ur']);
-const HYPHENATORS: Readonly<Record<string, (text: string) => string>> = {
-  en: hyphenateEnGb,
-  ru: hyphenateRu,
-};
+const HYPHENATORS: Record<string, ((text: string) => string) | undefined> = {};
 
 export interface Localizer {
   readonly locale: Locale;
@@ -101,6 +95,13 @@ export function getTextDirection(locale: string): 'ltr' | 'rtl' {
 export function hyphenateForLocale(text: string, locale: string): string {
   const language = canonicalLocale(locale).split('-')[0];
   return HYPHENATORS[language]?.(text) ?? text;
+}
+
+export async function loadHyphenator(locale: string): Promise<void> {
+  const language = canonicalLocale(locale).split('-')[0];
+  if (HYPHENATORS[language]) return;
+  if (language === 'en') HYPHENATORS.en = (await import('hyphen/en-gb')).hyphenateSync;
+  if (language === 'ru') HYPHENATORS.ru = (await import('hyphen/ru')).hyphenateSync;
 }
 
 export function formatNumber(value: number, locale: string): string {

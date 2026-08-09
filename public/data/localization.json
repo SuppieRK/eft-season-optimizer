@@ -1574,6 +1574,265 @@
         "en-GB": "{donors} → {received}",
         "ru-RU": "{donors} → {received}"
       }
+    },
+    {
+      "id": "seo.title",
+      "localizations": {
+        "en-GB": "Escape from Tarkov KORD BREACH Battle Pass Optimizer",
+        "ru-RU": "Оптимизатор Боевого пропуска KORD BREACH для Escape from Tarkov"
+      }
+    },
+    {
+      "id": "seo.description",
+      "localizations": {
+        "en-GB": "Optimize Escape from Tarkov KORD BREACH Battle Pass document farming. Track rewards, compare the fastest or safest locations, and plan Classified Document use.",
+        "ru-RU": "Оптимизируйте сбор документов для Боевого пропуска KORD BREACH в Escape from Tarkov. Отслеживайте награды, сравнивайте самые быстрые и безопасные локации и планируйте использование секретных данных."
+      }
+    },
+    {
+      "id": "seo.socialImageAlt",
+      "localizations": {
+        "en-GB": "EFT Season Optimizer: KORD BREACH Battle Pass farming planner",
+        "ru-RU": "Оптимизатор сезона EFT: планировщик Боевого пропуска KORD BREACH"
+      }
+    },
+    {
+      "id": "seo.applicationName",
+      "localizations": {
+        "en-GB": "EFT Season Optimizer",
+        "ru-RU": "Оптимизатор сезона EFT"
+      }
+    },
+    {
+      "id": "seo.applicationAlternateName",
+      "localizations": {
+        "en-GB": "KORD BREACH Optimizer",
+        "ru-RU": "Оптимизатор KORD BREACH"
+      }
+    },
+    {
+      "id": "seo.browserRequirements",
+      "localizations": {
+        "en-GB": "Requires JavaScript and a modern web browser.",
+        "ru-RU": "Требуется современный браузер с поддержкой JavaScript."
+      }
+    },
+    {
+      "id": "static.header",
+      "localizations": {
+        "en-GB": "Header",
+        "ru-RU": "Заголовок"
+      }
+    },
+    {
+      "id": "static.seasonAndProgress",
+      "localizations": {
+        "en-GB": "Season and progress",
+        "ru-RU": "Сезон и прогресс"
+      }
+    },
+    {
+      "id": "static.seasonIdentity",
+      "localizations": {
+        "en-GB": "Season identity",
+        "ru-RU": "Название сезона"
+      }
+    },
+    {
+      "id": "static.countdownLoading",
+      "localizations": {
+        "en-GB": "Loading countdown",
+        "ru-RU": "Загрузка таймера"
+      }
+    },
+    {
+      "id": "static.battlePassProgress",
+      "localizations": {
+        "en-GB": "Battle Pass progress",
+        "ru-RU": "Прогресс Боевого пропуска"
+      }
+    },
+    {
+      "id": "static.planningControls",
+      "localizations": {
+        "en-GB": "Planning controls",
+        "ru-RU": "Настройки плана"
+      }
+    },
+    {
+      "id": "static.battlePassWorkspace",
+      "localizations": {
+        "en-GB": "Battle Pass workspace",
+        "ru-RU": "План Боевого пропуска"
+      }
+    },
+    {
+      "id": "static.rewardsLoading",
+      "localizations": {
+        "en-GB": "Loading Battle Pass rewards…",
+        "ru-RU": "Загрузка наград Боевого пропуска…"
+      }
+    },
+    {
+      "id": "static.routeLoading",
+      "localizations": {
+        "en-GB": "Calculating a farming route…",
+        "ru-RU": "Расчёт маршрута фарма…"
+      }
+    },
+    {
+      "id": "static.optimizerLoading",
+      "localizations": {
+        "en-GB": "Loading optimizer…",
+        "ru-RU": "Загрузка оптимизатора…"
+      }
+    },
+    {
+      "id": "ui.applicationLoadError",
+      "localizations": {
+        "en-GB": "The optimizer could not load its data. Reload the page or try again later.",
+        "ru-RU": "Оптимизатор не смог загрузить данные. Перезагрузите страницу или повторите попытку позже."
+      }
+    },
+    {
+      "id": "ui.aboutOptimizer",
+      "localizations": {
+        "en-GB": "About this optimizer",
+        "ru-RU": "Об оптимизаторе"
+      }
+    },
+    {
+      "id": "about.summary",
+      "localizations": {
+        "en-GB": "{pages} Battle Pass pages contain {rewards} rewards and require {documents} regular documents in total.",
+        "ru-RU": "На {pages} страницах Боевого пропуска находится {rewards} наград. Для них требуется {documents} обычных документов."
+      }
+    },
+    {
+      "id": "about.rulesHeading",
+      "localizations": {
+        "en-GB": "Optimization rules",
+        "ru-RU": "Правила оптимизации"
+      }
+    },
+    {
+      "id": "about.pageUnlocksHeading",
+      "localizations": {
+        "en-GB": "Page unlocks",
+        "ru-RU": "Открытие страниц"
+      }
+    },
+    {
+      "id": "about.pageUnlocks",
+      "localizations": {
+        "en-GB": "Each page after Page 1 requires all but one reward from the previous page.",
+        "ru-RU": "Для каждой страницы после первой нужны все награды предыдущей страницы, кроме одной."
+      }
+    },
+    {
+      "id": "about.dailyLimitsHeading",
+      "localizations": {
+        "en-GB": "Daily limits",
+        "ru-RU": "Дневные лимиты"
+      }
+    },
+    {
+      "id": "about.dailyLimits",
+      "localizations": {
+        "en-GB": "PvE allows 10 documents per day, PvP allows 15, and PvP Seasonal allows 25.",
+        "ru-RU": "В PvE доступно 10 документов в день, в PvP — 15, а в сезонном PvP — 25."
+      }
+    },
+    {
+      "id": "about.exchangesHeading",
+      "localizations": {
+        "en-GB": "Regular exchanges",
+        "ru-RU": "Обмен документов"
+      }
+    },
+    {
+      "id": "about.exchanges",
+      "localizations": {
+        "en-GB": "Five surplus regular documents can be exchanged for one needed regular document.",
+        "ru-RU": "Пять лишних обычных документов можно обменять на один нужный обычный документ."
+      }
+    },
+    {
+      "id": "about.classifiedHeading",
+      "localizations": {
+        "en-GB": "Classified backfill",
+        "ru-RU": "Секретные данные"
+      }
+    },
+    {
+      "id": "about.classified",
+      "localizations": {
+        "en-GB": "Classified Documents fill missing reward requirements after matching regular documents are used.",
+        "ru-RU": "Секретные данные закрывают нехватку после использования подходящих обычных документов."
+      }
+    },
+    {
+      "id": "about.fastestHeading",
+      "localizations": {
+        "en-GB": "Fastest",
+        "ru-RU": "Быстрее"
+      }
+    },
+    {
+      "id": "about.fastest",
+      "localizations": {
+        "en-GB": "Fastest prioritizes routes with lower projected maximum raid time.",
+        "ru-RU": "Быстрый план выбирает маршруты с меньшим расчётным максимальным временем рейдов."
+      }
+    },
+    {
+      "id": "about.safestHeading",
+      "localizations": {
+        "en-GB": "Safest",
+        "ru-RU": "Безопаснее"
+      }
+    },
+    {
+      "id": "about.safest",
+      "localizations": {
+        "en-GB": "Safest prioritizes easier locations, then equipment insurance and projected raid time.",
+        "ru-RU": "Безопасный план выбирает более лёгкие локации, затем учитывает страховку снаряжения и время рейдов."
+      }
+    },
+    {
+      "id": "about.documentTableHeading",
+      "localizations": {
+        "en-GB": "Full-pass document requirements",
+        "ru-RU": "Документы для всего пропуска"
+      }
+    },
+    {
+      "id": "about.locationsNote",
+      "localizations": {
+        "en-GB": "Locations are maps where documents can appear. They are not individual spawn points.",
+        "ru-RU": "Локации указывают карты, где могут появиться документы. Это не отдельные точки появления."
+      }
+    },
+    {
+      "id": "about.documentColumn",
+      "localizations": {
+        "en-GB": "Document",
+        "ru-RU": "Документ"
+      }
+    },
+    {
+      "id": "about.totalColumn",
+      "localizations": {
+        "en-GB": "Total",
+        "ru-RU": "Всего"
+      }
+    },
+    {
+      "id": "about.locationsColumn",
+      "localizations": {
+        "en-GB": "Farming locations",
+        "ru-RU": "Локации для фарма"
+      }
     }
   ],
   "priceEntries": [
