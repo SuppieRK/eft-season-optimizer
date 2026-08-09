@@ -32,12 +32,16 @@ An explicit locale URL SHALL be authoritative. On the unprefixed root only, the 
 - **THEN** the application uses Russian and updates only the saved locale
 
 ### Requirement: Crawlable loading and error states
-The initial application shell SHALL remain visible, SHALL expose meaningful localized content, SHALL keep controls inert, and SHALL report a busy state while catalogs load. Successful initialization SHALL enable the shell. Failed initialization SHALL stop the busy state, keep controls disabled, and show a readable localized error.
+The initial application shell SHALL remain visible, SHALL expose meaningful localized content, SHALL keep controls inert, and SHALL report a busy state while catalogs load. Its build-generated Focus raid-result inputs SHALL serialize an explicit visible value of `0`, and matching client hydration SHALL preserve that zero value. Successful initialization SHALL enable the shell. Failed initialization SHALL stop the busy state, keep controls disabled, and show a readable localized error.
 
 #### Scenario: Catalog loading fails
 - **WHEN** one required catalog request fails
 - **THEN** the localized shell and error remain visible
 - **AND** unavailable controls cannot change state
+
+#### Scenario: Static Focus hydrates
+- **WHEN** the build-generated recommendation matches the first client optimizer result
+- **THEN** each reused raid-result input displays `0` before and after hydration
 
 ### Requirement: Catalog-derived About content
 The footer SHALL open a localized About dialog generated from validated catalogs. The dialog SHALL explain page unlocks, daily limits, regular-document exchanges, Classified backfill, Fastest and Safest routing, page and reward totals, the total required regular documents, and eligible farming maps. It SHALL state that listed maps are not individual spawn points.
@@ -74,4 +78,3 @@ The production build SHALL inject Google site-verification metadata when `VITE_G
 #### Scenario: Verification is not configured
 - **WHEN** the production build receives no verification value
 - **THEN** both locale pages omit the verification metadata and all other search output remains valid
-

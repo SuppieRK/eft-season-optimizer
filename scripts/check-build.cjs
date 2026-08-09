@@ -84,6 +84,11 @@ function validateLocalePage(route) {
   assert.ok(document.querySelector('[data-app-error]')?.textContent?.trim(), `${route.locale} has no static load error`);
   assert.ok(document.querySelector('[data-focus-content][data-static-next-raid]'), `${route.locale} has no static route recommendation`);
   assert.equal(document.querySelector('[data-focus-content] img')?.getAttribute('fetchpriority'), 'high');
+  const staticRaidInputs = [...document.querySelectorAll('[data-focus-content] [data-raid-result]')];
+  assert.ok(staticRaidInputs.length > 0, `${route.locale} has no static raid-result inputs`);
+  staticRaidInputs.forEach((input) => {
+    assert.equal(input.getAttribute('value'), '0', `${route.locale} static raid-result input has no zero value`);
+  });
   assert.ok(document.querySelector('[data-about-summary]')?.textContent?.trim(), `${route.locale} About summary is empty`);
   assert.equal(document.querySelectorAll('[data-about-table-body] tr').length, 8, `${route.locale} About table is incomplete`);
   assert.doesNotMatch(html, /%VITE_[A-Z0-9_]+%|⟦missing:/u, `${route.locale} contains an unresolved placeholder`);

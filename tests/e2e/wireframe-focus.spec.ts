@@ -366,6 +366,85 @@ test('dims and preserves the current Focus result during optimizer recalculation
   await expect(focusStage).toHaveAttribute('aria-busy', 'false');
 });
 
+test('updates Focus from valid direct document input without waiting for blur', async ({ page }) => {
+  await openWireframe(page);
+  const focusStage = page.locator('.focus-stage');
+  const focusHeading = page.locator('[data-focus-heading]');
+  await expect(focusHeading).toContainText('Interchange');
+
+  await documentQuantity(page, 'documents.blueprints.name').fill('1');
+
+  await expect(focusStage).toHaveAttribute('aria-busy', 'true');
+  await expect(focusStage).toHaveAttribute('aria-busy', 'false', { timeout: 10_000 });
+  await expect(focusHeading).toContainText('Reserve');
+});
+
+test('queues only the newest optimizer snapshot during a synchronous update burst', async ({ page }) => {
+  await page.addInitScript(() => {
+    const NativeWorker = window.Worker;
+    Reflect.set(window, '__optimizerPostCount', 0);
+    window.Worker = class extends NativeWorker {
+      override postMessage(message: unknown, transfer?: Transferable[]): void {
+        Reflect.set(window, '__optimizerPostCount', Number(Reflect.get(window, '__optimizerPostCount')) + 1);
+        super.postMessage(message, transfer ?? []);
+      }
+    } as typeof Worker;
+  });
+  await openWireframe(page);
+  await page.evaluate(() => Reflect.set(window, '__optimizerPostCount', 0));
+
+  await documentQuantity(page, 'documents.blueprints.name').evaluate((input) => {
+    const increment = input.parentElement?.querySelector<HTMLButtonElement>('[data-document-increment]');
+    if (!increment) throw new Error('Missing Blueprints increment control');
+    for (let index = 0; index < 50; index += 1) increment.click();
+  });
+
+  await expect(page.locator('.focus-stage')).toHaveAttribute('aria-busy', 'false', { timeout: 10_000 });
+  expect(await page.evaluate(() => Reflect.get(window, '__optimizerPostCount'))).toBe(1);
+  await expect(page.locator('[data-focus-heading]')).toContainText('Customs');
+});
+
+test('terminates an in-flight optimizer worker when a newer snapshot is requested', async ({ page }) => {
+  await page.addInitScript(() => {
+    const NativeWorker = window.Worker;
+    Reflect.set(window, '__optimizerTerminationCount', 0);
+    window.Worker = class extends NativeWorker {
+      constructor(scriptURL: string | URL, options?: WorkerOptions) {
+        super(scriptURL, options);
+        this.addEventListener('message', (event) => {
+          if (!event.isTrusted) return;
+          event.stopImmediatePropagation();
+          window.setTimeout(() => {
+            this.dispatchEvent(new MessageEvent('message', { data: event.data }));
+          }, 350);
+        });
+      }
+
+      override terminate(): void {
+        Reflect.set(window, '__optimizerTerminationCount', Number(Reflect.get(window, '__optimizerTerminationCount')) + 1);
+        super.terminate();
+      }
+    } as typeof Worker;
+  });
+  await openWireframe(page);
+  await page.evaluate(() => Reflect.set(window, '__optimizerTerminationCount', 0));
+  const blueprints = documentQuantity(page, 'documents.blueprints.name');
+
+  await blueprints.evaluate((input) => {
+    input.value = '1';
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await expect(page.locator('.focus-stage')).toHaveAttribute('aria-busy', 'true');
+  await blueprints.evaluate((input) => {
+    input.value = '50';
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
+  await expect(page.locator('.focus-stage')).toHaveAttribute('aria-busy', 'false', { timeout: 10_000 });
+  expect(await page.evaluate(() => Reflect.get(window, '__optimizerTerminationCount'))).toBeGreaterThanOrEqual(1);
+  await expect(page.locator('[data-focus-heading]')).toContainText('Customs');
+});
+
 test('shows every useful location document as a farming priority', async ({ page }) => {
   await openWireframe(page);
   await expect(page.locator('[data-raid-result]')).toHaveCount(2, { timeout: 10_000 });

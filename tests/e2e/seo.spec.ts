@@ -20,6 +20,9 @@ test('shows meaningful inert content while the application initializes', async (
   await expect(page.locator('[data-document-progress-label]')).toHaveText('Documents');
   await expect(page.locator('[data-focus-heading]')).toContainText(/Interchange/iu);
   await expect(page.locator('[data-focus-content] img').first()).toHaveAttribute('fetchpriority', 'high');
+  expect(await page.locator('[data-raid-result]').evaluateAll((inputs) => (
+    inputs.map((input) => (input as HTMLInputElement).value)
+  ))).toEqual(['0', '0']);
   await expect(page.locator('[data-reward-loading]')).toHaveText('Loading Battle Pass rewards…');
   await page.evaluate(() => Reflect.set(window, '__staticFocusImage', document.querySelector('[data-focus-content] img')));
 
@@ -27,6 +30,9 @@ test('shows meaningful inert content while the application initializes', async (
   await expect(shell).toHaveAttribute('aria-busy', 'false');
   await expect(shell.locator('[data-pending-control]')).toHaveCount(0);
   await expect(page.locator('[data-reward-loading]')).toHaveCount(0);
+  expect(await page.locator('[data-raid-result]').evaluateAll((inputs) => (
+    inputs.map((input) => (input as HTMLInputElement).value)
+  ))).toEqual(['0', '0']);
   expect(await page.evaluate(() => Reflect.get(window, '__staticFocusImage') === document.querySelector('[data-focus-content] img'))).toBe(true);
 });
 

@@ -346,6 +346,7 @@ function populateStaticFocus(document: Document, catalogs: Catalogs, locale: str
     input.min = '0';
     input.step = '1';
     input.value = '0';
+    input.setAttribute('value', '0');
     input.dataset.raidResult = recommendation.documentId;
     const quantityLabel = localizer.text('ui.raidResult');
     input.setAttribute('aria-label', `${quantityLabel}: ${localizer.text(record.id)}`);

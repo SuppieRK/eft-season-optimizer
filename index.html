@@ -2822,6 +2822,10 @@
           : 0;
         const setQuantity = (quantity) => {
           const normalizedQuantity = Math.max(readMinimumQuantity(), Math.trunc(quantity));
+          if (normalizedQuantity === readQuantity()) {
+            quantityInput.value = String(normalizedQuantity);
+            return;
+          }
           dispatch(documentRecord.kind === 'classified'
             ? { type: 'set-classified-documents', quantity: normalizedQuantity }
             : { type: 'set-owned-document', documentId, quantity: normalizedQuantity });
@@ -2831,6 +2835,11 @@
         quantityInput.value = String(readQuantity());
         decrementButton.addEventListener('click', () => setQuantity(Number(quantityInput.value) - 1));
         incrementButton.addEventListener('click', () => setQuantity(Number(quantityInput.value) + 1));
+        quantityInput.addEventListener('input', () => {
+          if (quantityInput.value === '') return;
+          const quantity = Number(quantityInput.value);
+          if (Number.isInteger(quantity) && quantity >= 0) setQuantity(quantity);
+        });
         quantityInput.addEventListener('change', () => {
           const quantity = Number(quantityInput.value);
           setQuantity(Number.isFinite(quantity) ? quantity : 0);
@@ -2846,8 +2855,11 @@
       };
       refreshDocumentQuantities();
 
-      const optimizerWorker = new Worker(new URL('./src/optimizer-worker.ts', import.meta.url), { type: 'module' });
       let optimizerRequestId = 0;
+      let optimizerWorkerGeneration = 0;
+      let optimizerWorker;
+      let queuedOptimizerInput;
+      let optimizerStartQueued = false;
 
       const createElement = (tagName, className, textContent) => {
         const element = document.createElement(tagName);
@@ -3127,6 +3139,7 @@
             const input = figure?.querySelector('[data-raid-result]');
             const [decrement, increment] = figure?.querySelectorAll('.raid-result-stepper button') ?? [];
             if (!input || !decrement || !increment) return;
+            input.value = '0';
             input.disabled = false;
             decrement.disabled = false;
             increment.disabled = false;
@@ -3284,24 +3297,7 @@
         focusStage.setAttribute('aria-busy', 'false');
       };
 
-      refreshOptimization = () => {
-        const requestId = ++optimizerRequestId;
-        showOptimizerLoading();
-        optimizerWorker.postMessage({
-          requestId,
-          input: {
-            catalogs,
-            claimedRewardIds: state.claimedRewardIds,
-            ownedDocuments: state.ownedDocuments,
-            classifiedDocuments: state.classifiedDocuments,
-            mode: state.mode,
-            locale: state.locale,
-          },
-        });
-      };
-
-      optimizerWorker.addEventListener('message', ({ data }) => {
-        if (data.requestId !== optimizerRequestId) return;
+      const renderOptimizerResponse = (data) => {
         if (data.error) {
           currentNextRaid = undefined;
           currentProfile = undefined;
@@ -3320,7 +3316,46 @@
         const profile = result.profiles[result.goal === 'black-division-crates' ? 'fastest' : state.selectedProfile];
         renderRouteDetails(profile, result);
         hideOptimizerLoading();
-      });
+      };
+
+      const startQueuedOptimization = () => {
+        optimizerStartQueued = false;
+        const input = queuedOptimizerInput;
+        queuedOptimizerInput = undefined;
+        if (!input) return;
+
+        const requestId = ++optimizerRequestId;
+        const generation = ++optimizerWorkerGeneration;
+        const worker = new Worker(new URL('./src/optimizer-worker.ts', import.meta.url), { type: 'module' });
+        optimizerWorker = worker;
+        worker.addEventListener('message', ({ data }) => {
+          if (worker !== optimizerWorker || generation !== optimizerWorkerGeneration || data.requestId !== requestId) return;
+          optimizerWorker = undefined;
+          worker.terminate();
+          renderOptimizerResponse(data);
+        });
+        worker.postMessage({ requestId, input });
+      };
+
+      refreshOptimization = () => {
+        queuedOptimizerInput = {
+          catalogs,
+          claimedRewardIds: state.claimedRewardIds,
+          ownedDocuments: state.ownedDocuments,
+          classifiedDocuments: state.classifiedDocuments,
+          mode: state.mode,
+          locale: state.locale,
+        };
+        showOptimizerLoading();
+        if (optimizerWorker) {
+          optimizerWorker.terminate();
+          optimizerWorker = undefined;
+          optimizerWorkerGeneration += 1;
+        }
+        if (optimizerStartQueued) return;
+        optimizerStartQueued = true;
+        window.queueMicrotask(startQueuedOptimization);
+      };
 
       commitRaidButton.addEventListener('click', () => {
         if (!currentNextRaid) return;
