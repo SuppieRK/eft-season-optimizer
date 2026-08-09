@@ -60,23 +60,23 @@
 
 - [x] 7.1 Resolve the one global game mode to its fixed `10`/`15`/`25` daily document limit and generate a daily estimate for every available route profile without exceeding that limit while retaining location grouping where possible.
 - [x] 7.2 Return summary-first progression data with reward claims and page unlocks, the first/current day expanded by default, and future days collapsed, without assigning real calendar dates or guaranteed raid counts.
-- [x] 7.3 Implement the all-rewards-claimed Black Division crate goal with a default count of one, regular-document inventory as identified by `kind`, and the eligible location with the lowest `maxRaidTimeMin` for any shortage.
+- [x] 7.3 Implement the all-rewards-claimed goal for one Black Division crate, regular-document inventory as identified by `kind`, and the eligible location with the lowest `maxRaidTimeMin` for any shortage.
 - [x] 7.4 Leave owned Classified Documents unchanged and exclude Classified backfill from Black Division crate planning.
-- [x] 7.5 Add tests proving the global PvE/PvP/PvP Seasonal selector produces fixed `10`/`15`/`25` daily limits, affects all profile schedules and estimated days, leaves route selection unchanged, advances the page-unlock frontier, covers every reward exactly once, and handles immediate crate exchange, shortages, and scaled crate counts.
+- [x] 7.5 Add tests proving the global PvE/PvP/PvP Seasonal selector produces fixed `10`/`15`/`25` daily limits, affects all profile schedules and estimated days, leaves route selection unchanged, advances the page-unlock frontier, covers every reward exactly once, and handles immediate crate exchange and shortages.
 
 ## 8. Implement State, Cookies, and Core Controls
 
-- [x] 8.1 Implement the typed application store/reducer for one global mode, daily limit, claimed rewards, owned documents, Classified Documents, crate count after pass completion, locale, and collapse state; do not store a reward-goal selection.
+- [x] 8.1 Implement the typed application store/reducer for one global mode, daily limit, claimed rewards, owned documents, Classified Documents, locale, and collapse state; do not store a reward-goal selection.
 - [x] 8.2 Implement versioned bounded first-party cookies for progress, settings, locale, and collapse state with game-data version and independent schema version metadata.
 - [x] 8.3 Restore valid cookie state, safely default malformed or unsupported state, and enforce serialized size limits without storing derived optimizer results.
-- [x] 8.4 Implement deliberate reset confirmation that clears every optimizer cookie and restores catalog defaults; reserve cookie-notice dismissal integration for the final task group.
+- [x] 8.4 Implement deliberate reset confirmation that clears every optimizer cookie and restores catalog defaults.
 - [x] 8.5 Add state and persistence tests for reducer transitions, cookie round trips, version mismatch, malformed data, size limits, reset confirmation, and reset cancellation.
 
 ## 9. Build the Five-Region Battle Pass Interface
 
 - [x] 9.1 Implement the semantic header, left rewards column, center results column, right controls column, and footer document/disclaimer regions in stable source order.
 - [x] 9.2 Implement the green-toned Battle Pass-inspired CSS system, dense panels, restrained texture, visible focus, readable contrast, touch targets, and unofficial-tool presentation.
-- [x] 9.3 Implement the header's localized locale selector and countdown to `2026-12-07 09:00:00 UTC`, including visibility-aware ticking, zero clamping, stable assistive text, and `Season ended` state.
+- [x] 9.3 Implement the header's localized locale selector and fixed in-game `d`/`h`/`m` countdown to `2026-12-07 09:00:00 UTC`, including visibility-aware ticking, zero clamping, stable localized assistive text, and `Season ended` state.
 - [x] 9.4 Implement independently collapsible reward pages whose visible rows contain only item name, compact accessible document requirements, and claimed controls, without target selection.
 - [x] 9.5 Implement per-reward, per-page, and global Claim all/Clear all behavior, including transition to Black Division crate controls when all rewards are claimed.
 - [x] 9.6 Implement right-column one global PvE/PvP/PvP Seasonal selector, effective daily-limit, and reset controls, with no reward-goal selector.
@@ -85,21 +85,12 @@
 - [x] 9.9 Add responsive grid areas and logical CSS properties that stack header, rewards, controls, results, and footer without viewport horizontal scrolling and support right-to-left locales.
 - [x] 9.10 Add DOM and accessibility tests for keyboard operation, region order, reward-row content limits, inventory entry, claims, controls, countdown, route cards, localized non-mutating buyout pricing, schedule disclosure, disclaimer, responsive states, and focus visibility.
 
-## 10. Add Feedback and Publication Configuration
-
-- [x] 10.1 Implement the in-page feedback form with exact title/body preview and optimizer context disabled by default.
-- [x] 10.2 Add explicit compact-context opt-in for game-data version, mode, and the mode-derived effective daily limit while excluding detailed inventory and reward state by default.
-- [x] 10.3 Build the prefilled `/issues/new` URL with `URLSearchParams`, safe length enforcement, and new-tab `noopener`/`noreferrer` behavior without tokens or issue-submission API calls.
-- [x] 10.4 Keep GitHub opening disabled with a localized publication explanation until owner/repository configuration is supplied, while leaving composition and preview testable.
-- [x] 10.5 Add feedback tests for encoding, preview fidelity, context privacy, length rejection, unconfigured target behavior, and absence of automatic submission.
-
-## 11. Complete Additional Localizations and Cookie Notice Last
+## 11. Complete Additional Localizations Last
 
 - [ ] 11.1 Add the user-supplied additional language values to each existing `localization.json` entry and expose only languages with complete coverage in the selector.
-- [ ] 11.2 Replace every development placeholder with reviewed human-authored item names and descriptions, image alternatives, screenshot descriptions, UI text, TarCoin price and buyout messages, requirement abbreviations, route factor labels, and feedback text for every release locale.
+- [ ] 11.2 Replace every development placeholder with reviewed human-authored item names and descriptions, image alternatives, screenshot descriptions, UI text, TarCoin price and buyout messages, requirement abbreviations, and route factor labels for every release locale.
 - [x] 11.3 Add production release-gate validation that rejects missing language values, missing or orphaned IDs, placeholders, absent descriptions, incomplete selectable locales, and untranslated assistive text.
-- [x] 11.4 Implement the non-blocking dismissible cookie-storage toast as the final UI feature, persist its dismissal, clear that dismissal during complete reset, and test first-use, dismissal, return-visit, and reset behavior.
-- [x] 11.5 After the toast is complete, run strict OpenSpec validation, all unit and DOM tests, accessibility checks, catalog validation, and the GitHub Pages production build; document any publication blockers without bypassing localization or UI/UX approval gates.
+- [x] 11.5 Run strict OpenSpec validation, all unit and DOM tests, accessibility checks, catalog validation, and the GitHub Pages production build; document any publication blockers without bypassing localization or UI/UX approval gates.
 - [x] 11.6 Add complete best-effort `ru-RU` text coverage, preserve every interpolation placeholder, expose the locale through its generated Russian flag asset, retain explicit screenshot-backed USD prices until regional prices are reviewed, and keep Russian terminology review as a release blocker.
 - [x] 11.7 Remove localization entries that have no reference in the application entry, maintained TypeScript modules, or runtime data catalogs, and add a regression that rejects future unreferenced text or structured-price IDs.
 
@@ -198,3 +189,4 @@
   - Set the `GOOGLE_SITE_VERIFICATION` repository variable. Then redeploy and complete verification.
   - Submit the sitemap. Then request indexing for both locale URLs.
   - Import the property into Bing Webmaster Tools. Then submit the same sitemap to Bing.
+- [x] 16.56 Enforce release-content validation before GitHub Pages upload; remove deferred feedback composition, cookie-notice, and crate-count behavior; clamp direct inventory values; retain the game's invariant `d`/`h`/`m` countdown and clear its accessible label at expiry; render immediate claims in Day 1; and hide the route-profile toggle in crate mode, with unit and Chromium regressions.

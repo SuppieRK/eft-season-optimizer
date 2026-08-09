@@ -62,14 +62,13 @@ describe('state and cookie persistence', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
     const initial = createDefaultState(catalog);
-    const state = reduceState(reduceState(reduceState(reduceState(reduceState(reduceState(initial, { type: 'set-mode', mode: 'pvp' }, catalog), { type: 'set-owned-document', documentId: 'documents.financial.name', quantity: 3 }, catalog), { type: 'set-classified-documents', quantity: 12 }, catalog), { type: 'set-profile', profile: 'safest' }, catalog), { type: 'set-page', page: 3 }, catalog), { type: 'dismiss-cookie-notice' }, catalog);
+    const state = reduceState(reduceState(reduceState(reduceState(reduceState(initial, { type: 'set-mode', mode: 'pvp' }, catalog), { type: 'set-owned-document', documentId: 'documents.financial.name', quantity: 3 }, catalog), { type: 'set-classified-documents', quantity: 12 }, catalog), { type: 'set-profile', profile: 'safest' }, catalog), { type: 'set-page', page: 3 }, catalog);
 
     saveState(state, cookies, catalog);
     const restored = restoreState(cookies, catalog);
     expect(restored.mode).toBe('pvp');
     expect(restored.ownedDocuments['documents.financial.name']).toBe(3);
     expect(restored.classifiedDocuments).toBe(12);
-    expect(restored.cookieNoticeDismissed).toBe(true);
     expect(restored.selectedProfile).toBe('safest');
     expect(restored.ownedDocuments).toEqual(state.ownedDocuments);
     expect(restored.selectedPage).toBe(3);
@@ -180,13 +179,12 @@ describe('state and cookie persistence', () => {
     cookies.values['kord-breach-ui'] = encodeURIComponent(JSON.stringify({
       dataFingerprint: catalog.dataFingerprint,
       schemaVersion: 1,
-      payload: { collapsedPages: { '1': true, '2': false }, selectedProfile: 'safest', cookieNoticeDismissed: true },
+      payload: { collapsedPages: { '1': true, '2': false }, selectedProfile: 'safest' },
     }));
 
     const restored = restoreState(cookies, catalog);
     expect(restored.selectedPage).toBe(2);
     expect(restored.selectedProfile).toBe('safest');
-    expect(restored.cookieNoticeDismissed).toBe(true);
   });
 
   it('falls back malformed or unsupported-schema segments and enforces cookie size limits', () => {
@@ -214,11 +212,9 @@ describe('state and cookie persistence', () => {
         'documents.medical.name': 3,
       },
       classifiedDocuments: 4,
-      crateCount: 2,
       locale: 'ru-RU',
       selectedPage: 2,
       selectedProfile: 'fastest' as const,
-      cookieNoticeDismissed: true,
     };
     cookies.values['kord-breach-progress'] = encodeURIComponent(JSON.stringify({
       gameDataVersion: catalog.battlePass.gameDataVersion,
@@ -227,7 +223,6 @@ describe('state and cookie persistence', () => {
         claimedRewardIds: expected.claimedRewardIds,
         ownedDocuments: expected.ownedDocuments,
         classifiedDocuments: expected.classifiedDocuments,
-        crateCount: expected.crateCount,
       },
     }));
     cookies.values['kord-breach-settings'] = encodeURIComponent(JSON.stringify({
@@ -241,7 +236,6 @@ describe('state and cookie persistence', () => {
       payload: {
         selectedPage: expected.selectedPage,
         selectedProfile: expected.selectedProfile,
-        cookieNoticeDismissed: expected.cookieNoticeDismissed,
       },
     }));
 
@@ -268,7 +262,6 @@ describe('state and cookie persistence', () => {
     saveState({
       ...createDefaultState(originalCatalog),
       mode: 'pvp',
-      cookieNoticeDismissed: true,
       ownedDocuments: { 'documents.financial.name': 12 },
     }, cookies, originalCatalog);
 

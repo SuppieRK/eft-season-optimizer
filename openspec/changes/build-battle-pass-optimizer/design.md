@@ -10,7 +10,7 @@ The optimizer must distinguish the selected game mode's daily document limit fro
 
 - Deliver a static, responsive optimization tool that can be deployed to GitHub Pages without a backend.
 - Keep Battle Pass facts and optimization defaults in auditable, validated JSON reconstructed from the supplied screenshots.
-- Produce deterministic plans and a legal recommended redemption sequence for every unclaimed reward, or a chosen number of Black Division crates after all rewards are claimed.
+- Produce deterministic plans and a legal recommended redemption sequence for every unclaimed reward, or one Black Division crate after all rewards are claimed.
 - Consume matching regular inventory first, maximize owned Classified Document consumption across all remaining rewards, then use useful `5:1` exchanges of surplus regular documents before farming.
 - Keep TarCoin-funded Classified Document bundles in a non-mutating informational buyout estimate instead of changing farming routes.
 - Present Fastest and Safest route alternatives using maximum raid time, official difficulty rating, and equipment-insurance availability, with deterministic low-hop tie-breaking and mode-specific daily-limit schedules.
@@ -18,7 +18,6 @@ The optimizer must distinguish the selected game mode's daily document limit fro
 - Present a green-toned, Tarkov Battle Pass-inspired interface that remains accessible and clearly unofficial.
 - Show the remaining season time from canonical metadata and stop cleanly when the season ends.
 - Internationalize all visible and assistive text and require human-authored item/image/screenshot descriptions before release.
-- Offer a reviewed, user-submitted feedback path through GitHub Issues without requiring a backend or embedded credentials.
 
 **Non-Goals:**
 
@@ -72,7 +71,7 @@ A claimed reward proves that its required documents were obtained even if the pl
 
 The Focus column is one next-raid workspace rather than a panel containing nested result cards. A redeemable reward never replaces or blocks the raid recommendation. Reward checkboxes remain the only confirmed progression state; projected claims may guide the schedule, but they do not mutate inventory or unlock pages in the live state. The optimizer may look ahead along the Page-12-first sequence to pre-farm the next ordinary-document deficit when the current page is already covered but its rewards remain unchecked. The Focus header shows the route purpose, localized location, official difficulty, and maximum raid time in a compact form such as `Factory (Easy, 15 min)`, with View full schedule and Commit aligned beside it. Estimated days do not appear in the normal workspace. When an optimizer-affecting state change starts a worker request, Focus keeps the current heading and result content in place, marks the region busy, and temporarily dims that existing result while stale schedule and Commit actions are disabled. Only the latest worker response replaces the result and removes the busy treatment. Page navigation and switching between already-calculated Fastest and Safest profiles do not enter this loading state. The body shows both regular document types available at that location on one continuous surface. Their visible names use the same localized first-word treatment as the persistent inventory counters, while full localized names remain available to controls and images. Pickup role remains above the image; no repeated pickup-role or planned-quantity subtitle appears below the document name. During Battle Pass farming, every still-needed document type assigned to the recommended location is a priority and remains fully emphasized; only location documents that do not advance the selected route are optional and dimmed. During optional crate stockpiling, both documents are useful and remain fully emphasized. The localized raid-result instruction renders its Commit term as an inline link-styled action that delegates to the same operation as the Focus-header Commit button. Either action adds both entered values to the existing inventory counters in one persisted update, clears the draft inputs, and requests a new recommendation. Empty and unavailable states use the same workspace structure.
 
-The former right context rail and full-width lower band are removed. The persistent owned-document ribbon becomes the bottom section of the expanded Focus region so the existing horizontal space replaces separate page height. A compact localized note above the ribbon states that document counts are independent from reward claims and must be adjusted separately. Images dominate each tile while the localized name, decrement, direct numeric input, and increment controls remain visible and keyboard operable. Every tile, square artwork frame, and quantity control uses the exact same shared dimensions; intrinsic title width must not enlarge any tile or child control. The credits footer remains structurally separate below the workspace. Global mode and conditional crate count remain in the native setup dialog; no editable TarCoin balance or route-purchase control is exposed. The header has two semantic sections: its left summary groups season identity with total-based document and claimed-reward progress, while its right controls group the Fastest/Safest toggle, mode, and locale. A Lucide CircleHelp control beside season identity reveals a concise localized two-paragraph optimizer workflow tooltip on hover or keyboard focus. The vector's square viewBox defines its round outline independently from font metrics. The Page-12-first complete-pass objective remains fixed rather than player-selectable. The localized asset disclaimer and link-styled cookie-storage reset button are centered on one line around a vertical divider; at narrow width they stack around a horizontal divider. Reset is not duplicated in the setup dialog.
+The former right context rail and full-width lower band are removed. The persistent owned-document ribbon becomes the bottom section of the expanded Focus region so the existing horizontal space replaces separate page height. A compact localized note above the ribbon states that document counts are independent from reward claims and must be adjusted separately. Images dominate each tile while the localized name, decrement, direct numeric input, and increment controls remain visible and keyboard operable. Every tile, square artwork frame, and quantity control uses the exact same shared dimensions; intrinsic title width must not enlarge any tile or child control. The credits footer remains structurally separate below the workspace. Global mode remains in the native setup dialog; no editable TarCoin balance, crate count, or route-purchase control is exposed. The header has two semantic sections: its left summary groups season identity with total-based document and claimed-reward progress, while its right controls group the Fastest/Safest toggle, mode, and locale. A Lucide CircleHelp control beside season identity reveals a concise localized two-paragraph optimizer workflow tooltip on hover or keyboard focus. The vector's square viewBox defines its round outline independently from font metrics. The Page-12-first complete-pass objective remains fixed rather than player-selectable. The localized asset disclaimer and link-styled cookie-storage reset button are centered on one line around a vertical divider; at narrow width they stack around a horizontal divider. Reset is not duplicated in the setup dialog.
 
 The document-progress label places a link-styled approximate localized buyout price beside `Documents`, for example `DOCUMENTS (~$100) 1 / 501`. Only the price is interactive. It updates from the independent remaining-pass buyout estimate and opens a native modal titled `Battle Pass buyout`. The modal contains exactly two concise comparison sections: Spend Battle Pass TarCoins and Keep Battle Pass TarCoins. Both scenario headings use the same season-accent color as an unlocked `X redeemable` count. A larger golden-ratio spacing step before Keep Battle Pass TarCoins visually separates the two alternatives. Each section renders TarCoin packages first and Classified Document bundles second as flat tables with bundle or package source, quantity, TarCoins, storefront price, and totals. The spend table includes one aggregated Battle Pass TarCoin contribution; the keep table excludes that contribution and purchases enough TarCoins to cover gross Classified bundle spend. It does not render separate funding, calculation-explanation, minimum-additional, starting-versus-earned, or `FROM estimate` prose. Individual package rows and table totals format their structured numeric prices for the active locale and ISO currency without storing or displaying a `FROM` prefix. The modal remains informational and does not mutate state or farming routes. If a complete local price is unavailable, the link uses a localized Buyout fallback rather than inventing a conversion. The link is removed after all Battle Pass rewards are claimed.
 
@@ -88,7 +87,7 @@ The 1440-to-2560-pixel desktop presentation is authoritative. The body establish
 
 The visual hierarchy permits at most one framed surface per major region. In particular, the center SHALL NOT render a framed result inside a framed panel, a framed next action inside that result, or framed locations inside the next action. Shadows are reserved for the native dialog and cookie toast. Semantic wrappers required for accessibility may remain in the DOM but do not create another visible surface.
 
-A persistent credits footer, structurally separate from the document section, will state: “Escape from Tarkov and all game assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool.” It remains available without opening a modal and is separate from the dismissible cookie notice.
+A persistent credits footer, structurally separate from the document section, will state: “Escape from Tarkov and all game assets displayed here belong to Battlestate Games. This is an unofficial fan-made optimization tool.” It remains available without opening a modal.
 
 Tarkov-inspired styling must preserve visible keyboard focus, semantic controls, readable contrast, responsive layout, and practical touch targets. Quantity inputs use non-negative integer validation and remain operable by keyboard. Decoration remains subordinate to content.
 
@@ -100,7 +99,7 @@ A naturally quantity-free occurrence is preferred. If quantity text such as `x0`
 
 `battle-pass.json` stores the season identifier as top-level `id: "season.one"` and the Unix deadline as top-level `endsAt: 1796634000`, which is `2026-12-07 09:00:00 UTC`. Runtime code treats this catalog field as the sole deadline source, validates only that it is a positive integer, converts it from seconds to milliseconds once, and calculates `max(0, endTime - Date.now())`; the value is not duplicated in runtime code or persisted in cookies.
 
-The header displays days, hours, minutes, and seconds and refreshes at most once per second while the page is visible. At zero it stops its timer and displays “Season ended.” A details label exposes the absolute UTC end time so users can distinguish the canonical deadline from a countdown affected by an incorrect device clock. Frequent tick updates are not announced through an ARIA live region; assistive text provides a stable summary instead.
+The header displays days, hours, and minutes with the game's fixed `d`/`h`/`m` abbreviations under every locale. It does not display seconds. It refreshes at most once per second while the page is visible. At zero it stops its timer and displays “Season ended.” A details label exposes the absolute UTC end time so users can distinguish the canonical deadline from a countdown affected by an incorrect device clock. Frequent tick updates are not announced through an ARIA live region; localized assistive text provides a stable summary instead.
 
 ### 4. Internationalize text and make content completeness a release gate
 
@@ -116,13 +115,13 @@ No user-facing or assistive string is hard-coded in render functions. Domain JSO
 }
 ```
 
-Names, descriptions, requirement abbreviations, image alternatives, screenshot descriptions, UI labels, countdown units, and validation messages use independent IDs so each entry has one semantic purpose and a consistent string value shape. Keeping all languages adjacent within the same entry makes omissions and translation differences easier to review than separate per-language dictionaries.
+Names, descriptions, requirement abbreviations, image alternatives, screenshot descriptions, UI labels, and validation messages use independent IDs so each entry has one semantic purpose and a consistent string value shape. Keeping all languages adjacent within the same entry makes omissions and translation differences easier to review than separate per-language dictionaries.
 
 Locale-dependent real-money TarCoin package prices use a separate `priceEntries` collection in the same file. Each price entry keeps the same ID-centered shape, but each locale value contains only numeric major-unit `price` and a three-letter uppercase ISO `currency` code. Display strings are derived with `Intl.NumberFormat` and its narrow currency symbol; no preformatted storefront price is stored or parsed. Calculations normalize the numeric price to the ISO currency's fraction digits before comparing package combinations. Invariant TarCoin amounts remain ordinary numeric game data rather than localized currency values.
 
 The configured default locale is always available. Catalog locale keys use regional BCP 47 tags such as `en-GB`; the region selects the corresponding 4:3 image from the installed `flag-icons` package, while the complete tag drives `Intl` formatting and browser preference matching. A Vite virtual module generated from `supportedLocales` replaces the former hard-coded `en` text-locale to `gb.svg` mapping, emits only declared 4:3 flag assets, and does not require a new icon import when another regional locale is added. A locale appears in the header selector only when every required entry has a non-empty value for that locale; offered locales may not silently fall back for missing release content. The initial `ru-RU` catalog is a complete best-effort draft whose terminology still requires human review. Its structured price entries explicitly retain the screenshot-backed USD values until reviewed regional prices are supplied; the application performs no fallback or currency conversion. Development builds may show conspicuous missing-ID markers, while production builds fail on missing, empty, duplicate, orphaned, invalid, or regionless locale IDs, missing locale values, or values for undeclared locales. The user's selected locale is stored in the UI-state cookie. Explicit locale URLs remain authoritative. On a first unprefixed-root visit, the application chooses a stored locale, then an exact or unambiguous browser preference, before falling back to the configured default.
 
-Formatting uses `Intl.NumberFormat`, `Intl.DateTimeFormat`, and locale-aware message templates rather than string concatenation. The countdown uses localized unit labels and plural forms while retaining the canonical UTC instant. The document abbreviations in the left column are localized data, not substrings cut from translated names.
+Formatting uses `Intl.NumberFormat`, `Intl.DateTimeFormat`, and locale-aware message templates rather than string concatenation. The visible countdown intentionally follows the game's invariant `d`/`h`/`m` notation while its assistive summary can use localized units. The document abbreviations in the left column are localized data, not substrings cut from translated names.
 
 Human-authored textual descriptions for every item, displayed item image, and displayed source screenshot are a release blocker. The best-effort Russian terminology and its regional prices also require user review. A release build must verify that the default locale and every locale exposed by the selector have complete UI strings, item names and descriptions, meaningful image alternatives, and required screenshot descriptions. Infrastructure may be implemented and previewed before that content exists, but the site cannot be marked publication-ready.
 
@@ -233,7 +232,7 @@ The daily limit affects only the projected schedule and estimated number of days
 
 ### 11. Keep a Black Division crate stockpile raid available
 
-When every reward is marked claimed, the all-unclaimed-rewards plan switches to a crate-count control with a default of one. The engine first applies the player's regular-document inventory, identified by `kind: "regular"`, toward the 10:1 crate requirement, then assigns any shortage to the eligible farming location with the lowest `maxRaidTimeMin`. A larger user-selected crate count scales the requirement. If the requested crate quantity is already covered, the next raid remains available as an optional stockpile recommendation for another crate.
+When every reward is marked claimed, the plan switches to one Black Division crate. The engine first applies the player's regular-document inventory, identified by `kind: "regular"`, toward the 10:1 crate requirement, then assigns any shortage to the eligible farming location with the lowest `maxRaidTimeMin`. If that crate is already covered, the next raid remains available as an optional stockpile recommendation for another crate.
 
 While rewards remain unchecked but current inventory already covers every remaining requirement, the goal stays `all-unclaimed-rewards` and the reward rail remains visible. The next raid alone switches to optional crate-stockpile purpose. Fastest chooses the eligible location by `maxRaidTimeMin`. Safest chooses by `difficultyRating`, then equipment-insurance availability, then `maxRaidTimeMin`, followed by stable location ID.
 
@@ -252,16 +251,6 @@ Alternatives considered:
 - `localStorage` offers more space and simpler APIs, but cookies are an explicit product requirement.
 - A single cookie is simpler but risks exceeding common per-cookie limits as claimed rewards and inventory values grow.
 
-### 13. Open a prefilled GitHub issue for feedback, with user review
-
-A persistent Feedback control opens a small in-page form. The user enters feedback and may enable “include optimizer context,” which is off by default. Before leaving the site, the UI previews the exact issue title and body.
-
-On confirmation, the application uses `URLSearchParams` to open the repository's GitHub `/issues/new` composer in a new tab with encoded `title`, `body`, and optional template parameters. GitHub handles authentication, final review, and submission. The static site does not call the Issues API, embed a token, or claim that feedback was sent automatically.
-
-Optional context is compact and non-sensitive: application data version, selected mode, effective daily limit, and whether the daily limit is customized. Inventory and claimed-reward details are excluded unless the user explicitly opts in and sees them in the preview. Input and generated URLs are length-limited. The repository target is release configuration rather than optimizer logic, and `.github/ISSUE_TEMPLATE/feedback.md` will provide structure on GitHub.
-
-The owner and repository will be configured only after the UI/UX has been reviewed and the site is approved for publication. During local review, the feedback form and preview may be exercised, but its “Open GitHub issue” action remains disabled with a clear “available after publication” explanation until a valid repository target is configured.
-
 Alternatives considered:
 
 - Calling the GitHub Issues REST API directly is rejected because a public static site cannot safely store a write-capable token and GitHub must authenticate the submitter.
@@ -272,7 +261,7 @@ Alternatives considered:
 
 Vitest will cover JSON validation and pure optimizer scenarios, including prerequisite closure, classified backfill, immediate TarCoin availability, bundle selection, difficulty mappings, maximum raid times, Fastest and Safest alternatives, low-hop tie-breaking, fixed mode limits, reward claims that unlock the next page, complete reward coverage by the schedule, an always-present clean-state raid, covered-page look-ahead, and crate-stockpile fallback. Fake-timer tests will verify the exact season timestamp, localized countdown formatting, zero clamping, and timer shutdown. Localization validation tests will compare referenced IDs with `localization.json`, enforce unique entry IDs, verify every declared language value, and check item/image/screenshot description coverage. jsdom and Testing Library DOM will cover domain and state transitions retained outside the root entry. A Chromium-only Playwright suite will cover the production root interface behavior that requires a real browser: native redemption-dialog focus and Enter defaults when subtraction is available, direct tracking without a popup when inventory is insufficient, inventory preservation, always-available raid entry and Commit controls, SlimSelect menus, computed completed-state styles, exclusive accordion transitions, document artwork and tooltips, inventory controls, progress and cookie restoration, profile and mode persistence, global tracking-only actions, and the crate-stockpile fallback. The deployment check will install Chromium, run this suite, and reject a duplicate preview page before publishing.
 
-Feedback tests will verify URL encoding, context opt-in, content limits, and that no issue-submission API is called. A production build check will catch broken GitHub Pages asset paths.
+A production build check will catch broken GitHub Pages asset paths.
 
 Screenshot transcription tests will assert known page/reward totals so data changes remain reviewable; screenshot paths remain outside the runtime catalogs.
 
@@ -282,7 +271,7 @@ Vite will inject the official Cloudflare Web Analytics module script before the 
 
 The development server and builds without a token will omit the beacon. A missing token will not block GitHub Pages deployment. The production build check will allow only Cloudflare's exact beacon URL and will reject unresolved Vite placeholders or malformed beacon output.
 
-The application will not add optimizer state, document quantities, reward claims, cookies, or custom metadata to the beacon. The existing cookie notice will continue to describe only the first-party cookies that store planner selections.
+The application will not add optimizer state, document quantities, reward claims, cookies, or custom metadata to the beacon.
 
 ### 16. Generate localized search pages from one site configuration
 
@@ -311,7 +300,6 @@ An original 1200 by 630 social image uses only project-owned graphics. Each orig
 - [TarCoin rewards create order-dependent plans] → Credit TarCoins immediately after each reward redemption, use deterministic bundle tie-breaking, and never credit an unredeemed reward early.
 - [Cookie state exceeds browser limits or becomes incompatible] → Split and version cookies, test serialized size, and fall back to defaults on invalid state.
 - [Framework-free DOM code accumulates inconsistent state] → Keep one typed state model, pure derivation functions, and small idempotent render functions.
-- [Prefilled feedback exposes player state or exceeds URL limits] → Keep context opt-in, preview the exact report, exclude detailed inventory by default, and enforce conservative input and URL limits.
 - [Exhaustive subset enumeration grows] → Keep location activation enumeration bounded to the small catalog; introduce branch-and-bound only if measured performance requires it.
 - [Game rules or store bundles change] → Version season data and optimizer rules in JSON rather than hard-coding values.
 - [Static asset paths fail on GitHub Pages] → Configure and test the repository base path in the production build and deployment workflow.
@@ -321,9 +309,9 @@ An original 1200 by 630 social image uses only project-owned graphics. Each orig
 1. Scaffold Vite's framework-free `vanilla-ts` application, semantic HTML/CSS shell, automated test environment, and GitHub Pages workflow.
 2. Transcribe and validate the five JSON catalogs, including `localization.json`, against the supplied screenshots and human-authored descriptions.
 3. Implement the pure optimizer and scenario tests before connecting UI state.
-4. Add the five-region responsive layout, footer inventory controls, season countdown, asset disclaimer, optimizer results, cautious schedule disclosure, versioned cookie persistence and toast, reset behavior, feedback issue composer, and localization infrastructure.
+4. Add the five-region responsive layout, footer inventory controls, season countdown, asset disclaimer, optimizer results, cautious schedule disclosure, versioned cookie persistence, reset behavior, and localization infrastructure.
 5. Load human-authored localized item/image/screenshot descriptions, validate every release locale, and complete accessibility and UI/UX review.
-6. After UI/UX and content approval, configure the GitHub owner/repository and feedback template, verify a production build with the GitHub Pages base path, and deploy through GitHub Actions.
+6. After UI/UX and content approval, verify a production build with the GitHub Pages base path and deploy through GitHub Actions.
 
 There is no existing application data to migrate. Rollback consists of restoring the previous Pages deployment or disabling the new workflow; versioned cookies can be ignored or cleared by a later build.
 
@@ -333,7 +321,3 @@ There is no existing application data to migrate. Rollback consists of restoring
 - Human-authored item names and descriptions, image alternatives, and displayed screenshot descriptions are present and reviewed.
 - The five-region UI and its responsive stacking have passed UI/UX and accessibility review.
 - No development missing-key markers or placeholder descriptions remain in the production build.
-
-## Deferred Publication Configuration
-
-The GitHub owner/repository URL and any feedback label remain intentionally unset until the UI/UX is reviewed and the site is approved for publication. They are release configuration, not unresolved optimizer behavior.

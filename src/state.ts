@@ -10,11 +10,9 @@ export interface AppState {
   readonly claimedRewardIds: readonly string[];
   readonly ownedDocuments: Readonly<Record<string, number>>;
   readonly classifiedDocuments: number;
-  readonly crateCount: number;
   readonly locale: string;
   readonly selectedPage: number;
   readonly selectedProfile: OptimizationProfile;
-  readonly cookieNoticeDismissed: boolean;
 }
 
 export type StateAction =
@@ -23,7 +21,6 @@ export type StateAction =
   | { readonly type: 'increment-document'; readonly documentId: string }
   | { readonly type: 'decrement-document'; readonly documentId: string }
   | { readonly type: 'set-classified-documents'; readonly quantity: number }
-  | { readonly type: 'set-crate-count'; readonly quantity: number }
   | { readonly type: 'set-locale'; readonly locale: string }
   | { readonly type: 'set-profile'; readonly profile: OptimizationProfile }
   | { readonly type: 'claim-reward'; readonly rewardId: string; readonly claimed: boolean }
@@ -31,7 +28,6 @@ export type StateAction =
   | { readonly type: 'claim-page'; readonly page: number; readonly claimed: boolean }
   | { readonly type: 'claim-all'; readonly claimed: boolean }
   | { readonly type: 'set-page'; readonly page: number }
-  | { readonly type: 'dismiss-cookie-notice' }
   | { readonly type: 'reset' };
 
 const MODES: readonly GameMode[] = ['pve', 'pvp', 'pvp-seasonal'];
@@ -42,11 +38,9 @@ export function createDefaultState(catalogs: Catalogs): AppState {
     claimedRewardIds: [],
     ownedDocuments: Object.fromEntries(catalogs.documents.documents.map((document) => [document.id, 0])),
     classifiedDocuments: 1,
-    crateCount: 1,
     locale: catalogs.localization.defaultLocale,
     selectedPage: getDefaultRewardPage(catalogs, []),
     selectedProfile: 'safest',
-    cookieNoticeDismissed: false,
   };
 }
 
@@ -66,8 +60,6 @@ export function reduceState(state: AppState, action: StateAction, catalogs: Cata
       return validQuantity(action.quantity)
         ? { ...state, classifiedDocuments: Math.max(getClassifiedDocumentMinimum(state.claimedRewardIds), action.quantity) }
         : state;
-    case 'set-crate-count':
-      return validQuantity(action.quantity) && action.quantity > 0 ? { ...state, crateCount: action.quantity } : state;
     case 'set-locale':
       return getCompleteLocales(catalogs.localization).includes(action.locale) ? { ...state, locale: action.locale } : state;
     case 'set-profile':
@@ -89,8 +81,6 @@ export function reduceState(state: AppState, action: StateAction, catalogs: Cata
     }
     case 'set-page':
       return catalogs.battlePass.pages.some((page) => page.page === action.page) ? { ...state, selectedPage: action.page } : state;
-    case 'dismiss-cookie-notice':
-      return { ...state, cookieNoticeDismissed: true };
     case 'reset':
       return createDefaultState(catalogs);
   }

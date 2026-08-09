@@ -268,14 +268,14 @@ For an available selected profile, the optimizer SHALL expose a next-raid recomm
 - **THEN** the optimizer result and persisted player inventory remain unchanged
 
 ### Requirement: Black Division crate fallback
-When every Battle Pass reward is claimed, the optimizer SHALL switch to a Black Division crate-count goal, default to one crate, apply inventory whose document has `kind: "regular"` at `10` documents per crate, and exclude documents with `kind: "classified"`.
+When every Battle Pass reward is claimed, the optimizer SHALL switch to one Black Division crate goal, apply inventory whose document has `kind: "regular"` at `10` documents per crate, and exclude documents with `kind: "classified"`.
 
 #### Scenario: All rewards claimed with insufficient regular inventory
-- **WHEN** the player requests one crate and owns fewer than ten documents whose kind is `regular`
+- **WHEN** the player owns fewer than ten documents whose kind is `regular`
 - **THEN** the result recommends farming the shortage at the eligible location with the lowest `maxRaidTimeMin`
 
 #### Scenario: Enough documents for immediate exchange
-- **WHEN** the player owns enough documents whose kind is `regular` for the requested crate count
+- **WHEN** the player owns at least ten documents whose kind is `regular`
 - **THEN** the result reports no crate shortage and still returns an optional stockpile raid for another crate
 
 #### Scenario: Classified Documents owned in crate mode

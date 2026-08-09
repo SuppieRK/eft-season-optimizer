@@ -424,6 +424,10 @@
         border: 1px solid var(--line-muted);
       }
 
+      .route-profile-toggle[hidden] {
+        display: none;
+      }
+
       .route-profile-option {
         position: relative;
         cursor: pointer;
@@ -2377,6 +2381,7 @@
       const modeSelect = document.querySelector('[data-mode-select]');
       const resetCookieState = document.querySelector('[data-reset-cookie-state]');
       const languageSelect = document.querySelector('[data-language-select]');
+      const routeProfileToggle = document.querySelector('.route-profile-toggle');
       const buyoutLink = document.querySelector('[data-buyout-link]');
       const focusStage = document.querySelector('.focus-stage');
       const focusEyebrow = document.querySelector('[data-focus-eyebrow]');
@@ -2507,7 +2512,6 @@
         'increment-document',
         'redeem-reward',
         'set-classified-documents',
-        'set-crate-count',
         'set-locale',
         'set-mode',
         'set-owned-document',
@@ -2730,6 +2734,7 @@
       refreshRewardRail = () => {
         const claimedRewards = new Set(state.claimedRewardIds);
         const allRewardsClaimed = rewards.every((reward) => claimedRewards.has(reward.id));
+        routeProfileToggle.hidden = allRewardsClaimed;
         const accordionIsMounted = pageViews.every(({ pageSection }) => pageSection.parentElement === rewardPages);
         const crateIsMounted = crateReward.parentElement === rewardPages;
         if (allRewardsClaimed && !crateIsMounted) rewardPages.replaceChildren(crateReward);
@@ -2903,7 +2908,12 @@
           routeScheduleContent.append(actions);
         }
 
-        profile.schedule.forEach((day, dayIndex) => {
+        const displayedSchedule = profile.schedule.length > 0
+          ? profile.schedule
+          : profile.projectedImmediateRewardIds.length > 0
+            ? [{ day: 1, documentQuantity: 0, locations: [], rewardIdsClaimed: [] }]
+            : [];
+        displayedSchedule.forEach((day, dayIndex) => {
           const rewardIdsToClaim = dayIndex === 0
             ? [...profile.projectedImmediateRewardIds, ...day.rewardIdsClaimed]
             : day.rewardIdsClaimed;
@@ -3286,7 +3296,6 @@
             classifiedDocuments: state.classifiedDocuments,
             mode: state.mode,
             locale: state.locale,
-            crateCount: state.crateCount,
           },
         });
       };
@@ -3454,6 +3463,7 @@
         const totalSeconds = Math.max(0, Math.ceil(endsAt - Date.now() / 1000));
         if (totalSeconds === 0) {
           timer.textContent = localizer.text('season.ended');
+          timer.removeAttribute('aria-label');
           return false;
         }
 

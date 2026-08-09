@@ -1380,13 +1380,6 @@
       }
     },
     {
-      "id": "ui.crateCount",
-      "localizations": {
-        "en-GB": "Black Division crates",
-        "ru-RU": "Контейнеры Black Division"
-      }
-    },
-    {
       "id": "ui.crateShortage",
       "localizations": {
         "en-GB": "Regular documents to farm: {count}",
@@ -1419,90 +1412,6 @@
       "localizations": {
         "en-GB": "Warning: {text}",
         "ru-RU": "Предупреждение: {text}"
-      }
-    },
-    {
-      "id": "feedback.button",
-      "localizations": {
-        "en-GB": "Feedback",
-        "ru-RU": "Обратная связь"
-      }
-    },
-    {
-      "id": "feedback.heading",
-      "localizations": {
-        "en-GB": "Send feedback",
-        "ru-RU": "Отправить отзыв"
-      }
-    },
-    {
-      "id": "feedback.message",
-      "localizations": {
-        "en-GB": "Message",
-        "ru-RU": "Сообщение"
-      }
-    },
-    {
-      "id": "feedback.includeContext",
-      "localizations": {
-        "en-GB": "Include compact optimizer context",
-        "ru-RU": "Добавить краткий контекст оптимизатора"
-      }
-    },
-    {
-      "id": "feedback.openGitHub",
-      "localizations": {
-        "en-GB": "Open GitHub issue composer",
-        "ru-RU": "Открыть форму обращения GitHub"
-      }
-    },
-    {
-      "id": "feedback.unconfigured",
-      "localizations": {
-        "en-GB": "GitHub submission will be enabled after publication configuration.",
-        "ru-RU": "Отправка через GitHub станет доступна после настройки публикации."
-      }
-    },
-    {
-      "id": "feedback.invalid",
-      "localizations": {
-        "en-GB": "Enter a message within the allowed length.",
-        "ru-RU": "Введите сообщение допустимой длины."
-      }
-    },
-    {
-      "id": "feedback.title",
-      "localizations": {
-        "en-GB": "KORD BREACH Optimizer feedback",
-        "ru-RU": "Отзыв об оптимизаторе KORD BREACH"
-      }
-    },
-    {
-      "id": "feedback.body",
-      "localizations": {
-        "en-GB": "Feedback:\n{message}",
-        "ru-RU": "Отзыв:\n{message}"
-      }
-    },
-    {
-      "id": "feedback.context",
-      "localizations": {
-        "en-GB": "Context:\nGame data: {version}\nMode: {mode}\nDaily limit: {limit}",
-        "ru-RU": "Контекст:\nВерсия игровых данных: {version}\nРежим: {mode}\nДневной лимит: {limit}"
-      }
-    },
-    {
-      "id": "cookieNotice.message",
-      "localizations": {
-        "en-GB": "Cookies store your planner selections on this device.",
-        "ru-RU": "Файлы cookie хранят настройки планировщика на этом устройстве."
-      }
-    },
-    {
-      "id": "cookieNotice.dismiss",
-      "localizations": {
-        "en-GB": "Dismiss",
-        "ru-RU": "Закрыть"
       }
     },
     {

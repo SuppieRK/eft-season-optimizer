@@ -1,5 +1,4 @@
 import type { Catalogs } from './catalogs';
-import { buildIssueUrl, composeFeedback, openIssueComposer, validateFeedbackMessage, type FeedbackConfig } from './feedback';
 import { formatAccessibleRequirements, formatCompactRequirements, formatCountdownUnit, formatDateTime, formatLocalPrice, formatNumber, createLocalizer } from './localization';
 import { optimize, type LocationAssignment, type NextRaidRecommendation, type OptimizerResult, type ProfileResult, type ScheduleDay } from './optimizer';
 import { getClassifiedDocumentMinimum, type AppState, type StateAction } from './state';
@@ -19,7 +18,6 @@ export function renderApp(documentRoot: Document, catalogs: Catalogs, state: App
     classifiedDocuments: state.classifiedDocuments,
     mode: state.mode,
     locale: state.locale,
-    crateCount: state.crateCount,
   });
   documentRoot.documentElement.lang = localizer.locale;
   documentRoot.documentElement.dir = localizer.direction;
@@ -33,11 +31,9 @@ export function renderApp(documentRoot: Document, catalogs: Catalogs, state: App
       <aside class="workspace-region route-context" data-region="route-context" aria-labelledby="route-context-title">${renderRouteContext(localizer, state, result)}</aside>
     </main>
     ${renderFooter(localizer, catalogs, state, result)}
-    ${renderSetupDialog(localizer, catalogs, state, result)}
-    ${state.cookieNoticeDismissed ? '' : `<aside class="cookie-toast" role="status" data-cookie-toast><p>${escapeHtml(localizer.text('cookieNotice.message'))}</p><button type="button" data-action="dismiss-cookie-notice">${escapeHtml(localizer.text('cookieNotice.dismiss'))}</button></aside>`}
+    ${renderSetupDialog(localizer, catalogs, state)}
   `;
   bindEvents(app, dispatch, localizer);
-  bindFeedback(app, catalogs, state, localizer);
   if (setupWasOpen) openDialog(app, '[data-setup-dialog]');
   startCountdown(documentRoot, localizer, catalogs.battlePass.endsAt);
 }
@@ -94,14 +90,13 @@ function renderRewards(localizer: ReturnType<typeof createLocalizer>, catalogs: 
     </section>`;
 }
 
-function renderSetupDialog(localizer: ReturnType<typeof createLocalizer>, catalogs: Catalogs, state: AppState, result: OptimizerResult): string {
+function renderSetupDialog(localizer: ReturnType<typeof createLocalizer>, catalogs: Catalogs, state: AppState): string {
   const modes = (['pvp-seasonal', 'pvp', 'pve'] as const).map((mode) => {
     const label = localizer.text(`mode.${mode === 'pvp-seasonal' ? 'pvpSeasonal' : mode}`);
     return `<label><input type="radio" name="mode" value="${mode}" data-field="mode" ${state.mode === mode ? 'checked' : ''} /><span>${escapeHtml(label)}</span><small>${formatNumber(catalogs.optimizerRules.dailyDocumentLimits[mode], localizer.locale)} / ${escapeHtml(localizer.text('ui.day'))}</small></label>`;
   }).join('');
   return `<dialog class="setup-dialog" data-setup-dialog aria-labelledby="setup-dialog-title"><header><h2 id="setup-dialog-title">${escapeHtml(localizer.text('ui.controls'))}</h2><button type="button" data-action="close-setup">${escapeHtml(localizer.text('ui.close'))}</button></header><div class="setup-fields">
       <fieldset class="mode-selector"><legend>${escapeHtml(localizer.text('optimizer.mode'))}</legend><div>${modes}</div></fieldset>
-      ${result.goal === 'black-division-crates' ? `<label>${escapeHtml(localizer.text('ui.crateCount'))}<input type="number" min="1" step="1" value="${state.crateCount}" data-field="crate-count" /></label>` : ''}
     </div><footer><button class="danger-action" type="button" data-action="reset">${escapeHtml(localizer.text('ui.reset'))}</button></footer></dialog>`;
 }
 
@@ -237,7 +232,7 @@ function renderFooter(localizer: ReturnType<typeof createLocalizer>, catalogs: C
       <div class="quantity-stepper"><button type="button" data-action="decrement" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" aria-label="${escapeHtml(`${localizer.text('ui.quantity')} − ${name}`)}">−</button><label><span class="sr-only">${escapeHtml(`${localizer.text('ui.quantity')} ${name}`)}</span><input type="number" min="${minimum}" step="1" value="${quantity}" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" /></label><button type="button" data-action="increment" data-document-id="${escapeHtml(document.id)}" data-document-kind="${document.kind}" aria-label="${escapeHtml(`${localizer.text('ui.quantity')} + ${name}`)}">+</button></div>
     </article>`;
   }).join('');
-  return `<footer class="site-footer" data-region="footer"><div class="section-heading"><h2>${escapeHtml(localizer.text('ui.documentsOwned'))}</h2></div><div class="document-tray">${documents}</div><div class="footer-meta"><p class="disclaimer">${escapeHtml(localizer.text('footer.disclaimer'))}</p><details class="feedback"><summary>${escapeHtml(localizer.text('feedback.button'))}</summary><form class="feedback-form" data-feedback-form><h3>${escapeHtml(localizer.text('feedback.heading'))}</h3><label>${escapeHtml(localizer.text('feedback.message'))}<textarea data-feedback-message maxlength="2000" rows="5"></textarea></label><label class="check-row"><input type="checkbox" data-feedback-context /> ${escapeHtml(localizer.text('feedback.includeContext'))}</label><pre data-feedback-preview></pre><p data-feedback-status>${escapeHtml(localizer.text('feedback.unconfigured'))}</p><button type="submit" data-feedback-open disabled>${escapeHtml(localizer.text('feedback.openGitHub'))}</button></form></details></div></footer>`;
+  return `<footer class="site-footer" data-region="footer"><div class="section-heading"><h2>${escapeHtml(localizer.text('ui.documentsOwned'))}</h2></div><div class="document-tray">${documents}</div><div class="footer-meta"><p class="disclaimer">${escapeHtml(localizer.text('footer.disclaimer'))}</p></div></footer>`;
 }
 
 function bindEvents(app: HTMLElement, dispatch: (action: StateAction) => void, localizer: ReturnType<typeof createLocalizer>): void {
@@ -265,7 +260,6 @@ function bindEvents(app: HTMLElement, dispatch: (action: StateAction) => void, l
     else if (action === 'decrement' && documentId && documentKind === 'classified') dispatch({ type: 'set-classified-documents', quantity: Math.max(0, Number(quantityInput?.value ?? 0) - 1) });
     else if (action === 'increment' && documentId) dispatch({ type: 'increment-document', documentId });
     else if (action === 'decrement' && documentId) dispatch({ type: 'decrement-document', documentId });
-    else if (action === 'dismiss-cookie-notice') dispatch({ type: 'dismiss-cookie-notice' });
     else if (action === 'reset' && window.confirm(localizer.text('ui.resetConfirm'))) {
       closeDialog(app, '[data-setup-dialog]');
       dispatch({ type: 'reset' });
@@ -277,9 +271,8 @@ function bindEvents(app: HTMLElement, dispatch: (action: StateAction) => void, l
     else if (target.matches('[data-field="reward-page"]')) dispatch({ type: 'set-page', page: Number(target.value) });
     else if (target.matches('[data-field="locale"]')) dispatch({ type: 'set-locale', locale: target.value });
     else if (target.matches('[data-field="mode"]')) dispatch({ type: 'set-mode', mode: target.value as AppState['mode'] });
-    else if (target.matches('[data-field="crate-count"]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-crate-count', quantity }), localizer);
-    else if (target.matches('[data-document-kind="classified"]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-classified-documents', quantity }), localizer);
-    else if (target.matches('[data-document-id]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-owned-document', documentId: target.dataset.documentId!, quantity }), localizer);
+    else if (target.matches('[data-document-kind="classified"]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-classified-documents', quantity }));
+    else if (target.matches('[data-document-id]')) commitQuantity(target, (quantity) => dispatch({ type: 'set-owned-document', documentId: target.dataset.documentId!, quantity }));
   };
 }
 
@@ -304,47 +297,10 @@ function selectStop(app: HTMLElement, index: number): void {
   app.querySelectorAll<HTMLElement>('[data-stop-index]').forEach((button) => button.setAttribute('aria-selected', String(Number(button.dataset.stopIndex) === index)));
 }
 
-function bindFeedback(app: HTMLElement, catalogs: Catalogs, state: AppState, localizer: ReturnType<typeof createLocalizer>): void {
-  const form = app.querySelector<HTMLFormElement>('[data-feedback-form]');
-  const message = app.querySelector<HTMLTextAreaElement>('[data-feedback-message]');
-  const includeContext = app.querySelector<HTMLInputElement>('[data-feedback-context]');
-  const preview = app.querySelector<HTMLElement>('[data-feedback-preview]');
-  const status = app.querySelector<HTMLElement>('[data-feedback-status]');
-  const openButton = app.querySelector<HTMLButtonElement>('[data-feedback-open]');
-  if (!form || !message || !includeContext || !preview || !status || !openButton) return;
-  const config: FeedbackConfig = {};
-  const update = (): void => {
-    const valid = validateFeedbackMessage(message.value);
-    const report = composeFeedback(localizer, message.value, includeContext.checked, {
-      gameDataVersion: catalogs.battlePass.gameDataVersion,
-      mode: state.mode,
-      effectiveDailyLimit: catalogs.optimizerRules.dailyDocumentLimits[state.mode],
-    });
-    preview.textContent = `${report.title}\n\n${report.body}`;
-    const url = valid ? buildIssueUrl(report, config) : undefined;
-    openButton.disabled = !url;
-    status.textContent = valid ? localizer.text('feedback.unconfigured') : localizer.text('feedback.invalid');
-    openButton.dataset.issueUrl = url ?? '';
-  };
-  message.addEventListener('input', update);
-  includeContext.addEventListener('change', update);
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const url = openButton.dataset.issueUrl;
-    if (url) openIssueComposer(url);
-  });
-  update();
-}
-
-function commitQuantity(input: HTMLInputElement | HTMLSelectElement, commit: (quantity: number) => void, localizer: ReturnType<typeof createLocalizer>): void {
+function commitQuantity(input: HTMLInputElement | HTMLSelectElement, commit: (quantity: number) => void): void {
   const quantity = Number(input.value);
-  if (!Number.isInteger(quantity) || quantity < 0 || !input.value.trim()) {
-    input.setCustomValidity(localizer.text('ui.invalidQuantity'));
-    input.reportValidity();
-    return;
-  }
-  input.setCustomValidity('');
-  commit(quantity);
+  const minimum = Number(input.getAttribute('min')) || 0;
+  commit(Number.isFinite(quantity) ? Math.max(minimum, Math.trunc(quantity)) : minimum);
 }
 
 function startCountdown(documentRoot: Document, localizer: ReturnType<typeof createLocalizer>, endsAt: number): void {
@@ -356,15 +312,16 @@ function startCountdown(documentRoot: Document, localizer: ReturnType<typeof cre
     const seconds = Math.max(0, Math.ceil(endsAt - Date.now() / 1000));
     if (seconds === 0) {
       element.textContent = localizer.text('season.ended');
+      element.removeAttribute('aria-label');
       if (countdownTimer !== undefined) window.clearInterval(countdownTimer);
       return;
     }
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-    const time = [formatCountdownUnit(days, localizer.locale, 'day'), formatCountdownUnit(hours, localizer.locale, 'hour'), formatCountdownUnit(minutes, localizer.locale, 'minute'), formatCountdownUnit(remainingSeconds, localizer.locale, 'second')].join(', ');
-    element.textContent = localizer.text('season.countdown', { time });
+    const accessible = [formatCountdownUnit(days, localizer.locale, 'day'), formatCountdownUnit(hours, localizer.locale, 'hour'), formatCountdownUnit(minutes, localizer.locale, 'minute')].join(', ');
+    element.textContent = `${days}d ${hours}h ${minutes}m`;
+    element.setAttribute('aria-label', localizer.text('season.countdown', { time: accessible }));
   };
   countdownVisibilityHandler = update;
   documentRoot.addEventListener('visibilitychange', update);

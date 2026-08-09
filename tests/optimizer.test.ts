@@ -536,7 +536,6 @@ describe('optimizer', () => {
 
     expect(result.goal).toBe('black-division-crates');
     expect(result.cratePlan).toEqual({
-      crateCount: 1,
       regularDocumentsRequired: 10,
       regularDocumentsOwned: 0,
       regularDocumentsToFarm: 10,
@@ -545,7 +544,7 @@ describe('optimizer', () => {
     expect(result.classifiedRemaining).toBe(7);
     expect(result.profiles.fastest.route.locations[0].locationId).toBe('locations.factory.name');
 
-    const immediate = optimize(input(catalogs, { claimedRewardIds: claimed, ownedDocuments: { 'documents.project.name': 20 }, crateCount: 2 }));
+    const immediate = optimize(input(catalogs, { claimedRewardIds: claimed, ownedDocuments: { 'documents.project.name': 10 } }));
     expect(immediate.cratePlan?.regularDocumentsToFarm).toBe(0);
     expect(immediate.profiles.fastest.route.locations).toEqual([]);
     expect(immediate.profiles.fastest.nextRaid?.purpose).toBe('crate-stockpile');

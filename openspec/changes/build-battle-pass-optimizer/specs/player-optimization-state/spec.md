@@ -27,8 +27,7 @@ The production build SHALL inject exactly one official Cloudflare Web Analytics 
 
 #### Scenario: Analytics does not change planner storage
 - **WHEN** analytics is enabled
-- **THEN** the existing cookie notice continues to describe only first-party planner state
-- **AND** the application does not send player-controlled optimizer state as analytics metadata
+- **THEN** the application does not send player-controlled optimizer state as analytics metadata
 
 ### Requirement: Two-column Battle Pass layout
 The desktop interface SHALL use a two-section header with season identity and total progress grouped on the left and route-profile, mode, and locale controls grouped on the right; a left reward column; one expanded Focus column containing the current next raid and persistent owned-document ribbon; and a separate credits footer containing the asset disclaimer and reset action. Normal-content placement SHALL be isolated in one editable CSS layout map, typography SHALL use one shared proportional caption/label/body/heading/metric/display token scale, and internal gaps, padding, and region spacing SHALL use one shared golden-ratio token scale. Layout, typography, spacing, and palette or visual-state styling SHALL remain independently editable.
@@ -66,7 +65,7 @@ The interface SHALL use the supplied screenshots as the source of truth for a gr
 - **AND** focusing or hovering the square Lucide CircleHelp control beside season identity shows localized instructions for setting existing progress, following Next raid, entering extracted documents, and committing the result
 
 ### Requirement: Header season countdown
-The header SHALL display the selected locale as the country flag derived from its regional BCP 47 key and a countdown derived from Unix timestamp `1796634000`, including days, hours, minutes, and seconds, and SHALL expose the absolute end time `2026-12-07 09:00:00 UTC`.
+The header SHALL display the selected locale as the country flag derived from its regional BCP 47 key and a countdown derived from Unix timestamp `1796634000`. The visible countdown SHALL use the game's invariant `d`/`h`/`m` notation without seconds or localized unit abbreviations, and SHALL expose the absolute end time `2026-12-07 09:00:00 UTC`.
 
 #### Scenario: Active countdown
 - **WHEN** the device time is before the season deadline
@@ -239,7 +238,7 @@ The expanded Focus column SHALL render one flat next-raid workspace focused on t
 - **THEN** the persistent Classified counter remains unchanged
 
 ### Requirement: Header setup and Focus actions
-The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal, plus conditional crate count. It SHALL NOT expose or persist an editable TarCoin balance or an optional route-purchase control. The Focus header SHALL instead show the recommended location, official difficulty, maximum raid time, View full schedule, and Commit. The full schedule SHALL preserve flat non-mutating exchange guidance, while the independent buyout SHALL move to the Documents progress price link and modal. The optimizer objective SHALL always rush Page 12 and then complete all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, a separate daily-limit readout, or controls that mutate inventory for suggested exchanges.
+The header SHALL contain a compact setup button labelled with the selected game mode and its fixed limit. It SHALL open a native setup dialog containing the global mode selector ordered as PvP Seasonal, PvP, then PvE and defaulting to PvP Seasonal. It SHALL NOT expose or persist an editable TarCoin balance, a crate-count control, or an optional route-purchase control. The Focus header SHALL instead show the recommended location, official difficulty, maximum raid time, View full schedule, and Commit. The full schedule SHALL preserve flat non-mutating exchange guidance, while the independent buyout SHALL move to the Documents progress price link and modal. The optimizer objective SHALL always rush Page 12 and then complete all unclaimed rewards while any remain, so the interface SHALL NOT expose a reward-goal selector, an editable daily-limit control, a separate daily-limit readout, or controls that mutate inventory for suggested exchanges.
 
 #### Scenario: Mode selection applies its default
 - **WHEN** the player selects PvE, PvP, or PvP Seasonal
@@ -315,15 +314,15 @@ The bottom of the expanded Focus region SHALL provide one contiguous in-game-ins
 - **THEN** the Classified Document quantity may become `0`
 
 #### Scenario: Invalid inventory value
-- **WHEN** the player enters a negative, fractional, non-numeric, or out-of-range quantity
-- **THEN** the interface reports a localized validation error and does not commit the invalid value
+- **WHEN** the player enters a negative, fractional, non-numeric, or cleared quantity
+- **THEN** the interface truncates fractional values toward zero and clamps all other invalid values to that document's current minimum
 
 ### Requirement: Persistent asset disclaimer
 The separate credits footer SHALL persistently state that Escape from Tarkov and all displayed game assets belong to Battlestate Games and that the optimizer is an unofficial fan-made tool. It SHALL center the localized disclaimer and a semantic link-styled button labelled `Reset cookie storage` on one line with a vertical divider, then stack them on separate lines with a horizontal divider when the available viewport width is sufficiently small.
 
 #### Scenario: Disclaimer remains available
 - **WHEN** the optimizer is displayed at any goal or progress state
-- **THEN** the disclaimer remains available without opening a modal and cannot be dismissed with the cookie notice
+- **THEN** the disclaimer remains available without opening a modal
 
 ### Requirement: Focused daily-plan disclosure
 The Focus column SHALL present the selected profile's next raid without an estimated-day value. A `View full schedule` action SHALL open a native dialog whose header contains the estimated days. When the selected profile requires one or more regular-document exchanges, the action SHALL show a bright amber Lucide exchange icon, expose the localized exchange count in its accessible name and hover title, and retain its normal dimensions. The icon SHALL remain hidden when the selected profile requires no exchange. The schedule and buyout dialog headers SHALL use the same clearly sized Lucide X vector inside square close buttons with localized accessible Close names and SHALL NOT show visible Close text. The dialog SHALL keep its header and scrolling content within one bounded modal frame, and its content scrollbar SHALL NOT extend across the dialog boundary at desktop or narrow viewports. Schedule and buyout content scrollbars SHALL use the same thin black-track styling as the reward accordion. The dialog SHALL preserve every selected-profile regular-document exchange in a visible non-collapsible Plan actions section, omit Classified consumed/remaining statistics, and render every projected day as a rule-separated manifest with distinct Raids and Rewards to redeem regions. The Regular-document exchanges heading SHALL use the same amber warning color as the exchange icon. Each Day heading SHALL use the same season-accent color as the estimated-days value. Projected immediately redeemable rewards SHALL appear first in Day 1's Rewards to redeem sequence and SHALL NOT appear in a separate list. Within each day's Rewards to redeem region, the dialog SHALL preserve legal page progression and separate consecutive rewards by localized Battle Pass page headings and rule lines. Rewards within each page group SHALL use the same relative catalog order as that page's reward accordion. Before the first displayed Page X reward, the displayed sequence SHALL contain at least one fewer reward than the total on Page X - 1. These page groups SHALL remain intact when the Raids and Rewards to redeem regions stack at narrow viewports. The schedule SHALL NOT render day cards or page-unlocked labels and SHALL NOT create daily farming state.
@@ -364,22 +363,15 @@ The application SHALL persist player-controlled progress, optimizer settings, lo
 
 #### Scenario: Migrate legacy state without data loss
 - **WHEN** the player reloads with older cookie envelopes that have no catalog fingerprint and have a game-data version matching the loaded Battle Pass
-- **THEN** the application restores the sanitized player progress, settings, locale, selected page, route profile, and notice state
+- **THEN** the application restores the sanitized player progress, settings, locale, selected page, and route profile
 - **AND** the application rewrites all optimizer cookies with the current catalog fingerprint
 
-### Requirement: Cookie-storage notice
-The application SHALL show a non-blocking dismissible toast on first use explaining that cookies store planner selections on the device, and SHALL persist the dismissal.
-
-#### Scenario: Dismiss notice
-- **WHEN** the player dismisses the cookie-storage toast
-- **THEN** the toast does not appear on the next visit with valid dismissal state
-
 ### Requirement: Complete reset
-The centered link-styled reset button in the credits footer below the workspace SHALL require deliberate confirmation, delete all optimizer cookies including notice dismissal, and restore catalog and UI defaults.
+The centered link-styled reset button in the credits footer below the workspace SHALL require deliberate confirmation, delete all optimizer cookies, and restore catalog and UI defaults.
 
 #### Scenario: Confirm reset
 - **WHEN** the player confirms a complete reset
-- **THEN** inventory returns to one Classified Document and zero regular documents while claimed rewards, settings, locale, selected page, route profile, and notice dismissal return to defaults
+- **THEN** inventory returns to one Classified Document and zero regular documents while claimed rewards, settings, locale, selected page, and route profile return to defaults
 
 #### Scenario: Cancel reset
 - **WHEN** the player cancels reset confirmation

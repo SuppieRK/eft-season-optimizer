@@ -761,66 +761,6 @@ small,
   white-space: nowrap;
 }
 
-.feedback {
-  flex: 0 0 auto;
-  padding-block-start: var(--space-1);
-  font-size: var(--label-size);
-}
-
-.feedback > summary {
-  cursor: pointer;
-}
-
-.feedback[open] {
-  position: fixed;
-  z-index: 6;
-  right: var(--space-4);
-  bottom: var(--space-4);
-  width: min(32rem, calc(100vw - (2 * var(--space-m))));
-  padding: var(--space-3);
-}
-
-.feedback-form {
-  display: grid;
-  gap: var(--space-3);
-  margin-block-start: var(--space-3);
-}
-
-.feedback-form textarea {
-  resize: vertical;
-}
-
-.feedback-form pre {
-  max-height: 12rem;
-  overflow: auto;
-  margin: 0;
-  padding: var(--space-3);
-  font-size: var(--label-size);
-  white-space: pre-wrap;
-}
-
-.cookie-toast {
-  position: fixed;
-  z-index: 5;
-  right: var(--space-4);
-  bottom: var(--space-4);
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  justify-content: space-between;
-  width: min(32rem, calc(100vw - (2 * var(--space-m))));
-  padding: var(--space-3);
-}
-
-.cookie-toast p {
-  margin: 0;
-  font-size: var(--label-size);
-}
-
-.cookie-toast button {
-  flex: 0 0 auto;
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -929,9 +869,4 @@ small,
     white-space: normal;
   }
 
-  .cookie-toast {
-    right: var(--space-2);
-    bottom: var(--space-2);
-    width: calc(100vw - (2 * var(--space-xs)));
-  }
 }

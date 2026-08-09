@@ -38,7 +38,6 @@ interface ProgressPayload {
   readonly claimedRewardIds: readonly string[];
   readonly ownedDocuments: Readonly<Record<string, number>>;
   readonly classifiedDocuments: number;
-  readonly crateCount: number;
 }
 
 interface SettingsPayload {
@@ -50,7 +49,6 @@ interface UiPayload {
   readonly selectedPage?: number;
   readonly collapsedPages?: Readonly<Record<string, boolean>>;
   readonly selectedProfile?: OptimizationProfile;
-  readonly cookieNoticeDismissed: boolean;
 }
 
 const COOKIE_NAMES = {
@@ -65,7 +63,6 @@ export function saveState(state: AppState, cookies: CookieAdapter, catalogs: Cat
     claimedRewardIds: state.claimedRewardIds,
     ownedDocuments: state.ownedDocuments,
     classifiedDocuments: state.classifiedDocuments,
-    crateCount: state.crateCount,
   }, dataFingerprint);
   writeEnvelope(cookies, COOKIE_NAMES.settings, {
     mode: state.mode,
@@ -74,7 +71,6 @@ export function saveState(state: AppState, cookies: CookieAdapter, catalogs: Cat
   writeEnvelope(cookies, COOKIE_NAMES.ui, {
     selectedPage: state.selectedPage,
     selectedProfile: state.selectedProfile,
-    cookieNoticeDismissed: state.cookieNoticeDismissed,
   }, dataFingerprint);
 }
 
@@ -183,7 +179,6 @@ function sanitizeProgress(payload: ProgressPayload, defaults: AppState, catalogs
     claimedRewardIds,
     ownedDocuments: { ...defaults.ownedDocuments, ...ownedDocuments },
     classifiedDocuments: Math.max(getClassifiedDocumentMinimum(claimedRewardIds), classifiedDocuments),
-    crateCount: validQuantity(payload.crateCount) && payload.crateCount > 0 ? payload.crateCount : defaults.crateCount,
   };
 }
 
@@ -201,7 +196,7 @@ function sanitizeUi(payload: UiPayload, defaults: AppState, catalogs: Catalogs):
   const legacySelectedPage = Number(Object.entries(payload.collapsedPages ?? {}).find(([page, collapsed]) => pageIds.has(Number(page)) && collapsed === false)?.[0]);
   const selectedPage = pageIds.has(payload.selectedPage ?? -1) ? payload.selectedPage! : pageIds.has(legacySelectedPage) ? legacySelectedPage : defaults.selectedPage;
   const selectedProfile = payload.selectedProfile === 'fastest' || payload.selectedProfile === 'safest' ? payload.selectedProfile : defaults.selectedProfile;
-  return { selectedPage, selectedProfile, cookieNoticeDismissed: payload.cookieNoticeDismissed === true };
+  return { selectedPage, selectedProfile };
 }
 
 function validQuantity(value: unknown): value is number {

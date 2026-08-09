@@ -34,7 +34,6 @@ async function seedOptimizerState(
         claimedRewardIds: input.claimedRewardIds,
         ownedDocuments: input.ownedDocuments ?? {},
         classifiedDocuments: input.classifiedDocuments ?? 0,
-        crateCount: 1,
       }),
       url: page.url(),
     },
@@ -67,13 +66,11 @@ test('migrates legacy optimizer cookies without losing player state on reload', 
       claimedRewardIds: [],
       ownedDocuments: { 'documents.financial.name': 12 },
       classifiedDocuments: 4,
-      crateCount: 1,
     })}; Path=/; SameSite=Lax`;
     document.cookie = `kord-breach-settings=${envelope({ mode: 'pvp', locale: 'en-GB' })}; Path=/; SameSite=Lax`;
     document.cookie = `kord-breach-ui=${envelope({
       selectedPage: 1,
       selectedProfile: 'fastest',
-      cookieNoticeDismissed: true,
     })}; Path=/; SameSite=Lax`;
   }, { version: gameDataVersion });
 
@@ -103,6 +100,24 @@ test('offers a raid beside the starting Classified Document redemption option', 
   await expect(page.locator('[data-exchange-warning]')).toHaveCSS('display', 'none');
   await expect(page.locator(`[data-reward-id="${dogtagReward}"]`)).not.toBeChecked();
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
+});
+
+test('renders immediately redeemable rewards as Day 1 when no farming is required', async ({ page }) => {
+  await openWireframe(page);
+  const ownedDocuments = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/documents.json', document.baseURI));
+    const catalog = await response.json() as { documents: Array<{ id: string; kind: string }> };
+    return Object.fromEntries(catalog.documents
+      .filter((document) => document.kind === 'regular')
+      .map((document) => [document.id, 999]));
+  });
+  await seedOptimizerState(page, { claimedRewardIds: [], ownedDocuments, classifiedDocuments: 1 });
+
+  await expect(page.locator('[data-view-route-schedule]')).toBeEnabled({ timeout: 10_000 });
+  await page.locator('[data-view-route-schedule]').click();
+  await expect(page.locator('.schedule-projection-day')).toHaveCount(1);
+  await expect(page.locator('.schedule-projection-day > h3')).toContainText('Day 1');
+  await expect(page.locator('[data-schedule-reward-id]')).not.toHaveCount(0);
 });
 
 test('dims and preserves the current Focus result during optimizer recalculation', async ({ page }) => {

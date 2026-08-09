@@ -260,7 +260,6 @@ function populateStaticFocus(document: Document, catalogs: Catalogs, locale: str
     classifiedDocuments: state.classifiedDocuments,
     mode: state.mode,
     locale,
-    crateCount: state.crateCount,
   });
   const nextRaid = result.profiles[state.selectedProfile].nextRaid;
   if (!nextRaid) return;

@@ -145,6 +145,30 @@ test('updates quantities, progress, boundaries, and cookie-restored values toget
   await expect(page.locator('[data-document-progress-current]')).toHaveText('10');
 });
 
+test('clamps direct inventory values instead of rejecting them', async ({ page }) => {
+  await openWireframe(page);
+  const financial = documentQuantity(page, 'documents.financial.name');
+  const classified = documentQuantity(page, 'documents.classified.name');
+
+  await financial.evaluate((input) => {
+    input.value = '-4';
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await expect(financial).toHaveValue('0');
+
+  await financial.evaluate((input) => {
+    input.value = '3.9';
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await expect(financial).toHaveValue('3');
+
+  await classified.evaluate((input) => {
+    input.value = '';
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await expect(classified).toHaveValue('1');
+});
+
 test('shows the centered asset disclaimer and resets cookie-backed state', async ({ page }) => {
   await openWireframe(page);
 

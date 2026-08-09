@@ -8,7 +8,7 @@ The system SHALL store all translated content in `localization.json` with defaul
 - **THEN** its language variants are read from that entry's `localizations` object rather than separate language files
 
 ### Requirement: Single-purpose localization IDs
-Names, textual descriptions, requirement abbreviations, image alternatives, displayed screenshot descriptions, UI labels, countdown units, validation messages, and feedback text SHALL use independent stable localization IDs with string values.
+Names, textual descriptions, requirement abbreviations, image alternatives, displayed screenshot descriptions, UI labels, and validation messages SHALL use independent stable localization IDs with string values.
 
 #### Scenario: Document content references localization
 - **WHEN** a document record is loaded
@@ -89,9 +89,10 @@ The application SHALL persist the selected locale in versioned UI-state cookies 
 ### Requirement: Locale-aware formatting
 The application SHALL use locale-aware number, date, time, plural, and message formatting and SHALL NOT construct translated sentences by concatenating independently translated fragments.
 
-#### Scenario: Render countdown in selected locale
-- **WHEN** the countdown is active under a selected locale
-- **THEN** unit labels and plural forms use that locale while the underlying deadline remains Unix timestamp `1796634000`
+#### Scenario: Render the in-game countdown notation
+- **WHEN** the countdown is active under any selected locale
+- **THEN** the visible timer uses the game's invariant `d`/`h`/`m` notation while the underlying deadline remains Unix timestamp `1796634000`
+- **AND** the accessible countdown summary can use locale-aware unit names
 
 #### Scenario: Render numeric document quantity
 - **WHEN** a document quantity is displayed

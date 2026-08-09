@@ -28,6 +28,20 @@ afterEach(() => {
 });
 
 describe('Battle Pass interface', () => {
+  it('uses the ended text as the accessible countdown name after expiry', () => {
+    const catalog = catalogs();
+    const expiredCatalog = {
+      ...catalog,
+      battlePass: { ...catalog.battlePass, endsAt: Math.floor(Date.now() / 1000) - 1 },
+    };
+    document.body.innerHTML = '<div id="app"></div>';
+    renderApp(document, expiredCatalog, createDefaultState(expiredCatalog), () => undefined);
+
+    const countdown = document.querySelector('[data-countdown]');
+    expect(countdown?.textContent).toBe('Season ended');
+    expect(countdown?.hasAttribute('aria-label')).toBe(false);
+  });
+
   it('renders the selected-page, next-raid, route-context, and inventory regions', () => {
     const catalog = catalogs();
     const routeState = {
@@ -44,7 +58,7 @@ describe('Battle Pass interface', () => {
     expect(document.querySelectorAll('.reward-row img')).toHaveLength(0);
     expect(document.querySelectorAll('.document-tile')).toHaveLength(9);
     expect(document.querySelector('.disclaimer')?.textContent).toContain('Battlestate Games');
-    expect(document.querySelector('[data-countdown]')?.textContent).toContain('Season ends in');
+    expect(document.querySelector('[data-countdown]')?.textContent).toMatch(/^\d+d \d+h \d+m$/u);
     expect(document.querySelector('[data-countdown-end]')?.textContent).toContain('2026');
     expect(document.querySelector('.schedule-dialog:not([open])')).toBeTruthy();
     expect(document.querySelector('.setup-dialog:not([open])')).toBeTruthy();
@@ -79,7 +93,6 @@ describe('Battle Pass interface', () => {
     expect(document.querySelector('.season-mark')).toBeNull();
     expect(document.querySelector('.context-day-outcome')).toBeTruthy();
     expect(document.querySelector('[data-field="locale"]')).toBeTruthy();
-    expect(document.querySelector('[data-cookie-toast]')).toBeTruthy();
   });
 
   it('exposes keyboard-operable claims and inventory quantity controls', () => {
@@ -96,9 +109,6 @@ describe('Battle Pass interface', () => {
 
     expect(actions).toContainEqual({ type: 'claim-all', claimed: true });
     expect(actions).toContainEqual({ type: 'set-owned-document', documentId: 'documents.financial.name', quantity: 3 });
-    expect(actions).not.toContainEqual({ type: 'dismiss-cookie-notice' });
-    document.querySelector<HTMLButtonElement>('[data-action="dismiss-cookie-notice"]')!.click();
-    expect(actions).toContainEqual({ type: 'dismiss-cookie-notice' });
     expect(document.querySelectorAll('button[data-action="increment"]')).toHaveLength(9);
     expect(document.querySelectorAll('button[data-action="decrement"]')).toHaveLength(9);
   });
@@ -181,7 +191,7 @@ describe('Battle Pass interface', () => {
     expect(document.querySelector('[data-action="set-profile"]')).toBeNull();
     expect(document.querySelectorAll('[data-route-workspace]')).toHaveLength(1);
     expect(document.querySelector('[data-route-workspace]')?.textContent).toContain('Black Division');
-    expect(document.querySelector('[data-field="crate-count"]')).toBeTruthy();
+    expect(document.querySelector('[data-field="crate-count"]')).toBeNull();
   });
 
   it('keeps a stockpile raid visible when every remaining reward is covered', () => {

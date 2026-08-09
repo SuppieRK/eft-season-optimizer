@@ -219,6 +219,7 @@ test('keeps bulk actions tracking-only and replaces full completion with the cra
   );
   await expect(documentQuantity(page, 'documents.financial.name')).toHaveValue('2');
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
+  await expect(page.locator('.route-profile-toggle')).toBeHidden();
 
   await setDocumentQuantity(page, 'documents.classified.name', 0);
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('0');
@@ -228,6 +229,7 @@ test('keeps bulk actions tracking-only and replaces full completion with the cra
   await expect(page.locator('[data-reward-progress-current]')).toHaveText('0');
   await expect(documentQuantity(page, 'documents.financial.name')).toHaveValue('2');
   await expect(documentQuantity(page, 'documents.classified.name')).toHaveValue('1');
+  await expect(page.locator('.route-profile-toggle')).toBeVisible();
   await expect(page.locator('.reward-page__trigger[aria-expanded="true"]')).toHaveAttribute('id', 'reward-page-trigger-1');
 });
 

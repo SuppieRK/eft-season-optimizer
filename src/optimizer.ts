@@ -18,7 +18,6 @@ export interface OptimizerInput {
   readonly classifiedDocuments: number;
   readonly mode: GameMode;
   readonly locale?: string;
-  readonly crateCount?: number;
 }
 
 export interface DocumentAssignment {
@@ -93,7 +92,6 @@ export interface NextRaidRecommendation {
 }
 
 export interface CratePlan {
-  readonly crateCount: number;
   readonly regularDocumentsRequired: number;
   readonly regularDocumentsOwned: number;
   readonly regularDocumentsToFarm: number;
@@ -186,7 +184,6 @@ export function optimize(input: OptimizerInput): OptimizerResult {
 
 function validateInput(input: OptimizerInput): void {
   if (!Number.isInteger(input.classifiedDocuments) || input.classifiedDocuments < 0) throw new RangeError('Classified Documents must be a non-negative integer');
-  if (input.crateCount !== undefined && (!Number.isInteger(input.crateCount) || input.crateCount < 1)) throw new RangeError('Crate count must be a positive integer');
   for (const [documentId, quantity] of Object.entries(input.ownedDocuments)) {
     if (!Number.isInteger(quantity) || quantity < 0) throw new RangeError(`Owned quantity for ${documentId} must be a non-negative integer`);
   }
@@ -972,11 +969,10 @@ function scheduleRoute(route: RouteResult, dailyLimit: number): readonly Schedul
 }
 
 function optimizeCrates(input: OptimizerInput, effectiveDailyLimit: number): OptimizerResult {
-  const crateCount = input.crateCount ?? 1;
   const ratio = input.catalogs.optimizerRules.exchange.regularDocumentsPerBlackDivisionGearCrate;
   const regularDocuments = input.catalogs.documents.documents.filter((document) => document.kind === 'regular');
   const regularDocumentsOwned = regularDocuments.reduce((sum, document) => sum + (input.ownedDocuments[document.id] ?? 0), 0);
-  const regularDocumentsRequired = crateCount * ratio;
+  const regularDocumentsRequired = ratio;
   const regularDocumentsToFarm = Math.max(0, regularDocumentsRequired - regularDocumentsOwned);
   const profiles = (['fastest', 'safest'] as const).reduce((result, profile) => {
     const nextRaid = buildStockpileRaidRecommendation(profile, input.catalogs);
@@ -1035,7 +1031,6 @@ function optimizeCrates(input: OptimizerInput, effectiveDailyLimit: number): Opt
     profilesCoincide: sameAssignment(profiles.fastest, profiles.safest),
     buyout: emptyBuyout(input.catalogs.optimizerRules.classifiedDocuments.bundles.length, input.catalogs.optimizerRules.tarCoinBundles.length),
     cratePlan: {
-      crateCount,
       regularDocumentsRequired,
       regularDocumentsOwned,
       regularDocumentsToFarm,

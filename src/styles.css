@@ -469,32 +469,6 @@ small,
   appearance: none;
 }
 
-.feedback {
-  color: var(--green-bright);
-}
-
-.feedback > summary {
-  text-transform: uppercase;
-}
-
-.feedback[open] {
-  border: 1px solid var(--line-bright);
-  color: inherit;
-  background: #07100f;
-}
-
-.feedback-form pre {
-  border: 1px solid var(--line);
-  background: var(--stage);
-}
-
-.cookie-toast {
-  border: 1px solid var(--green-bright);
-  color: #dfe5db;
-  background: #111e19;
-  box-shadow: 0 0.75rem 1.5rem #000a;
-}
-
 @media (width <= 74rem) {
   .header-stat,
   .season-status,

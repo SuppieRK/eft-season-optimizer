@@ -2,6 +2,15 @@ import { expect, test } from '@playwright/test';
 
 import { openWireframe } from './wireframe-helpers';
 
+test('uses the ended text as the timer accessible name after expiry', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-12-07T09:00:01.000Z') });
+  await openWireframe(page);
+
+  const timer = page.locator('[data-season-timer]');
+  await expect(timer).toHaveText('Season ended');
+  await expect(timer).not.toHaveAttribute('aria-label');
+});
+
 test('shows the season identity, relative countdown, totals, and default route profile', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-08-07T09:58:30.000Z') });
   await openWireframe(page);
