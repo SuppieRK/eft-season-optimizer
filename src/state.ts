@@ -129,7 +129,7 @@ function updateClaimedRewards(state: AppState, catalogs: Catalogs, update: (rewa
   const claimedRewardIds = [...claimed].sort();
   const selectedPage = pageHasUnclaimedReward(catalogs, state.selectedPage, claimed)
     ? state.selectedPage
-    : getDefaultRewardPage(catalogs, claimedRewardIds);
+    : getNextUnredeemedRewardPage(catalogs, claimedRewardIds, state.selectedPage);
   const classifiedDocuments = Math.max(getClassifiedDocumentMinimum(claimedRewardIds), state.classifiedDocuments);
   return { ...state, claimedRewardIds, classifiedDocuments, selectedPage };
 }
@@ -141,6 +141,22 @@ export function getClassifiedDocumentMinimum(claimedRewardIds: readonly string[]
 export function getDefaultRewardPage(catalogs: Catalogs, claimedRewardIds: readonly string[]): number {
   const claimed = new Set(claimedRewardIds);
   return catalogs.battlePass.pages.find((page) => page.rewards.some((reward) => !claimed.has(reward.id)))?.page
+    ?? catalogs.battlePass.pages[0]?.page
+    ?? 1;
+}
+
+export function getNextUnredeemedRewardPage(
+  catalogs: Catalogs,
+  claimedRewardIds: readonly string[],
+  currentPage: number,
+): number {
+  const claimed = new Set(claimedRewardIds);
+  const currentIndex = catalogs.battlePass.pages.findIndex((page) => page.page === currentPage);
+  if (currentIndex < 0) return getDefaultRewardPage(catalogs, claimedRewardIds);
+  const pagesAfterCurrent = catalogs.battlePass.pages.slice(currentIndex + 1);
+  const pagesBeforeCurrent = catalogs.battlePass.pages.slice(0, currentIndex);
+  return [...pagesAfterCurrent, ...pagesBeforeCurrent]
+    .find((page) => page.rewards.some((reward) => !claimed.has(reward.id)))?.page
     ?? catalogs.battlePass.pages[0]?.page
     ?? 1;
 }

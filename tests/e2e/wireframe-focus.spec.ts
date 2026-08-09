@@ -155,7 +155,7 @@ test('dims and preserves the current Focus result during optimizer recalculation
   await expect(focusStage).toHaveAttribute('aria-busy', 'false');
 });
 
-test('shows both location documents with one clear farming priority', async ({ page }) => {
+test('shows every useful location document as a farming priority', async ({ page }) => {
   await openWireframe(page);
   await expect(page.locator('[data-raid-result]')).toHaveCount(2, { timeout: 10_000 });
 
@@ -163,12 +163,11 @@ test('shows both location documents with one clear farming priority', async ({ p
   const priority = page.locator('.focus-document:not(.focus-document--optional)');
   const optional = page.locator('.focus-document--optional');
   await expect(documents).toHaveCount(2);
-  await expect(priority).toHaveCount(1);
-  await expect(optional).toHaveCount(1);
-  await expect(priority).toContainText('Priority');
-  await expect(optional.locator('.focus-document__status')).toHaveText('Optional');
-  await expect(documents.locator('figcaption strong')).toHaveText(['Project', 'Blueprints']);
-  await expect(documents.locator('figcaption')).toHaveText(['Project', 'Blueprints']);
+  await expect(priority).toHaveCount(2);
+  await expect(optional).toHaveCount(0);
+  await expect(priority.locator('.focus-document__status')).toHaveText(['Priority', 'Priority']);
+  await expect(documents.locator('figcaption strong')).toHaveText(['Financial', 'Blueprints']);
+  await expect(documents.locator('figcaption')).toHaveText(['Financial', 'Blueprints']);
   await expect(documents.locator('figcaption span')).toHaveCount(0);
   await expect(page.locator('[data-focus-heading]')).toHaveText(/.+ \((Easy|Normal|Hard|Insane), \d+ min\)/u);
   await expect(page.locator('.detail-rail')).toHaveCount(0);
@@ -176,9 +175,10 @@ test('shows both location documents with one clear farming priority', async ({ p
   await expect(page.locator('.focus-heading__actions [data-commit-raid]')).toBeVisible();
   await expect(page.locator('.focus-stage')).not.toContainText(/Estimated days/iu);
 
-  const priorityOpacity = await priority.locator('.focus-document__image-frame').evaluate((element) => Number(getComputedStyle(element).opacity));
-  const optionalOpacity = await optional.locator('.focus-document__image-frame').evaluate((element) => Number(getComputedStyle(element).opacity));
-  expect(priorityOpacity).toBeGreaterThan(optionalOpacity);
+  const priorityOpacities = await priority.locator('.focus-document__image-frame').evaluateAll((elements) => (
+    elements.map((element) => Number(getComputedStyle(element).opacity))
+  ));
+  expect(new Set(priorityOpacities).size).toBe(1);
 });
 
 test('keeps Focus document artwork and counters fixed across the stacked breakpoint', async ({ page }) => {

@@ -1,7 +1,7 @@
 import type { Catalogs, GameMode } from './catalogs';
 import { getCompleteLocales, resolvePreferredLocale } from './localization';
 import type { OptimizationProfile } from './optimizer';
-import { createDefaultState, getClassifiedDocumentMinimum, getDefaultRewardPage, type AppState } from './state';
+import { createDefaultState, getClassifiedDocumentMinimum, getNextUnredeemedRewardPage, type AppState } from './state';
 
 export const COOKIE_SCHEMA_VERSION = 1;
 export const MAX_COOKIE_BYTES = 3800;
@@ -113,7 +113,7 @@ export function restoreState(
     .find((page) => page.page === restored.selectedPage)
     ?.rewards.some((reward) => !restored.claimedRewardIds.includes(reward.id))
     ? restored.selectedPage
-    : getDefaultRewardPage(catalogs, restored.claimedRewardIds);
+    : getNextUnredeemedRewardPage(catalogs, restored.claimedRewardIds, restored.selectedPage);
   const result = { ...restored, selectedPage };
   if (compatibility === 'migrate') saveState(result, cookies, catalogs);
   return result;

@@ -137,17 +137,17 @@ The farming optimizer produces independent Fastest and Safest routes. The select
 
 The fixed daily limits are 10 for PvE, 15 for PvP, and 25 for PvP Seasonal.
 
-The optimizer does not model spawn probabilities, raid counts, extraction rates, or a per-location spawn limit. Each missing Document contributes one unit.
+The optimizer does not model spawn probabilities, extraction rates, or a per-location spawn limit. For route comparison only, it assumes that one raid can advance each useful document type assigned to that location once. The projected raid count for a location is therefore the largest assigned deficit at that location. Actual results still come only from the values that the player commits.
 
 #### Location assignment
 
-The optimizer evaluates every nonempty subset of configured locations. It rejects a subset when that subset cannot provide every missing document type.
+The optimizer evaluates every complete assignment of missing document types to their eligible source locations. It rejects the route when any missing document type has no source.
 
-For each missing document type, it selects the best eligible source in the subset. It assigns the full quantity of that type to one location.
+It assigns the full quantity of each document type to one location. Assigning different useful types to one location can reduce the projected raids because those types can be collected in parallel.
 
-The Fastest score is `sum(document quantity × maxRaidTimeMin)`. The maximum raid time acts as a speed and map-size proxy.
+The Fastest score is `sum(projected raids at location × maxRaidTimeMin)`. The maximum raid time acts as a speed and map-size proxy.
 
-The Safest score is `sum(document quantity × difficultyRating)`. The difficulty rating uses Easy 1, Normal 2, Hard 3, and Insane 4.
+The Safest score is `sum(projected raids at location × difficultyRating)`. The difficulty rating uses Easy 1, Normal 2, Hard 3, and Insane 4.
 
 Equipment insurance is a location property. It states whether insured player equipment can return after death.
 
@@ -164,12 +164,12 @@ The Safest optimizer compares complete routes in this order:
 
 1. Lower Safest score.
 2. Fewer selected locations without equipment insurance.
-3. Lower total maximum raid time for the selected locations.
+3. Lower total projected raid time.
 4. Fewer distinct locations.
 5. Fewer missing Documents.
 6. Stable location ID order.
 
-When one document type has equal-cost sources, Fastest uses stable location ID order. Safest uses insurance, lower maximum raid time, then stable location ID order.
+Complete-route comparison determines the source of each document type. Stable location ID order resolves the final complete tie.
 
 The optimizer has no separate location-switch penalty. The distinct-location tie-break reduces location changes only after the earlier comparisons are equal.
 
@@ -185,7 +185,7 @@ The scheduler adds Documents until it reaches the fixed daily limit. It can incl
 
 After each farming batch, the scheduler claims newly covered legal rewards. It continues this process until no farming shortage remains.
 
-The next-raid recommendation is the first location in the first projected day. One Document is the priority pickup.
+The next-raid recommendation is the first location in the first projected day. Every still-needed document type assigned to that location is a priority pickup.
 
 Other regular Documents at that location appear as optional pickups. The player can enter all results before the next recommendation.
 

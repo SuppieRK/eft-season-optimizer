@@ -188,6 +188,23 @@ test('marks completed rewards and pages with the same gradient and advances to P
   await expect(page.locator('.reward-page__trigger[aria-expanded="true"]')).toHaveAttribute('id', 'reward-page-trigger-2');
 });
 
+test('advances from a completed page to the next unredeemed page before earlier incomplete pages', async ({ page }) => {
+  await openWireframe(page);
+
+  const pageOneRewardIds = await page.locator('#reward-page-panel-1 [data-reward-id]').evaluateAll((inputs) => (
+    inputs.map((input) => (input as HTMLInputElement).dataset.rewardId ?? '')
+  ));
+  for (const rewardId of pageOneRewardIds.slice(0, -1)) {
+    await trackRewardWithoutInventoryChange(page, rewardId);
+  }
+  await page.locator('#reward-page-trigger-2').click();
+  await redeemVisiblePageWithoutInventory(page, 2);
+
+  await expect(page.locator('#reward-page-trigger-1 .reward-page__count')).toHaveText('4 / 5');
+  await expect(page.locator('#reward-page-trigger-2 .reward-page__count')).toHaveText('5 / 5');
+  await expect(page.locator('.reward-page__trigger[aria-expanded="true"]')).toHaveAttribute('id', 'reward-page-trigger-3');
+});
+
 test('keeps bulk actions tracking-only and replaces full completion with the crate fallback', async ({ page }) => {
   await openWireframe(page);
   await setDocumentQuantity(page, 'documents.financial.name', 2);

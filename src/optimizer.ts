@@ -275,7 +275,11 @@ function buildProfile(
     remainingSurplus: exchanges.surplus,
     projectedImmediateRewardIds: progression.projectedImmediateRewardIds,
     nextRaid: route.available
-      ? buildNextRaidRecommendation(progression.days[0]?.locations[0], input.catalogs)
+      ? buildNextRaidRecommendation(
+        progression.days[0]?.locations[0],
+        input.catalogs,
+        route.locations.find((location) => location.locationId === progression.days[0]?.locations[0]?.locationId),
+      )
         ?? buildStockpileRaidRecommendation(profile, input.catalogs)
       : undefined,
     schedule: progression.days,
@@ -397,29 +401,27 @@ function routeForDeficits(
   };
   const documents = new Map(catalogs.documents.documents.map((document) => [document.id, document]));
   const locations = [...catalogs.locations.locations].sort((left, right) => left.id.localeCompare(right.id));
+  const sourceOptions = Object.entries(positiveDeficits).map(([documentId, quantity]) => ({
+    documentId,
+    quantity,
+    sources: documents.get(documentId)?.sourceLocationIds
+      .map((sourceId) => locations.find((location) => location.id === sourceId))
+      .filter((location): location is LocationRecord => Boolean(location)) ?? [],
+  }));
+  if (sourceOptions.some((option) => option.sources.length === 0)) return {
+    available: false,
+    reason: `No eligible source locations cover ${sourceOptions.filter((option) => option.sources.length === 0).map((option) => option.documentId).join(', ')}`,
+    locations: [],
+    profileCost: Number.POSITIVE_INFINITY,
+    rawDocumentQuantity,
+    deficits: positiveDeficits,
+    locationIds: [],
+    locationsWithoutInsurance: Number.POSITIVE_INFINITY,
+    totalRaidTimeMin: Number.POSITIVE_INFINITY,
+  };
   let best: RouteCandidate | undefined;
-  for (let mask = 1; mask < 1 << locations.length; mask += 1) {
-    const selected = locations.filter((_, index) => (mask & (1 << index)) !== 0);
-    const selectedIds = new Set(selected.map((location) => location.id));
-    const byLocation = new Map<string, DocumentAssignment[]>();
-    let cost = 0;
-    let available = true;
-    for (const [documentId, quantity] of Object.entries(positiveDeficits)) {
-      const document = documents.get(documentId);
-      const source = document?.sourceLocationIds
-        .map((sourceId) => locations.find((location) => location.id === sourceId))
-        .filter((location): location is LocationRecord => Boolean(location && selectedIds.has(location.id)))
-        .sort((left, right) => compareSourceLocations(left, right, profile))[0];
-      if (!source) {
-        available = false;
-        break;
-      }
-      cost += quantity * Number(source[PROFILE_FACTORS[profile]]);
-      const assignments = byLocation.get(source.id) ?? [];
-      assignments.push({ documentId, quantity });
-      byLocation.set(source.id, assignments);
-    }
-    if (!available) continue;
+  const byLocation = new Map<string, DocumentAssignment[]>();
+  const evaluateAssignment = (): void => {
     const routeLocations = [...byLocation.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([locationId, documentsAtLocation]) => {
       const location = locations.find((candidate) => candidate.id === locationId)!;
       return {
@@ -428,21 +430,47 @@ function routeForDeficits(
         difficultyRating: location.difficultyRating,
         maxRaidTimeMin: location.maxRaidTimeMin,
         insurance: location.insurance,
-        documents: documentsAtLocation.sort((left, right) => left.documentId.localeCompare(right.documentId)),
+        documents: [...documentsAtLocation].sort((left, right) => left.documentId.localeCompare(right.documentId)),
       };
     });
+    const projectedRaids = routeLocations.map((location) => ({
+      location,
+      count: Math.max(...location.documents.map((document) => document.quantity)),
+    }));
     const route: RouteCandidate = {
       available: true,
       locations: routeLocations,
-      profileCost: cost,
+      profileCost: projectedRaids.reduce(
+        (total, raid) => total + raid.count * Number(raid.location[PROFILE_FACTORS[profile]]),
+        0,
+      ),
       rawDocumentQuantity,
       deficits: positiveDeficits,
       locationIds: [...byLocation.keys()].sort(),
       locationsWithoutInsurance: routeLocations.filter((location) => !location.insurance).length,
-      totalRaidTimeMin: routeLocations.reduce((total, location) => total + location.maxRaidTimeMin, 0),
+      totalRaidTimeMin: projectedRaids.reduce(
+        (total, raid) => total + raid.count * raid.location.maxRaidTimeMin,
+        0,
+      ),
     };
     if (!best || compareRoutes(route, best, profile) < 0) best = route;
-  }
+  };
+  const assignDocument = (index: number): void => {
+    if (index === sourceOptions.length) {
+      evaluateAssignment();
+      return;
+    }
+    const option = sourceOptions[index];
+    for (const source of option.sources) {
+      const previous = byLocation.get(source.id);
+      const assignments = byLocation.get(source.id) ?? [];
+      byLocation.set(source.id, [...assignments, { documentId: option.documentId, quantity: option.quantity }]);
+      assignDocument(index + 1);
+      if (previous) byLocation.set(source.id, previous);
+      else byLocation.delete(source.id);
+    }
+  };
+  assignDocument(0);
   return best ?? {
     available: false,
     reason: `No eligible source locations cover ${Object.keys(positiveDeficits).join(', ')}`,
@@ -695,16 +723,16 @@ function bestSource(
 function buildNextRaidRecommendation(
   location: LocationAssignment | undefined,
   catalogs: Catalogs,
+  routeLocation: LocationAssignment | undefined = location,
 ): NextRaidRecommendation | undefined {
   if (!location) return undefined;
-  const assignments = new Map(location.documents.map((document) => [document.documentId, document.quantity]));
-  const priorityDocumentId = location.documents[0]?.documentId;
+  const assignments = new Map(routeLocation?.documents.map((document) => [document.documentId, document.quantity]) ?? []);
   const documents = catalogs.documents.documents
     .filter((document) => document.kind === 'regular' && document.sourceLocationIds.includes(location.locationId))
     .map((document) => ({
       documentId: document.id,
-      role: document.id === priorityDocumentId ? 'priority' as const : 'optional' as const,
-      targetQuantity: document.id === priorityDocumentId ? assignments.get(document.id) ?? 0 : 0,
+      role: assignments.has(document.id) ? 'priority' as const : 'optional' as const,
+      targetQuantity: assignments.get(document.id) ?? 0,
     }));
   return {
     purpose: 'battle-pass',

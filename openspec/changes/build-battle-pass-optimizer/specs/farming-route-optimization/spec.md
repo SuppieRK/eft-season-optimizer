@@ -154,15 +154,36 @@ TarCoins granted by a Battle Pass reward SHALL become available immediately afte
 - **THEN** its TarCoins are excluded from the available balance
 
 ### Requirement: Fastest and Safest route objectives
-For remaining document deficits, the optimizer SHALL produce a Fastest profile that minimizes `sum(assigned documents × maxRaidTimeMin)` and a Safest profile that minimizes `sum(assigned documents × difficultyRating)`. When Safest candidates have equal difficulty cost, it SHALL first prefer fewer selected locations without equipment insurance and then lower total `maxRaidTimeMin`. After profile-specific comparisons, each profile SHALL break ties by fewer distinct locations, lower raw farming quantity, and stable location identifier order. Location factors SHALL remain identical across PvE, PvP, and PvP Seasonal; the selected mode affects scheduling through its daily limit only.
+For remaining document deficits, the optimizer SHALL enumerate complete assignments of document types to eligible locations. For route comparison only, it SHALL define a location's projected raid count as the largest deficit assigned among the useful document types at that location. The Fastest profile SHALL minimize `sum(projected raid count × maxRaidTimeMin)`. The Safest profile SHALL minimize `sum(projected raid count × difficultyRating)`. When Safest candidates have equal difficulty exposure, it SHALL first prefer fewer selected locations without equipment insurance and then lower total projected raid time. After profile-specific comparisons, each profile SHALL break ties by fewer distinct locations, lower raw farming quantity, and stable location identifier order. This useful-yield model SHALL NOT invent spawn probabilities, guarantee simultaneous drops, or alter the fixed daily document limit. Location factors SHALL remain identical across PvE, PvP, and PvP Seasonal; the selected mode affects scheduling through its daily limit only.
 
 #### Scenario: Fastest and Safest differ
 - **WHEN** one complete route has lower maximum-raid-time cost and another has lower difficulty-rating cost
 - **THEN** the optimizer returns the first as Fastest and the second as Safest
 
-#### Scenario: Shared location wins a profile tie
-- **WHEN** candidate routes tie on a profile's route cost but one uses fewer distinct locations because multiple documents share that location
-- **THEN** that profile selects the route with fewer locations
+#### Scenario: Shared useful yield reduces total Fastest time
+- **WHEN** one 15-minute location can advance two deficits in parallel and completing those deficits at separate 10-minute locations requires two projected raids
+- **THEN** Fastest selects the shared 15-minute location over the 20-minute separate route
+
+#### Scenario: Shared location is not always faster
+- **WHEN** one 25-minute location can advance two deficits in parallel and separate 10-minute locations cover them in 20 projected minutes
+- **THEN** Fastest selects the separate locations
+
+#### Scenario: Equal total time reduces location hopping
+- **WHEN** shared and separate routes have equal Fastest projected time
+- **THEN** Fastest selects the shared route with fewer distinct locations
+
+#### Scenario: Asymmetric deficits limit shared yield
+- **WHEN** a shared location receives deficits of two and one for its useful document types
+- **THEN** its projected raid count is two rather than one
+
+#### Scenario: Safety remains primary
+- **WHEN** a shared-yield route has greater difficulty exposure than a route using separate easier locations
+- **THEN** Safest selects the lower-difficulty route
+- **AND** equal difficulty exposure is resolved by equipment-insurance availability before projected raid time
+
+#### Scenario: Shared yield reduces equal-difficulty exposure
+- **WHEN** shared and separate locations have equal difficulty and insurance availability but the shared location advances both deficits in one projected raid
+- **THEN** Safest selects the shared route over two separate raids
 
 #### Scenario: Equipment insurance breaks a Safest tie
 - **WHEN** Safest candidate routes have equal difficulty cost and one uses fewer locations where equipment insurance is unavailable
@@ -215,7 +236,7 @@ The optimizer SHALL partition remaining farming quantities into ordered projecte
 - **THEN** changing the daily limit changes each profile schedule but not its route objective values
 
 ### Requirement: Rolling next-raid recommendation
-For an available selected profile, the optimizer SHALL expose a next-raid recommendation whenever an eligible regular-document location exists. Projected immediately redeemable rewards SHALL remain advisory schedule metadata and SHALL NOT suppress the recommendation. The projection SHALL start from confirmed checked rewards and current inventory, MAY reserve covered rewards without mutating that state, and SHALL look ahead along the Page-12-first sequence to pre-farm the next ordinary-document deficit. The recommendation SHALL be recalculated from the player's current inventory after each committed raid result. Every regular document available at that location SHALL remain identifiable with an explicit `priority`, `optional`, or `stockpile` role.
+For an available selected profile, the optimizer SHALL expose a next-raid recommendation whenever an eligible regular-document location exists. Projected immediately redeemable rewards SHALL remain advisory schedule metadata and SHALL NOT suppress the recommendation. The projection SHALL start from confirmed checked rewards and current inventory, MAY reserve covered rewards without mutating that state, and SHALL look ahead along the Page-12-first sequence to pre-farm the next ordinary-document deficit. The recommendation SHALL be recalculated from the player's current inventory after each committed raid result. Every still-needed document type assigned to the recommended location SHALL have the `priority` role, including deficits needed later in the legal route. Other farmable types at that location SHALL remain `optional`, and crate fallback types SHALL remain `stockpile`.
 
 #### Scenario: Recommend the next raid
 - **WHEN** farming is required

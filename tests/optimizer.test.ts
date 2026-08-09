@@ -64,6 +64,49 @@ function input(catalogs: Catalogs, overrides: Partial<Parameters<typeof optimize
   };
 }
 
+function sharedYieldScenario(
+  quantities: readonly [number, number] = [1, 1],
+): { catalogs: Catalogs; claimedRewardIds: readonly string[] } {
+  const catalogs = structuredClone(loadCatalogs()) as Catalogs;
+  const financial = catalogs.documents.documents.find((document) => document.id === 'documents.financial.name') as {
+    id: string;
+    sourceLocationIds: string[];
+  };
+  const project = catalogs.documents.documents.find((document) => document.id === 'documents.project.name') as {
+    id: string;
+    sourceLocationIds: string[];
+  };
+  financial.sourceLocationIds = ['locations.customs.name', 'locations.factory.name'];
+  project.sourceLocationIds = ['locations.customs.name', 'locations.woods.name'];
+  const targetReward = catalogs.battlePass.pages[0].rewards[0] as {
+    id: string;
+    requirements: Array<{ documentId: string; quantity: number }>;
+  };
+  targetReward.requirements = [
+    { documentId: financial.id, quantity: quantities[0] },
+    { documentId: project.id, quantity: quantities[1] },
+  ];
+  return {
+    catalogs,
+    claimedRewardIds: allRewardIds(catalogs).filter((rewardId) => rewardId !== targetReward.id),
+  };
+}
+
+function setLocationFactors(
+  catalogs: Catalogs,
+  locationId: string,
+  factors: { maxRaidTimeMin: number; difficultyRating?: number; insurance?: boolean },
+): void {
+  const location = catalogs.locations.locations.find((candidate) => candidate.id === locationId) as {
+    maxRaidTimeMin: number;
+    difficultyRating: number;
+    insurance: boolean;
+  };
+  location.maxRaidTimeMin = factors.maxRaidTimeMin;
+  if (factors.difficultyRating !== undefined) location.difficultyRating = factors.difficultyRating;
+  if (factors.insurance !== undefined) location.insurance = factors.insurance;
+}
+
 describe('optimizer', () => {
   it('uses the fixed Page-12-first complete-pass objective', () => {
     const catalogs = loadCatalogs();
@@ -129,7 +172,7 @@ describe('optimizer', () => {
     expect(result.profiles.safest.classifiedAllocation).toEqual({ 'documents.financial.name': 1 });
     expect(result.profiles.safest.projectedImmediateRewardIds).toContain('rewards.dogtag01.name');
     expect(result.profiles.safest.nextRaid?.purpose).toBe('battle-pass');
-    expect(result.profiles.safest.nextRaid?.documents.map((document) => document.role).sort()).toEqual(['optional', 'priority']);
+    expect(result.profiles.safest.nextRaid?.documents.map((document) => document.role).sort()).toEqual(['priority', 'priority']);
   });
 
   it('looks ahead to the next farming deficit without confirming covered rewards', () => {
@@ -202,8 +245,8 @@ describe('optimizer', () => {
     expect(seasonal.effectiveDailyLimit).toBe(25);
     expect(pve.profiles.fastest.route.profileCost).toBe(seasonal.profiles.fastest.route.profileCost);
     expect(pve.profiles.safest.route.profileCost).toBe(seasonal.profiles.safest.route.profileCost);
-    expect(pve.profiles.fastest.route.locations.map((location) => location.locationId)).toContain('locations.lab.name');
-    expect(pve.profiles.safest.route.locations.map((location) => location.locationId)).toContain('locations.groundZero.name');
+    expect(pve.profiles.fastest.route.locations).toEqual(seasonal.profiles.fastest.route.locations);
+    expect(pve.profiles.safest.route.locations).toEqual(seasonal.profiles.safest.route.locations);
     expect(pve.profiles.fastest.classifiedConsumed).toBe(1);
     expect(pve.profiles.safest.classifiedConsumed).toBe(1);
   });
@@ -219,6 +262,107 @@ describe('optimizer', () => {
     expect(fastestLocation.difficultyId).toBe('difficulty.hard');
     expect(fastestLocation.difficultyRating).toBe(3);
     expect(fastestLocation.maxRaidTimeMin).toBe(25);
+  });
+
+  it('prefers one longer shared-yield raid over multiple shorter raids when total Fastest time is lower', () => {
+    const { catalogs, claimedRewardIds } = sharedYieldScenario();
+    setLocationFactors(catalogs, 'locations.customs.name', { maxRaidTimeMin: 15, difficultyRating: 4, insurance: false });
+    setLocationFactors(catalogs, 'locations.factory.name', { maxRaidTimeMin: 10 });
+    setLocationFactors(catalogs, 'locations.woods.name', { maxRaidTimeMin: 10 });
+
+    const result = optimize(input(catalogs, { claimedRewardIds }));
+
+    expect(result.profiles.fastest.route.profileCost).toBe(15);
+    expect(result.profiles.fastest.route.locations.map((location) => location.locationId)).toEqual(['locations.customs.name']);
+    expect(result.profiles.fastest.nextRaid?.locationId).toBe('locations.customs.name');
+    expect(result.profiles.fastest.nextRaid?.documents.filter((document) => document.role === 'priority').map((document) => document.documentId).sort()).toEqual([
+      'documents.financial.name',
+      'documents.project.name',
+    ]);
+  });
+
+  it('keeps separate short raids when their total Fastest time beats the shared-yield raid', () => {
+    const { catalogs, claimedRewardIds } = sharedYieldScenario();
+    setLocationFactors(catalogs, 'locations.customs.name', { maxRaidTimeMin: 25 });
+    setLocationFactors(catalogs, 'locations.factory.name', { maxRaidTimeMin: 10 });
+    setLocationFactors(catalogs, 'locations.woods.name', { maxRaidTimeMin: 10 });
+
+    const result = optimize(input(catalogs, { claimedRewardIds }));
+
+    expect(result.profiles.fastest.route.profileCost).toBe(20);
+    expect(result.profiles.fastest.route.locations.map((location) => location.locationId).sort()).toEqual([
+      'locations.factory.name',
+      'locations.woods.name',
+    ]);
+  });
+
+  it('prefers fewer location hops when shared and separate Fastest time are equal', () => {
+    const { catalogs, claimedRewardIds } = sharedYieldScenario();
+    setLocationFactors(catalogs, 'locations.customs.name', { maxRaidTimeMin: 20 });
+    setLocationFactors(catalogs, 'locations.factory.name', { maxRaidTimeMin: 10 });
+    setLocationFactors(catalogs, 'locations.woods.name', { maxRaidTimeMin: 10 });
+
+    const result = optimize(input(catalogs, { claimedRewardIds }));
+
+    expect(result.profiles.fastest.route.profileCost).toBe(20);
+    expect(result.profiles.fastest.route.locations.map((location) => location.locationId)).toEqual(['locations.customs.name']);
+  });
+
+  it('does not overvalue one shared pickup when document quantities are asymmetric', () => {
+    const { catalogs, claimedRewardIds } = sharedYieldScenario([2, 1]);
+    setLocationFactors(catalogs, 'locations.customs.name', { maxRaidTimeMin: 16 });
+    setLocationFactors(catalogs, 'locations.factory.name', { maxRaidTimeMin: 10 });
+    setLocationFactors(catalogs, 'locations.woods.name', { maxRaidTimeMin: 10 });
+
+    const result = optimize(input(catalogs, { claimedRewardIds }));
+
+    expect(result.profiles.fastest.route.profileCost).toBe(30);
+    expect(result.profiles.fastest.route.locations.map((location) => location.locationId).sort()).toEqual([
+      'locations.factory.name',
+      'locations.woods.name',
+    ]);
+  });
+
+  it('keeps Safest difficulty ahead of shared-yield time efficiency', () => {
+    const { catalogs, claimedRewardIds } = sharedYieldScenario();
+    setLocationFactors(catalogs, 'locations.customs.name', { maxRaidTimeMin: 5, difficultyRating: 3 });
+    setLocationFactors(catalogs, 'locations.factory.name', { maxRaidTimeMin: 10, difficultyRating: 1 });
+    setLocationFactors(catalogs, 'locations.woods.name', { maxRaidTimeMin: 10, difficultyRating: 1 });
+
+    const result = optimize(input(catalogs, { claimedRewardIds }));
+
+    expect(result.profiles.safest.route.profileCost).toBe(2);
+    expect(result.profiles.safest.route.locations.map((location) => location.locationId).sort()).toEqual([
+      'locations.factory.name',
+      'locations.woods.name',
+    ]);
+  });
+
+  it('uses shared useful yield to reduce Safest exposure when location difficulty is equal', () => {
+    const { catalogs, claimedRewardIds } = sharedYieldScenario();
+    setLocationFactors(catalogs, 'locations.customs.name', { maxRaidTimeMin: 15, difficultyRating: 1, insurance: true });
+    setLocationFactors(catalogs, 'locations.factory.name', { maxRaidTimeMin: 10, difficultyRating: 1, insurance: true });
+    setLocationFactors(catalogs, 'locations.woods.name', { maxRaidTimeMin: 10, difficultyRating: 1, insurance: true });
+
+    const result = optimize(input(catalogs, { claimedRewardIds }));
+
+    expect(result.profiles.safest.route.profileCost).toBe(1);
+    expect(result.profiles.safest.route.locations.map((location) => location.locationId)).toEqual(['locations.customs.name']);
+  });
+
+  it('keeps Safest equipment insurance ahead of shared-yield time when difficulty exposure ties', () => {
+    const { catalogs, claimedRewardIds } = sharedYieldScenario();
+    setLocationFactors(catalogs, 'locations.customs.name', { maxRaidTimeMin: 5, difficultyRating: 2, insurance: false });
+    setLocationFactors(catalogs, 'locations.factory.name', { maxRaidTimeMin: 10, difficultyRating: 1, insurance: true });
+    setLocationFactors(catalogs, 'locations.woods.name', { maxRaidTimeMin: 10, difficultyRating: 1, insurance: true });
+
+    const result = optimize(input(catalogs, { claimedRewardIds }));
+
+    expect(result.profiles.safest.route.profileCost).toBe(2);
+    expect(result.profiles.safest.route.locations.map((location) => location.locationId).sort()).toEqual([
+      'locations.factory.name',
+      'locations.woods.name',
+    ]);
   });
 
   it('prefers equipment insurance before raid time when Safest locations have equal difficulty', () => {

@@ -150,6 +150,29 @@ describe('state and cookie persistence', () => {
     expect(restoreState(cookies, catalog).selectedPage).toBe(2);
   });
 
+  it('advances to the next unredeemed page instead of returning to an earlier incomplete page', () => {
+    const catalog = catalogs();
+    const [pageOne, pageTwo] = catalog.battlePass.pages;
+    const claimedRewardIds = [
+      ...pageOne.rewards.slice(0, -1),
+      ...pageTwo.rewards.slice(0, -1),
+    ].map((reward) => reward.id).sort();
+    const state = {
+      ...createDefaultState(catalog),
+      claimedRewardIds,
+      selectedPage: pageTwo.page,
+    };
+
+    const completedPageTwo = reduceState(state, {
+      type: 'claim-reward',
+      rewardId: pageTwo.rewards.at(-1)!.id,
+      claimed: true,
+    }, catalog);
+
+    expect(pageOne.rewards.some((reward) => !completedPageTwo.claimedRewardIds.includes(reward.id))).toBe(true);
+    expect(completedPageTwo.selectedPage).toBe(catalog.battlePass.pages[2].page);
+  });
+
   it('migrates the previously expanded reward page without invalidating the UI cookie', () => {
     const catalog = catalogs();
     const cookies = memoryCookies();
