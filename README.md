@@ -290,6 +290,26 @@ The Vite base path is `/eft-season-optimizer/`. If the repository name changes, 
 - `playwright.config.ts`
 - `scripts/check-build.cjs`
 
+## Web analytics
+
+Production builds can use [Cloudflare Web Analytics](https://developers.cloudflare.com/web-analytics/). The development server does not load the analytics script.
+
+The build omits analytics when no token is available. Cloudflare states that Web Analytics does not use cookies, local storage, or fingerprinting.
+
+To configure GitHub Pages:
+
+1. Add `suppierk.github.io` to Cloudflare Web Analytics.
+2. Copy the token from the generated `data-cf-beacon` value.
+3. Open the GitHub repository settings.
+4. Select **Secrets and variables**, **Actions**, and **Variables**.
+5. Add a repository variable named `CLOUDFLARE_WEB_ANALYTICS_TOKEN`.
+6. Set its value to the Cloudflare site token.
+7. Run the GitHub Pages workflow again.
+
+For a local production build, copy `.env.example` to `.env.local`. Add the token to `.env.local`. Then run `npm run build`.
+
+The token is public browser configuration. Do not put Cloudflare API keys or account credentials in a Vite environment variable.
+
 ## Local storage
 
 The application stores progress, document counts, and interface choices in first-party cookies. It does not send this state to an application server. On reload, the application automatically resets these cookies if any public data catalog changed.

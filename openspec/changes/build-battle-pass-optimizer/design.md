@@ -24,7 +24,7 @@ The optimizer must distinguish the selected game mode's daily document limit fro
 
 - General Battle Pass documentation, news, progression guides, or reward showcases.
 - Detailed routes, spawn coordinates, keys, or navigation within a Tarkov location.
-- Accounts, cloud synchronization, telemetry, multiplayer sharing, or server-side processing.
+- Accounts, cloud synchronization, multiplayer sharing, or server-side processing.
 - Automatic ingestion or OCR of screenshots at runtime.
 - Predicting raid outcomes, PvP encounters, exact drop rates, or completion time from live game data.
 - Pixel-for-pixel replication of the official interface, claiming ownership of game imagery, or presenting the tool as an official Battlestate Games product.
@@ -275,6 +275,14 @@ Vitest will cover JSON validation and pure optimizer scenarios, including prereq
 Feedback tests will verify URL encoding, context opt-in, content limits, and that no issue-submission API is called. A production build check will catch broken GitHub Pages asset paths.
 
 Screenshot transcription tests will assert known page/reward totals so data changes remain reviewable; screenshot paths remain outside the runtime catalogs.
+
+### 15. Inject optional privacy-first analytics only into production builds
+
+Vite will inject the official Cloudflare Web Analytics module script before the closing body tag during production builds. The build reads the public site token from `VITE_CLOUDFLARE_WEB_ANALYTICS_TOKEN`. GitHub Actions maps the `CLOUDFLARE_WEB_ANALYTICS_TOKEN` repository variable to that build variable.
+
+The development server and builds without a token will omit the beacon. A missing token will not block GitHub Pages deployment. The production build check will allow only Cloudflare's exact beacon URL and will reject unresolved Vite placeholders or malformed beacon output.
+
+The application will not add optimizer state, document quantities, reward claims, cookies, or custom metadata to the beacon. The existing cookie notice will continue to describe only the first-party cookies that store planner selections.
 
 ## Risks / Trade-offs
 

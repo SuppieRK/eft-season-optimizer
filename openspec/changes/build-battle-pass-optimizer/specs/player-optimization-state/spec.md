@@ -12,6 +12,24 @@ The application SHALL render as semantic HTML and CSS with TypeScript compiled t
 - **THEN** it loads the reviewed Battle Pass workspace from `index.html`
 - **AND** no alternate `wireframe.html` page is available in the build
 
+### Requirement: Optional production web analytics
+The production build SHALL inject exactly one official Cloudflare Web Analytics module script when a non-empty public site token is configured. Local development and builds without a token SHALL omit the beacon. A missing token SHALL NOT block deployment. The application SHALL NOT add optimizer state, document quantities, reward claims, cookies, or custom metadata to the analytics payload.
+
+#### Scenario: Production token is configured
+- **WHEN** the production build receives `VITE_CLOUDFLARE_WEB_ANALYTICS_TOKEN`
+- **THEN** it injects one module script from `https://static.cloudflareinsights.com/beacon.min.js` before the closing body tag
+- **AND** its `data-cf-beacon` value contains the configured site token
+
+#### Scenario: Analytics token is unavailable
+- **WHEN** local development starts or a production build has no analytics token
+- **THEN** the page contains no Cloudflare Web Analytics beacon
+- **AND** the application and GitHub Pages deployment remain available
+
+#### Scenario: Analytics does not change planner storage
+- **WHEN** analytics is enabled
+- **THEN** the existing cookie notice continues to describe only first-party planner state
+- **AND** the application does not send player-controlled optimizer state as analytics metadata
+
 ### Requirement: Two-column Battle Pass layout
 The desktop interface SHALL use a two-section header with season identity and total progress grouped on the left and route-profile, mode, and locale controls grouped on the right; a left reward column; one expanded Focus column containing the current next raid and persistent owned-document ribbon; and a separate credits footer containing the asset disclaimer and reset action. Normal-content placement SHALL be isolated in one editable CSS layout map, typography SHALL use one shared proportional caption/label/body/heading/metric/display token scale, and internal gaps, padding, and region spacing SHALL use one shared golden-ratio token scale. Layout, typography, spacing, and palette or visual-state styling SHALL remain independently editable.
 

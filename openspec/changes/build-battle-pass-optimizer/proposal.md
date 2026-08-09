@@ -22,6 +22,7 @@ Escape from Tarkov players currently have to manually reconcile Battle Pass rewa
 - Display a persistent centered disclaimer in that sibling footer stating that Escape from Tarkov image assets belong to Battlestate Games and that the optimizer is an unofficial fan-made tool. Separate the footer from the document section with space and a horizontal rule; keep disclaimer and reset inline around a vertical divider until narrow width stacks them around a horizontal divider.
 - Add internationalization infrastructure for every user-facing string, item label and description, image alternative, and displayed screenshot description. `localization.json` keeps each stable text ID and all of its language variants together in one object. Human-authored textual descriptions and complete localizations are required before release.
 - Add a feedback action that lets the player review a compact, privacy-conscious report and opens GitHub's prefilled new-issue composer for final submission.
+- Add optional production-only Cloudflare Web Analytics through a GitHub Actions repository variable, without adding analytics cookies or sending optimizer state.
 - Keep general Battle Pass guidance and detailed in-map navigation outside the scope of the site; supplied screenshots remain the backed-up source of truth for reconstructing and auditing optimizer data.
 
 ## Capabilities
@@ -42,6 +43,6 @@ Escape from Tarkov players currently have to manually reconcile Battle Pass rewa
 
 - Introduces a framework-free static HTML, CSS, and compiled TypeScript frontend, optimizer domain logic, JSON data assets, automated tests, and GitHub Pages deployment configuration.
 - Uses the supplied screenshots as authoring evidence for data reconstruction and validation; optimizer behavior reads normalized JSON rather than image content at runtime.
-- Stores player-specific selections locally in cookies and does not require accounts, a server, or external APIs.
+- Stores player-specific selections locally in cookies and does not require accounts or an application server; optional production analytics uses Cloudflare's public beacon.
 - Adds a dedicated localization catalog and build-time content-completeness checks; publication is blocked until the configured release locales and textual descriptions are complete.
 - Establishes implementation constraints for the frontend toolchain, JSON validation, optimizer ordering, cookie schema and migration, and responsive presentation.

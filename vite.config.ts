@@ -1,6 +1,33 @@
 import { readFileSync } from 'node:fs';
 
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type HtmlTagDescriptor, type Plugin } from 'vite';
+
+export const CLOUDFLARE_WEB_ANALYTICS_SOURCE = 'https://static.cloudflareinsights.com/beacon.min.js';
+
+export function cloudflareWebAnalyticsTag(token: string | undefined): HtmlTagDescriptor | undefined {
+  const normalizedToken = token?.trim();
+  if (!normalizedToken) return undefined;
+  return {
+    tag: 'script',
+    attrs: {
+      type: 'module',
+      src: CLOUDFLARE_WEB_ANALYTICS_SOURCE,
+      'data-cf-beacon': JSON.stringify({ token: normalizedToken }),
+    },
+    injectTo: 'body',
+  };
+}
+
+function cloudflareWebAnalytics(token: string | undefined): Plugin {
+  return {
+    name: 'cloudflare-web-analytics',
+    apply: 'build',
+    transformIndexHtml() {
+      const tag = cloudflareWebAnalyticsTag(token);
+      return tag ? [tag] : [];
+    },
+  };
+}
 
 const localeFlagsModule = 'virtual:locale-flags';
 const resolvedLocaleFlagsModule = `\0${localeFlagsModule}`;
@@ -27,7 +54,13 @@ function localeFlags(): Plugin {
   };
 }
 
-export default defineConfig({
-  base: '/eft-season-optimizer/',
-  plugins: [localeFlags()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd());
+  return {
+    base: '/eft-season-optimizer/',
+    plugins: [
+      localeFlags(),
+      cloudflareWebAnalytics(env.VITE_CLOUDFLARE_WEB_ANALYTICS_TOKEN),
+    ],
+  };
 });
