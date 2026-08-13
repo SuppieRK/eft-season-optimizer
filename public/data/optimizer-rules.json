@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "dailyDocumentLimits": {
-    "pve": 10,
-    "pvp": 15,
-    "pvp-seasonal": 25
+    "pve": 15,
+    "pvp": 20,
+    "pvp-seasonal": 30
   },
   "exchange": {
     "regularDocumentsPerBlackDivisionGearCrate": 10,
