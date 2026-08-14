@@ -1676,8 +1676,8 @@
     {
       "id": "about.dailyLimits",
       "localizations": {
-        "en-GB": "PvE allows 10 documents per day, PvP allows 15, and PvP Seasonal allows 25.",
-        "ru-RU": "В PvE доступно 10 документов в день, в PvP — 15, а в сезонном PvP — 25."
+        "en-GB": "PvE allows {pve} documents per day, PvP allows {pvp}, and PvP Seasonal allows {pvpSeasonal}.",
+        "ru-RU": "В PvE доступно {pve} документов в день, в PvP — {pvp}, а в сезонном PvP — {pvpSeasonal}."
       }
     },
     {

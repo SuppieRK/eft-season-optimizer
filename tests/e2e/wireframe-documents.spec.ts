@@ -199,7 +199,7 @@ test('shows exact remaining requirements beside document titles', async ({ page 
   const beforePreferences = await needTexts();
   await page.locator('.route-profile-option').filter({ hasText: 'Fastest' }).click();
   await page.locator('.ss-main.mode-select').click();
-  await page.locator('.ss-content.mode-select .ss-option').filter({ hasText: 'PvE · 10 / day' }).click();
+  await page.locator('.ss-content.mode-select .ss-option').filter({ hasText: /^PvE ·/u }).click();
   expect(await needTexts()).toEqual(beforePreferences);
 
   await page.locator('[data-reward-claim-all]').click();

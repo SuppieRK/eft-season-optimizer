@@ -133,6 +133,7 @@ export function renderLocalizedPage(
 
   populateDocumentStrip(document, catalogs, route.locale, config.basePath);
   populateStaticTotals(document, catalogs, route.locale);
+  populateStaticMode(document, catalogs, route.locale);
   populateStaticFocus(document, catalogs, route.locale, config.basePath);
   populateAboutDialog(document, catalogs, route.locale);
   document.querySelectorAll<HTMLElement>('button, input, select').forEach((control) => {
@@ -278,6 +279,12 @@ function populateAboutDialog(document: Document, catalogs: Catalogs, locale: str
   const totalDocuments = [...documentTotals.values()].reduce((total, quantity) => total + quantity, 0);
   const summary = document.querySelector<HTMLElement>('[data-about-summary]');
   const number = new Intl.NumberFormat(locale);
+  const dailyLimits = document.querySelector<HTMLElement>('[data-static-i18n="about.dailyLimits"]');
+  if (dailyLimits) dailyLimits.textContent = localizer.text('about.dailyLimits', {
+    pve: number.format(catalogs.optimizerRules.dailyDocumentLimits.pve),
+    pvp: number.format(catalogs.optimizerRules.dailyDocumentLimits.pvp),
+    pvpSeasonal: number.format(catalogs.optimizerRules.dailyDocumentLimits['pvp-seasonal']),
+  });
   if (summary) summary.textContent = localizer.text('about.summary', {
     pages: number.format(catalogs.battlePass.pages.length),
     rewards: number.format(rewardCount),
@@ -298,6 +305,17 @@ function populateAboutDialog(document: Document, catalogs: Catalogs, locale: str
     row.append(name, total, locations);
     body.append(row);
   }
+}
+
+function populateStaticMode(document: Document, catalogs: Catalogs, locale: string): void {
+  const localizer = createLocalizer(catalogs.localization, locale);
+  const option = document.querySelector<HTMLOptionElement>('[data-mode-select] option');
+  if (!option) return;
+  option.value = 'pvp-seasonal';
+  option.textContent = `${localizer.text('mode.pvpSeasonal')} · ${formatNumber(
+    catalogs.optimizerRules.dailyDocumentLimits['pvp-seasonal'],
+    locale,
+  )} / ${localizer.text('ui.day')}`;
 }
 
 function populateStaticFocus(document: Document, catalogs: Catalogs, locale: string, basePath: string): void {

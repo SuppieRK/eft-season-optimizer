@@ -86,9 +86,18 @@ test('persists the Fastest route selection', async ({ page }) => {
 test('orders and persists game modes while keeping the language selector icon-only', async ({ page }) => {
   await openWireframe(page);
 
+  const limits = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/optimizer-rules.json', document.baseURI));
+    const rules = await response.json() as {
+      dailyDocumentLimits: { pve: number; pvp: number; 'pvp-seasonal': number };
+    };
+    return rules.dailyDocumentLimits;
+  });
+
   const modeControl = page.locator('.ss-main.mode-select');
   const languageControl = page.locator('.ss-main.language-select');
-  await expect(modeControl).toContainText('PvP Seasonal · 25 / day');
+  const enNumber = new Intl.NumberFormat('en-GB');
+  await expect(modeControl).toContainText(`PvP Seasonal · ${enNumber.format(limits['pvp-seasonal'])} / day`);
   await expect(page.locator('[data-language-select]')).toHaveValue('en-GB');
   await expect(languageControl.locator('.locale-choice__flag[data-flag-region="gb"]')).toBeVisible();
 
@@ -110,15 +119,15 @@ test('orders and persists game modes while keeping the language selector icon-on
   const modeMenu = page.locator('.ss-content.mode-select');
   await expect(modeMenu).toBeVisible();
   await expect(modeMenu.locator('.ss-option')).toHaveText([
-    'PvP Seasonal · 25 / day',
-    'PvP · 15 / day',
-    'PvE · 10 / day',
+    `PvP Seasonal · ${enNumber.format(limits['pvp-seasonal'])} / day`,
+    `PvP · ${enNumber.format(limits.pvp)} / day`,
+    `PvE · ${enNumber.format(limits.pve)} / day`,
   ]);
   const opensBelowMode = await Promise.all([modeControl, modeMenu].map((locator) => locator.boundingBox()));
   expect(opensBelowMode[1]!.y).toBeGreaterThanOrEqual(opensBelowMode[0]!.y + opensBelowMode[0]!.height - 1);
-  await modeMenu.locator('.ss-option').filter({ hasText: 'PvP · 15 / day' }).click();
+  await modeMenu.locator('.ss-option').filter({ hasText: /^PvP ·/u }).click();
   await expect(page.locator('[data-mode-select]')).toHaveValue('pvp');
-  await expect(modeControl).toContainText('PvP · 15 / day');
+  await expect(modeControl).toContainText(`PvP · ${enNumber.format(limits.pvp)} / day`);
 
   await languageControl.click();
   const languageMenu = page.locator('.ss-content.language-select');
@@ -134,7 +143,9 @@ test('orders and persists game modes while keeping the language selector icon-on
   await expect(page.locator('.wireframe-shell')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('.ss-main.language-select .locale-choice__flag[data-flag-region="ru"]')).toBeVisible();
   await expect(page.locator('[data-mode-select]')).toHaveValue('pvp');
-  await expect(page.locator('.ss-main.mode-select')).toContainText('PvP · 15 / день');
+  await expect(page.locator('.ss-main.mode-select')).toContainText(
+    `PvP · ${new Intl.NumberFormat('ru-RU').format(limits.pvp)} / день`,
+  );
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

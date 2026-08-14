@@ -253,7 +253,7 @@ The header SHALL contain a compact setup button labelled with the selected game 
 
 #### Scenario: Mode selection applies its default
 - **WHEN** the player selects PvE, PvP, or PvP Seasonal
-- **THEN** the effective daily limit becomes `10`, `15`, or `25` respectively
+- **THEN** the effective daily limit becomes that mode's current value from `optimizer-rules.json`
 
 #### Scenario: Global mode selection recomputes optimizer output
 - **WHEN** the player changes the global game mode

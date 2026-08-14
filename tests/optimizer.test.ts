@@ -132,7 +132,9 @@ describe('optimizer', () => {
     expect(Object.values(result.initialDeficits).reduce((sum, quantity) => sum + quantity, 0)).toBe(expectedDocumentTotal);
     expect(result.profiles.fastest.route.available).toBe(true);
     expect(result.profiles.safest.route.available).toBe(true);
-    expect(result.profiles.fastest.schedule.every((day) => day.documentQuantity <= 10)).toBe(true);
+    expect(result.profiles.fastest.schedule.every((day) => (
+      day.documentQuantity <= catalogs.optimizerRules.dailyDocumentLimits.pve
+    ))).toBe(true);
     expect(result.profiles.fastest.schedule[0].expanded).toBe(true);
     expect(result.profiles.fastest.schedule[0].rewardIdsClaimed.length).toBeGreaterThan(0);
     expect(result.profiles.fastest.schedule[0].unlockedPage).toBe(2);
@@ -241,8 +243,8 @@ describe('optimizer', () => {
     const pve = optimize(input(catalogs, { claimedRewardIds: claimed, classifiedDocuments: 1, mode: 'pve' }));
     const seasonal = optimize(input(catalogs, { claimedRewardIds: claimed, classifiedDocuments: 1, mode: 'pvp-seasonal' }));
 
-    expect(pve.effectiveDailyLimit).toBe(10);
-    expect(seasonal.effectiveDailyLimit).toBe(25);
+    expect(pve.effectiveDailyLimit).toBe(catalogs.optimizerRules.dailyDocumentLimits.pve);
+    expect(seasonal.effectiveDailyLimit).toBe(catalogs.optimizerRules.dailyDocumentLimits['pvp-seasonal']);
     expect(pve.profiles.fastest.route.profileCost).toBe(seasonal.profiles.fastest.route.profileCost);
     expect(pve.profiles.safest.route.profileCost).toBe(seasonal.profiles.safest.route.profileCost);
     expect(pve.profiles.fastest.route.locations).toEqual(seasonal.profiles.fastest.route.locations);
@@ -521,12 +523,20 @@ describe('optimizer', () => {
     const pvp = optimize(input(catalogs, { mode: 'pvp' }));
     const seasonal = optimize(input(catalogs, { mode: 'pvp-seasonal' }));
 
-    expect(pve.effectiveDailyLimit).toBe(10);
-    expect(pvp.effectiveDailyLimit).toBe(15);
-    expect(seasonal.effectiveDailyLimit).toBe(25);
+    expect(pve.effectiveDailyLimit).toBe(catalogs.optimizerRules.dailyDocumentLimits.pve);
+    expect(pvp.effectiveDailyLimit).toBe(catalogs.optimizerRules.dailyDocumentLimits.pvp);
+    expect(seasonal.effectiveDailyLimit).toBe(catalogs.optimizerRules.dailyDocumentLimits['pvp-seasonal']);
     expect(pve.profiles.fastest.route.locations).toEqual(pvp.profiles.fastest.route.locations);
-    expect(pve.profiles.fastest.schedule.length).toBeGreaterThan(pvp.profiles.fastest.schedule.length);
-    expect(pvp.profiles.fastest.schedule.length).toBeGreaterThan(seasonal.profiles.fastest.schedule.length);
+    expect(pvp.profiles.fastest.route.locations).toEqual(seasonal.profiles.fastest.route.locations);
+    expect(pve.profiles.fastest.schedule.every((day) => (
+      day.documentQuantity <= catalogs.optimizerRules.dailyDocumentLimits.pve
+    ))).toBe(true);
+    expect(pvp.profiles.fastest.schedule.every((day) => (
+      day.documentQuantity <= catalogs.optimizerRules.dailyDocumentLimits.pvp
+    ))).toBe(true);
+    expect(seasonal.profiles.fastest.schedule.every((day) => (
+      day.documentQuantity <= catalogs.optimizerRules.dailyDocumentLimits['pvp-seasonal']
+    ))).toBe(true);
   });
 
   it('switches to regular-document Black Division crate planning after the pass', () => {

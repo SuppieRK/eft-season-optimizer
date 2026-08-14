@@ -139,7 +139,7 @@ The optimizer converts prices to integer currency units before comparison. It us
 
 The farming optimizer produces independent Fastest and Safest routes. The selected game mode changes only the daily Document limit.
 
-The fixed daily limits are 10 for PvE, 15 for PvP, and 25 for PvP Seasonal.
+The daily limits for PvE, PvP, and PvP Seasonal come from `public/data/optimizer-rules.json`.
 
 The optimizer does not model spawn probabilities, extraction rates, or a per-location spawn limit. For route comparison only, it assumes that one raid can advance each useful document type assigned to that location once. The projected raid count for a location is therefore the largest assigned deficit at that location. Actual results still come only from the values that the player commits.
 

@@ -51,7 +51,10 @@ describe('catalogs', () => {
     expect(catalogs.documents.documents.find((document) => document.id === 'documents.medical.name')?.sourceLocationIds).toContain('locations.labyrinth.name');
     expect(catalogs.documents.documents.find((document) => document.id === 'documents.blueprints.name')?.sourceLocationIds).toContain('locations.labyrinth.name');
 
-    expect(catalogs.optimizerRules.dailyDocumentLimits).toEqual({ pve: 10, pvp: 15, 'pvp-seasonal': 25 });
+    expect(Object.keys(catalogs.optimizerRules.dailyDocumentLimits).sort()).toEqual(['pve', 'pvp', 'pvp-seasonal']);
+    expect(Object.values(catalogs.optimizerRules.dailyDocumentLimits).every((limit) => (
+      Number.isInteger(limit) && limit > 0
+    ))).toBe(true);
     expect(catalogs.optimizerRules.exchange).toEqual({
       regularDocumentsPerBlackDivisionGearCrate: 10,
       regularDocumentsPerOtherDocuments: 5,

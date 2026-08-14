@@ -99,9 +99,9 @@ Battle Pass pages SHALL be interpreted in ascending `page` order. Page 1 SHALL h
 ### Requirement: Configurable optimizer rules
 The optimizer rules catalog SHALL define mode daily document limits under `dailyDocumentLimits`; `exchange.regularDocumentsPerOtherDocuments` and `exchange.regularDocumentsPerBlackDivisionGearCrate`; the complete configured set of Classified Document purchase bundles with integer document quantities and TarCoin costs; purchasable TarCoin packages with final credited TarCoin totals plus local-price references; Fastest and Safest factor-field selection; and deterministic optimizer ordering without embedding those values in UI code. Neither purchase-bundle collection SHALL store `bonusTarCoins`.
 
-#### Scenario: Default daily limits
+#### Scenario: Configured daily limits
 - **WHEN** the optimizer rules are loaded
-- **THEN** `dailyDocumentLimits` defines PvE as `10`, PvP as `15`, and PvP Seasonal as `25` documents per day
+- **THEN** `dailyDocumentLimits` defines one positive integer limit for each of PvE, PvP, and PvP Seasonal
 
 #### Scenario: Black Division exchange ratio
 - **WHEN** the Black Division crate rule is loaded
@@ -141,4 +141,3 @@ Catalog validation SHALL reject duplicate identifiers, unknown references, redun
 #### Scenario: Reviewed Battle Pass content is adjusted
 - **WHEN** rewards are added or removed, positive requirement quantities are corrected, or version and season localization IDs are updated with valid references
 - **THEN** runtime catalog validation accepts the new content and derived totals update without matching TypeScript constants
-

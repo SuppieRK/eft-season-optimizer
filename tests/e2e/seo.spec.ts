@@ -69,6 +69,13 @@ test('keeps localized content available without JavaScript', async ({ browser },
 
 test('opens the catalog-derived About dialog', async ({ page }) => {
   await openWireframe(page);
+  const limits = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/optimizer-rules.json', document.baseURI));
+    const rules = await response.json() as {
+      dailyDocumentLimits: { pve: number; pvp: number; 'pvp-seasonal': number };
+    };
+    return rules.dailyDocumentLimits;
+  });
   await page.getByRole('button', { name: 'About this optimizer' }).click();
   const dialog = page.locator('[data-about-dialog]');
   await expect(dialog).toBeVisible();
@@ -77,6 +84,9 @@ test('opens the catalog-derived About dialog', async ({ page }) => {
   await expect(dialog.locator('[data-about-table-body] tr')).toHaveCount(8);
   await expect(dialog).toContainText('Financial documents');
   await expect(dialog).toContainText('Customs');
+  await expect(dialog).toContainText(
+    `PvE allows ${limits.pve} documents per day, PvP allows ${limits.pvp}, and PvP Seasonal allows ${limits['pvp-seasonal']}.`,
+  );
   await dialog.getByRole('button', { name: 'Close' }).click();
   await expect(dialog).toBeHidden();
 });

@@ -212,7 +212,7 @@ The optimizer SHALL read each recommended location's `maxRaidTimeMin`, `difficul
 - **THEN** Fastest uses `maxRaidTimeMin: 15` and Safest uses `difficultyRating: 1` with `difficultyId: "difficulty.easy"`
 
 ### Requirement: Global game-mode scheduling input
-The optimizer SHALL accept exactly one selected game mode for the complete calculation. It SHALL resolve PvE, PvP, and PvP Seasonal to fixed daily document limits `10`, `15`, and `25` respectively from `optimizer-rules.json`. The selected mode SHALL affect optimizer results only through the effective daily document limit and resulting schedules and estimated day counts. It SHALL NOT alter reward expansion, document deficits, inventory consumption, Classified Document allocation, TarCoin calculations, location eligibility, route assignments, or Fastest and Safest objective values. The optimizer SHALL NOT accept a user-defined daily-limit override.
+The optimizer SHALL accept exactly one selected game mode for the complete calculation. It SHALL resolve PvE, PvP, and PvP Seasonal to their configured daily document limits from `optimizer-rules.json`. The selected mode SHALL affect optimizer results only through the effective daily document limit and resulting schedules and estimated day counts. It SHALL NOT alter reward expansion, document deficits, inventory consumption, Classified Document allocation, TarCoin calculations, location eligibility, route assignments, or Fastest and Safest objective values. The optimizer SHALL NOT accept a user-defined daily-limit override.
 
 #### Scenario: Global mode changes estimated days
 - **WHEN** the same route requires `50` farmed documents
@@ -291,4 +291,3 @@ The optimizer result SHALL report all included unclaimed rewards and their Page-
 #### Scenario: Result is rendered
 - **WHEN** optimization completes successfully
 - **THEN** the UI can render every summary and detail from the returned result without recomputing domain decisions
-
