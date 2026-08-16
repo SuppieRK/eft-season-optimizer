@@ -138,7 +138,7 @@
               "quantity": 1
             },
             {
-              "documentId": "documents.technical.name",
+              "documentId": "documents.medical.name",
               "quantity": 1
             }
           ]
@@ -149,7 +149,7 @@
           "tarCoinsAwarded": 50,
           "requirements": [
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.medical.name",
               "quantity": 2
             },
             {
@@ -176,7 +176,7 @@
               "quantity": 1
             },
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.test.name",
               "quantity": 1
             }
           ]
@@ -190,7 +190,7 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.technical.name",
+              "documentId": "documents.financial.name",
               "quantity": 2
             },
             {
@@ -204,7 +204,7 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.medical.name",
               "quantity": 2
             },
             {
@@ -235,7 +235,7 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.medical.name",
+              "documentId": "documents.blueprints.name",
               "quantity": 1
             }
           ]
@@ -253,7 +253,7 @@
               "quantity": 1
             },
             {
-              "documentId": "documents.test.name",
+              "documentId": "documents.user.name",
               "quantity": 1
             }
           ]
@@ -276,7 +276,7 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.medical.name",
               "quantity": 1
             }
           ]
@@ -290,7 +290,7 @@
               "quantity": 4
             },
             {
-              "documentId": "documents.medical.name",
+              "documentId": "documents.blueprints.name",
               "quantity": 3
             },
             {
@@ -313,7 +313,7 @@
               "quantity": 3
             },
             {
-              "documentId": "documents.medical.name",
+              "documentId": "documents.project.name",
               "quantity": 2
             }
           ]
@@ -327,11 +327,11 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.technical.name",
               "quantity": 2
             },
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.project.name",
               "quantity": 1
             }
           ]
@@ -372,15 +372,15 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.project.name",
-              "quantity": 2
-            },
-            {
-              "documentId": "documents.user.name",
-              "quantity": 2
-            },
-            {
               "documentId": "documents.medical.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 2
+            },
+            {
+              "documentId": "documents.project.name",
               "quantity": 1
             }
           ]
@@ -399,11 +399,11 @@
               "quantity": 1
             },
             {
-              "documentId": "documents.medical.name",
+              "documentId": "documents.user.name",
               "quantity": 1
             },
             {
-              "documentId": "documents.test.name",
+              "documentId": "documents.medical.name",
               "quantity": 1
             }
           ]
@@ -421,7 +421,7 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.project.name",
               "quantity": 1
             }
           ]
@@ -439,7 +439,7 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.project.name",
+              "documentId": "documents.user.name",
               "quantity": 1
             }
           ]
@@ -453,7 +453,7 @@
               "quantity": 3
             },
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.financial.name",
               "quantity": 2
             },
             {
@@ -472,7 +472,7 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.user.name",
+              "documentId": "documents.financial.name",
               "quantity": 4
             },
             {
@@ -516,7 +516,7 @@
           "kind": "gear",
           "requirements": [
             {
-              "documentId": "documents.medical.name",
+              "documentId": "documents.financial.name",
               "quantity": 6
             },
             {
@@ -543,15 +543,15 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.technical.name",
               "quantity": 5
             },
             {
-              "documentId": "documents.technical.name",
+              "documentId": "documents.pmc.name",
               "quantity": 3
             },
             {
-              "documentId": "documents.project.name",
+              "documentId": "documents.blueprints.name",
               "quantity": 2
             }
           ]
@@ -562,7 +562,7 @@
           "tarCoinsAwarded": 50,
           "requirements": [
             {
-              "documentId": "documents.technical.name",
+              "documentId": "documents.user.name",
               "quantity": 4
             },
             {
@@ -580,7 +580,7 @@
           "kind": "gear",
           "requirements": [
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.test.name",
               "quantity": 5
             },
             {
@@ -602,7 +602,7 @@
           "kind": "gear",
           "requirements": [
             {
-              "documentId": "documents.medical.name",
+              "documentId": "documents.technical.name",
               "quantity": 5
             },
             {
@@ -629,7 +629,7 @@
           "kind": "crate",
           "requirements": [
             {
-              "documentId": "documents.project.name",
+              "documentId": "documents.medical.name",
               "quantity": 2
             },
             {
@@ -637,7 +637,7 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.project.name",
               "quantity": 2
             }
           ]
@@ -648,7 +648,7 @@
           "tarCoinsAwarded": 50,
           "requirements": [
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.pmc.name",
               "quantity": 5
             },
             {
@@ -656,11 +656,11 @@
               "quantity": 4
             },
             {
-              "documentId": "documents.medical.name",
+              "documentId": "documents.technical.name",
               "quantity": 4
             },
             {
-              "documentId": "documents.test.name",
+              "documentId": "documents.project.name",
               "quantity": 1
             }
           ]
@@ -670,7 +670,7 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.project.name",
               "quantity": 6
             },
             {
@@ -692,7 +692,7 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.project.name",
+              "documentId": "documents.technical.name",
               "quantity": 3
             },
             {
@@ -700,7 +700,7 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.user.name",
               "quantity": 1
             }
           ]
@@ -710,7 +710,7 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.user.name",
               "quantity": 1
             },
             {
@@ -737,7 +737,7 @@
               "quantity": 4
             },
             {
-              "documentId": "documents.technical.name",
+              "documentId": "documents.user.name",
               "quantity": 4
             },
             {
@@ -756,15 +756,15 @@
           "tarCoinsAwarded": 50,
           "requirements": [
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.blueprints.name",
               "quantity": 3
             },
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.test.name",
               "quantity": 2
             },
             {
-              "documentId": "documents.technical.name",
+              "documentId": "documents.medical.name",
               "quantity": 1
             }
           ]
@@ -774,7 +774,7 @@
           "kind": "gear",
           "requirements": [
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.test.name",
               "quantity": 5
             },
             {
@@ -792,15 +792,15 @@
           "kind": "crate",
           "requirements": [
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.test.name",
               "quantity": 2
             },
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.technical.name",
               "quantity": 2
             },
             {
-              "documentId": "documents.project.name",
+              "documentId": "documents.user.name",
               "quantity": 1
             }
           ]
@@ -826,7 +826,7 @@
               "quantity": 2
             },
             {
-              "documentId": "documents.test.name",
+              "documentId": "documents.financial.name",
               "quantity": 2
             }
           ]
@@ -841,15 +841,15 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.blueprints.name",
               "quantity": 6
             },
             {
-              "documentId": "documents.project.name",
+              "documentId": "documents.technical.name",
               "quantity": 5
             },
             {
-              "documentId": "documents.blueprints.name",
+              "documentId": "documents.pmc.name",
               "quantity": 5
             },
             {
@@ -867,15 +867,15 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.financial.name",
               "quantity": 6
             },
             {
-              "documentId": "documents.technical.name",
+              "documentId": "documents.medical.name",
               "quantity": 5
             },
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.test.name",
               "quantity": 5
             },
             {
@@ -893,11 +893,11 @@
           "kind": "crate",
           "requirements": [
             {
-              "documentId": "documents.test.name",
+              "documentId": "documents.project.name",
               "quantity": 3
             },
             {
-              "documentId": "documents.project.name",
+              "documentId": "documents.blueprints.name",
               "quantity": 3
             },
             {
@@ -912,19 +912,19 @@
           "tarCoinsAwarded": 100,
           "requirements": [
             {
-              "documentId": "documents.project.name",
+              "documentId": "documents.medical.name",
               "quantity": 5
             },
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.user.name",
               "quantity": 4
             },
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.test.name",
               "quantity": 2
             },
             {
-              "documentId": "documents.test.name",
+              "documentId": "documents.financial.name",
               "quantity": 2
             }
           ]
@@ -947,11 +947,11 @@
               "quantity": 3
             },
             {
-              "documentId": "documents.technical.name",
+              "documentId": "documents.test.name",
               "quantity": 2
             },
             {
-              "documentId": "documents.test.name",
+              "documentId": "documents.financial.name",
               "quantity": 2
             }
           ]
@@ -962,19 +962,19 @@
           "tarCoinsAwarded": 150,
           "requirements": [
             {
-              "documentId": "documents.financial.name",
+              "documentId": "documents.user.name",
               "quantity": 5
-            },
-            {
-              "documentId": "documents.technical.name",
-              "quantity": 5
-            },
-            {
-              "documentId": "documents.medical.name",
-              "quantity": 3
             },
             {
               "documentId": "documents.blueprints.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.test.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.project.name",
               "quantity": 3
             }
           ]
@@ -984,12 +984,16 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.blueprints.name",
               "quantity": 5
             },
             {
-              "documentId": "documents.user.name",
+              "documentId": "documents.medical.name",
               "quantity": 5
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 3
             },
             {
               "documentId": "documents.technical.name",
@@ -997,10 +1001,6 @@
             },
             {
               "documentId": "documents.financial.name",
-              "quantity": 3
-            },
-            {
-              "documentId": "documents.test.name",
               "quantity": 3
             }
           ]
@@ -1010,7 +1010,7 @@
           "kind": "cosmetic",
           "requirements": [
             {
-              "documentId": "documents.pmc.name",
+              "documentId": "documents.technical.name",
               "quantity": 5
             },
             {
@@ -1018,15 +1018,15 @@
               "quantity": 5
             },
             {
-              "documentId": "documents.test.name",
+              "documentId": "documents.medical.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.user.name",
               "quantity": 3
             },
             {
               "documentId": "documents.blueprints.name",
-              "quantity": 3
-            },
-            {
-              "documentId": "documents.technical.name",
               "quantity": 3
             }
           ]
@@ -1041,8 +1041,24 @@
           "kind": "gear",
           "requirements": [
             {
-              "documentId": "documents.financial.name",
-              "quantity": 29
+              "documentId": "documents.test.name",
+              "quantity": 7
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.pmc.name",
+              "quantity": 6
+            },
+            {
+              "documentId": "documents.user.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 5
             }
           ]
         },
@@ -1051,37 +1067,7 @@
           "kind": "gear",
           "requirements": [
             {
-              "documentId": "documents.medical.name",
-              "quantity": 6
-            },
-            {
-              "documentId": "documents.blueprints.name",
-              "quantity": 5
-            },
-            {
-              "documentId": "documents.project.name",
-              "quantity": 5
-            },
-            {
-              "documentId": "documents.test.name",
-              "quantity": 4
-            },
-            {
               "documentId": "documents.technical.name",
-              "quantity": 3
-            },
-            {
-              "documentId": "documents.financial.name",
-              "quantity": 2
-            }
-          ]
-        },
-        {
-          "id": "rewards.nocturnal-lower.name",
-          "kind": "gear",
-          "requirements": [
-            {
-              "documentId": "documents.financial.name",
               "quantity": 6
             },
             {
@@ -1097,7 +1083,41 @@
               "quantity": 4
             },
             {
+              "documentId": "documents.test.name",
+              "quantity": 3
+            },
+            {
+              "documentId": "documents.financial.name",
+              "quantity": 1
+            },
+            {
+              "documentId": "documents.medical.name",
+              "quantity": 1
+            }
+          ]
+        },
+        {
+          "id": "rewards.nocturnal-lower.name",
+          "kind": "gear",
+          "requirements": [
+            {
+              "documentId": "documents.technical.name",
+              "quantity": 6
+            },
+            {
               "documentId": "documents.user.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.project.name",
+              "quantity": 5
+            },
+            {
+              "documentId": "documents.blueprints.name",
+              "quantity": 4
+            },
+            {
+              "documentId": "documents.medical.name",
               "quantity": 3
             }
           ]
