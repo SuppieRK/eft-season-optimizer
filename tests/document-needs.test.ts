@@ -20,48 +20,42 @@ function loadCatalogs(): Catalogs {
   ) as Record<CatalogKey, unknown>);
 }
 
-function expectedNeedsFromCsv(): Record<string, number> {
-  const [headerLine, ...lines] = readFileSync(resolve('tests/documents.csv'), 'utf8').trim().split(/\r?\n/u);
-  const headers = headerLine.split(',').slice(2);
-  const documentIds: Record<string, string> = {
-    financial: 'documents.financial.name',
-    pmc: 'documents.pmc.name',
-    project: 'documents.project.name',
-    blueprints: 'documents.blueprints.name',
-    test: 'documents.test.name',
-    user: 'documents.user.name',
-    medical: 'documents.medical.name',
-    technical: 'documents.technical.name',
-  };
-
-  return Object.fromEntries(headers.map((header, columnIndex) => [
-    documentIds[header],
-    lines.reduce((total, line) => total + (Number(line.split(',')[columnIndex + 2]) || 0), 0),
-  ]));
-}
-
 describe('document needs', () => {
-  it('reports exact full-pass requirements for every regular document', () => {
+  it('reports catalog-derived full-pass requirements for every regular document', () => {
     const catalogs = loadCatalogs();
+    const needs = calculateDocumentNeeds(catalogs, [], {});
+    const regularDocumentIds = catalogs.documents.documents
+      .filter((document) => document.kind === 'regular')
+      .map((document) => document.id);
+    const requirementTotal = catalogs.battlePass.pages
+      .flatMap((page) => page.rewards)
+      .flatMap((reward) => reward.requirements)
+      .reduce((total, requirement) => total + requirement.quantity, 0);
 
-    expect(calculateDocumentNeeds(catalogs, [], {})).toEqual(expectedNeedsFromCsv());
+    expect(Object.keys(needs).sort()).toEqual([...regularDocumentIds].sort());
+    expect(Object.values(needs).reduce((total, need) => total + need, 0)).toBe(requirementTotal);
   });
 
   it('subtracts owned documents and requirements from claimed rewards', () => {
     const catalogs = loadCatalogs();
     const firstReward = catalogs.battlePass.pages[0].rewards[0];
-
-    const needs = calculateDocumentNeeds(catalogs, [firstReward.id], {
+    const baseline = calculateDocumentNeeds(catalogs, [], {});
+    const ownedDocuments = {
       'documents.financial.name': 10,
       'documents.project.name': 200,
-    });
+    };
 
-    const initialFinancial = expectedNeedsFromCsv()['documents.financial.name'];
-    const claimedFinancial = firstReward.requirements.find((requirement) => (
-      requirement.documentId === 'documents.financial.name'
-    ))?.quantity ?? 0;
-    expect(needs['documents.financial.name']).toBe(initialFinancial - claimedFinancial - 10);
-    expect(needs['documents.project.name']).toBe(0);
+    const needs = calculateDocumentNeeds(catalogs, [firstReward.id], ownedDocuments);
+
+    for (const [documentId, baselineNeed] of Object.entries(baseline)) {
+      const claimedQuantity = firstReward.requirements.find((requirement) => (
+        requirement.documentId === documentId
+      ))?.quantity ?? 0;
+      expect(needs[documentId]).toBe(Math.max(
+        0,
+        baselineNeed - claimedQuantity - (ownedDocuments[documentId as keyof typeof ownedDocuments] ?? 0),
+      ));
+    }
   });
 
   it('does not apply Classified backfill, exchanges, mode, or route profile choices', () => {

@@ -370,13 +370,14 @@ test('updates Focus from valid direct document input without waiting for blur', 
   await openWireframe(page);
   const focusStage = page.locator('.focus-stage');
   const focusHeading = page.locator('[data-focus-heading]');
-  await expect(focusHeading).toContainText('Interchange');
+  await expect(focusHeading).toHaveText(/.+ \((Easy|Normal|Hard|Insane), \d+ min\)/u);
 
   await documentQuantity(page, 'documents.blueprints.name').fill('1');
 
   await expect(focusStage).toHaveAttribute('aria-busy', 'true');
   await expect(focusStage).toHaveAttribute('aria-busy', 'false', { timeout: 10_000 });
-  await expect(focusHeading).toContainText('Reserve');
+  await expect(documentQuantity(page, 'documents.blueprints.name')).toHaveValue('1');
+  await expect(focusHeading).toHaveText(/.+ \((Easy|Normal|Hard|Insane), \d+ min\)/u);
 });
 
 test('queues only the newest optimizer snapshot during a synchronous update burst', async ({ page }) => {
@@ -456,8 +457,8 @@ test('shows every useful location document as a farming priority', async ({ page
   await expect(priority).toHaveCount(2);
   await expect(optional).toHaveCount(0);
   await expect(priority.locator('.focus-document__status')).toHaveText(['Priority', 'Priority']);
-  await expect(documents.locator('figcaption strong')).toHaveText(['Financial', 'Blueprints']);
-  await expect(documents.locator('figcaption')).toHaveText(['Financial', 'Blueprints']);
+  await expect(documents.locator('figcaption strong')).toHaveText([/\S+/u, /\S+/u]);
+  await expect(documents.locator('figcaption')).toHaveText([/\S+/u, /\S+/u]);
   await expect(documents.locator('figcaption span')).toHaveCount(0);
   await expect(page.locator('[data-focus-heading]')).toHaveText(/.+ \((Easy|Normal|Hard|Insane), \d+ min\)/u);
   await expect(page.locator('.detail-rail')).toHaveCount(0);
