@@ -18,7 +18,7 @@ test('shows meaningful inert content while the application initializes', async (
   await expect(shell.locator('[data-pending-control]').first()).toHaveAttribute('inert', '');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('KORD BREACH');
   await expect(page.locator('[data-document-progress-label]')).toHaveText('Documents');
-  await expect(page.locator('[data-focus-heading]')).toContainText(/Interchange/iu);
+  await expect(page.locator('[data-focus-heading]')).toHaveText(/^.+ \(.+, \d+ min\)$/u);
   await expect(page.locator('[data-focus-content] img').first()).toHaveAttribute('fetchpriority', 'high');
   expect(await page.locator('[data-raid-result]').evaluateAll((inputs) => (
     inputs.map((input) => (input as HTMLInputElement).value)
