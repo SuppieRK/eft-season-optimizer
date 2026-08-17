@@ -31,7 +31,7 @@
     "@types/hyphen": "^1.14.0",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.1.2",
-    "eslint": "^10.8.0",
+    "eslint": "^10.8.1",
     "globals": "^17.9.0",
     "jsdom": "^30.0.1",
     "lighthouse": "^13.4.1",
