@@ -47,6 +47,6 @@
     "flag-icons": "^7.5.0",
     "hyphen": "^1.14.1",
     "lucide": "^1.45.0",
-    "slim-select": "^4.0.7"
+    "slim-select": "^4.2.3"
   }
 }
