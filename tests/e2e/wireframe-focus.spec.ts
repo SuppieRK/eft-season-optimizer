@@ -261,6 +261,13 @@ for (const mutation of catalogMutations) {
     await setDocumentQuantity(page, 'documents.financial.name', 12);
     await trackRewardWithoutInventoryChange(page, dogtagReward);
     const originalFingerprint = await catalogDataFingerprint(page);
+    await page.locator('.requirements-edit-trigger').click();
+    const editor = page.locator('.requirements-dialog:not(.requirements-import-dialog)');
+    await editor.locator('summary').first().click();
+    const requirementQuantity = editor.locator('[data-requirement-quantity]').first();
+    const personalQuantity = String(Number(await requirementQuantity.inputValue()) + 2);
+    await requirementQuantity.fill(personalQuantity);
+    await editor.getByRole('button', { name: 'Save changes', exact: true }).click();
     const changedCatalog = await page.evaluate(async (fileName) => {
       const response = await fetch(new URL(`data/${fileName}`, document.baseURI), { cache: 'no-store' });
       return await response.json() as MutableCatalog;
@@ -284,6 +291,8 @@ for (const mutation of catalogMutations) {
       expect(envelope.dataFingerprint).toBe(changedFingerprint);
     }
     expect(consoleErrors).toEqual([]);
+    await page.locator('.requirements-edit-trigger').click();
+    await expect(requirementQuantity).toHaveValue(personalQuantity);
   });
 }
 

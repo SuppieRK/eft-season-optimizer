@@ -8,6 +8,181 @@
   "releaseStatus": "release",
   "entries": [
     {
+      "id": "about.defaultsNotice",
+      "localizations": {
+        "en-GB": "These totals use the default requirements. Your personal requirements apply to the planner.",
+        "ru-RU": "Здесь указаны стандартные требования. Планировщик использует ваши личные требования."
+      }
+    },
+    {
+      "id": "requirements.import",
+      "localizations": {
+        "en-GB": "Import",
+        "ru-RU": "Импорт"
+      }
+    },
+    {
+      "id": "requirements.export",
+      "localizations": {
+        "en-GB": "Export",
+        "ru-RU": "Экспорт"
+      }
+    },
+    {
+      "id": "requirements.only",
+      "localizations": {
+        "en-GB": "Requirements only",
+        "ru-RU": "Только требования"
+      }
+    },
+    {
+      "id": "requirements.complete",
+      "localizations": {
+        "en-GB": "Complete backup",
+        "ru-RU": "Полная копия"
+      }
+    },
+    {
+      "id": "requirements.replace",
+      "localizations": {
+        "en-GB": "Replace",
+        "ru-RU": "Заменить"
+      }
+    },
+    {
+      "id": "requirements.replaceScope",
+      "localizations": {
+        "en-GB": "What to replace",
+        "ru-RU": "Что заменить"
+      }
+    },
+    {
+      "id": "requirements.replaceConfirm",
+      "localizations": {
+        "en-GB": "Import replaces saved data in the selected scope and discards unsaved edits. Export a backup first if needed.",
+        "ru-RU": "Импорт заменит выбранные данные и отменит несохранённые правки. При необходимости сначала экспортируйте копию."
+      }
+    },
+    {
+      "id": "requirements.invalidBackup",
+      "localizations": {
+        "en-GB": "This file is not a valid supported planner backup. No data was changed.",
+        "ru-RU": "Файл не является допустимой копией планировщика. Данные не изменены."
+      }
+    },
+    {
+      "id": "requirements.differentSeason",
+      "localizations": {
+        "en-GB": "This backup belongs to a different season. No data was changed.",
+        "ru-RU": "Эта копия относится к другому сезону. Данные не изменены."
+      }
+    },
+    {
+      "id": "requirements.omittedReward",
+      "localizations": {
+        "en-GB": "Removed reward omitted: {name}",
+        "ru-RU": "Удалённая награда пропущена: {name}"
+      }
+    },
+    {
+      "id": "requirements.defaultReward",
+      "localizations": {
+        "en-GB": "Current defaults will be used for: {name}",
+        "ru-RU": "Будут использованы стандартные требования: {name}"
+      }
+    },
+    {
+      "id": "requirements.adjustedProgress",
+      "localizations": {
+        "en-GB": "Progress or preference will be adjusted: {name}",
+        "ru-RU": "Прогресс или параметр будет скорректирован: {name}"
+      }
+    },
+    {
+      "id": "requirements.rollbackError",
+      "localizations": {
+        "en-GB": "Storage failed and could not be fully restored. Keep your backup and check browser storage before reloading.",
+        "ru-RU": "Ошибка хранилища: не удалось полностью восстановить данные. Сохраните копию и проверьте хранилище браузера перед перезагрузкой."
+      }
+    },
+    {
+      "id": "requirements.edit",
+      "localizations": {
+        "en-GB": "Edit requirements",
+        "ru-RU": "Изменить требования"
+      }
+    },
+    {
+      "id": "requirements.notice",
+      "localizations": {
+        "en-GB": "Requirements may vary by player. Check yours in-game.",
+        "ru-RU": "Требования могут различаться у игроков. Сверьте их в игре."
+      }
+    },
+    {
+      "id": "requirements.save",
+      "localizations": {
+        "en-GB": "Save changes",
+        "ru-RU": "Сохранить изменения"
+      }
+    },
+    {
+      "id": "requirements.restoreDefault",
+      "localizations": {
+        "en-GB": "Restore default",
+        "ru-RU": "По умолчанию"
+      }
+    },
+    {
+      "id": "requirements.remove",
+      "localizations": {
+        "en-GB": "Remove",
+        "ru-RU": "Удалить"
+      }
+    },
+    {
+      "id": "requirements.add",
+      "localizations": {
+        "en-GB": "Add document",
+        "ru-RU": "Добавить документ"
+      }
+    },
+    {
+      "id": "requirements.invalid",
+      "localizations": {
+        "en-GB": "Use at least one regular document, positive whole quantities, and no duplicate types.",
+        "ru-RU": "Укажите хотя бы один обычный документ, целые положительные количества и разные типы."
+      }
+    },
+    {
+      "id": "requirements.unknownDocument",
+      "localizations": {
+        "en-GB": "This requirement contains an unavailable document type.",
+        "ru-RU": "В требовании указан недоступный тип документа."
+      }
+    },
+    {
+      "id": "requirements.storageReadError",
+      "localizations": {
+        "en-GB": "Saved requirements could not be read. Defaults are shown. Open the editor to import a backup.",
+        "ru-RU": "Не удалось прочитать сохранённые требования. Показаны стандартные. Откройте редактор для импорта копии."
+      }
+    },
+    {
+      "id": "requirements.storageWriteError",
+      "localizations": {
+        "en-GB": "Changes could not be saved. Your previous saved data is unchanged. Check browser storage permissions and try again.",
+        "ru-RU": "Не удалось сохранить изменения. Прежние данные сохранены. Проверьте разрешения хранилища браузера и повторите попытку."
+      }
+    },
+    {
+      "id": "requirements.changedCatalog",
+      "localizations": {
+        "en-GB": "Some saved requirements are no longer compatible. Valid requirements and progress were preserved; affected rewards use defaults.",
+        "ru-RU": "Некоторые требования больше не совместимы. Остальные требования и прогресс сохранены, для затронутых наград показаны стандартные требования."
+      }
+    },
+    {
       "id": "app.title",
       "localizations": {
         "en-GB": "KORD Breach Optimizer",

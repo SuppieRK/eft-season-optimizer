@@ -24,6 +24,31 @@ The localization catalog marks the project as development-only. The Russian draf
 - Store progress and interface choices in first-party cookies.
 - Operate as a static site with no application server.
 
+## Personal requirements and backups
+
+Reward document types and quantities can differ between players. The supplied catalog is a default, not a universal requirement list.
+
+1. Select **Edit requirements** below the Rewards heading.
+2. Open the relevant page and adjust document types and quantities.
+3. Select **Save changes** to apply all edits, or **Cancel** to discard them.
+
+All editor pages start collapsed. Each page opens and closes independently, so you can keep several pages open.
+
+Each reward needs at least one regular document type with a positive whole-number quantity. Each type can appear only once per reward.
+**Restore default** restores one reward's catalog requirements. Requirement edits never change owned documents or claimed rewards.
+
+Personal requirements use browser `localStorage`. Progress and preferences keep their existing cookies.
+Both stores survive ordinary reloads. Browser-data removal or the end of a private session can remove saved data.
+The complete reset action removes both progress and personal requirements. It does not remove unrelated site storage.
+
+**Export** downloads a JSON backup of all saved reward requirements, inventory, claims, and preferences. Unsaved editor changes are not included.
+**Import** replaces either all saved data or requirements only. Requirements-only import preserves current inventory, claims, and preferences.
+Import shows compatibility adjustments before confirmation and rejects malformed or different-season backups without changes.
+Backup files stay on your device. The application does not upload them.
+
+Personal requirements survive compatible catalog corrections. The planner uses them for progress, redemption, document needs, farming, schedules, and buyout estimates.
+The About dialog continues to show labeled default totals. No purchase, exchange, page-unlock, or Classified backfill rule changes.
+
 ## Optimizer logic
 
 The optimizer code is in [`src/optimizer.ts`](src/optimizer.ts). The rules and numeric values are in [`public/data/optimizer-rules.json`](public/data/optimizer-rules.json).

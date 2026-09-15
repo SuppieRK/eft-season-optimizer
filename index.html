@@ -2330,6 +2330,7 @@
         <button type="button" data-close-about data-static-i18n-aria-label="ui.close" aria-label="Close"></button>
       </header>
       <div data-about-content>
+        <p class="about-location-note" data-static-i18n="about.defaultsNotice">These totals use the default requirements. Your personal requirements apply to the planner.</p>
         <p class="about-summary" data-about-summary></p>
         <section class="about-rules" data-static-i18n-aria-label="about.rulesHeading" aria-label="Optimization rules">
           <article>
@@ -2381,6 +2382,9 @@
       import { ArrowLeftRight, CircleHelp, X, createElement as createIconElement } from 'lucide';
       import flagIconUrls from 'virtual:locale-flags';
       import { loadCatalogs } from '/src/catalogs.ts';
+      import { clearPersonalRequirements, loadPersonalRequirements, resolvePersonalCatalogs, savePersonalRequirements } from '/src/personal-requirements.ts';
+      import { mountRequirementsEditor } from '/src/requirements-editor.ts';
+      import { persistPlannerImport } from '/src/planner-backup.ts';
       import { calculateDocumentNeeds } from '/src/document-needs.ts';
       import { createLocalizer, formatAccessibleRequirements, formatCountdownUnit, formatLocalPrice, formatNumber, getCompleteLocales, getLocaleRegion, hyphenateForLocale, loadHyphenator } from '/src/localization.ts';
       import { browserCookieAdapter, resetPersistedState, restoreState, saveState } from '/src/persistence.ts';
@@ -2390,7 +2394,10 @@
       import { getClassifiedDocumentMinimum, reduceState } from '/src/state.ts';
 
       const initialize = async () => {
-      const catalogs = await loadCatalogs();
+      const defaultCatalogs = await loadCatalogs();
+      const personal = loadPersonalRequirements(defaultCatalogs);
+      let personalOverrides = personal.overrides;
+      let catalogs = resolvePersonalCatalogs(defaultCatalogs, personalOverrides);
       let state = restoreState(browserCookieAdapter, catalogs, navigator.languages);
       const route = getLocaleRouteForPath(window.location.pathname) ?? getDefaultLocaleRoute();
       if (route.default && state.locale !== route.locale) {
@@ -2434,12 +2441,12 @@
       const openAboutButton = document.querySelector('[data-about-open]');
       const closeAboutButton = document.querySelector('[data-close-about]');
       const endsAt = catalogs.battlePass.endsAt;
-      const rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
+      let rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
       const rewardPageById = new Map(catalogs.battlePass.pages.flatMap((page) =>
         page.rewards.map((reward) => [reward.id, page.page])));
       const rewardOrderById = new Map(catalogs.battlePass.pages.flatMap((page) =>
         page.rewards.map((reward, rewardIndex) => [reward.id, rewardIndex])));
-      const documentTotal = rewards.reduce(
+      let documentTotal = rewards.reduce(
         (total, reward) => total + reward.requirements.reduce((rewardTotal, requirement) => rewardTotal + requirement.quantity, 0),
         0,
       );
@@ -2476,10 +2483,17 @@
       document.querySelector('[data-asset-disclaimer]').textContent = localizer.text('footer.disclaimer');
       resetCookieState.textContent = localizer.text('ui.resetCookieStorage');
       resetCookieState.addEventListener('click', () => {
+        if (!window.confirm(localizer.text('ui.resetConfirm'))) return;
+        try {
+          clearPersonalRequirements(defaultCatalogs);
+        } catch {
+          window.alert(localizer.text('requirements.storageWriteError'));
+          return;
+        }
         const resetState = resetPersistedState(
           browserCookieAdapter,
           catalogs,
-          window.confirm(localizer.text('ui.resetConfirm')),
+          true,
         );
         if (resetState) window.location.reload();
       });
@@ -2492,7 +2506,10 @@
         document.querySelector(totalSelector).textContent = formatNumber(total, localizer.locale);
         progress.max = total;
         progress.setAttribute('aria-label', label);
-        return (value) => {
+        return (value, nextTotal = total) => {
+          total = nextTotal;
+          document.querySelector(totalSelector).textContent = formatNumber(total, localizer.locale);
+          progress.max = total;
           const boundedValue = Math.min(total, Math.max(0, value));
           current.textContent = formatNumber(boundedValue, localizer.locale);
           progress.value = boundedValue;
@@ -2525,7 +2542,7 @@
             : state.ownedDocuments[documentRecord.id] ?? 0;
           return total + quantity;
         }, 0);
-        updateDocumentProgress(claimedDocumentTotal + ownedDocumentTotal);
+        updateDocumentProgress(claimedDocumentTotal + ownedDocumentTotal, documentTotal);
         updateRewardProgress(state.claimedRewardIds.length);
       };
 
@@ -2726,15 +2743,16 @@
               dispatch({ type: 'claim-reward', rewardId: reward.id, claimed: false });
               return;
             }
-            const plan = planRewardRedemption(reward, state.ownedDocuments, state.classifiedDocuments);
+            const effectiveReward = rewards.find((candidate) => candidate.id === reward.id);
+            const plan = planRewardRedemption(effectiveReward, state.ownedDocuments, state.classifiedDocuments);
             if (!plan.canRedeem) {
               dispatch({ type: 'claim-reward', rewardId: reward.id, claimed: true });
               return;
             }
             checkbox.checked = false;
-            openRedemptionDialog(reward, plan);
+            openRedemptionDialog(effectiveReward, plan);
           });
-          return { reward, rewardId: reward.id, checkbox, item };
+          return { rewardId: reward.id, checkbox, item, requirements };
         });
 
         trigger.append(pageLabel, claimedCount, chevron);
@@ -2772,7 +2790,8 @@
         if (allRewardsClaimed && !crateIsMounted) rewardPages.replaceChildren(crateReward);
         else if (!allRewardsClaimed && !accordionIsMounted) rewardPages.replaceChildren(...pageViews.map(({ pageSection }) => pageSection));
         claimAllButton.disabled = allRewardsClaimed;
-        pageViews.forEach(({ page, pageSection, trigger, panel, redeemableCount, claimedCount, rewardInputs }) => {
+        pageViews.forEach(({ page: originalPage, pageSection, trigger, panel, redeemableCount, claimedCount, rewardInputs }) => {
+          const page = catalogs.battlePass.pages.find((candidate) => candidate.page === originalPage.page);
           const selected = page.page === state.selectedPage;
           const pageUnlocked = isBattlePassPageUnlocked(catalogs.battlePass.pages, page.page, claimedRewards);
           const claimedOnPage = rewardInputs.filter(({ rewardId }) => claimedRewards.has(rewardId)).length;
@@ -2792,7 +2811,10 @@
             : '';
           redeemableCount.classList.toggle('reward-page__redeemable--locked', redeemableOnPage > 0 && !pageUnlocked);
           claimedCount.textContent = `${formatNumber(claimedOnPage, localizer.locale)} / ${formatNumber(page.rewards.length, localizer.locale)}`;
-          rewardInputs.forEach(({ reward, rewardId, checkbox, item }) => {
+          rewardInputs.forEach(({ rewardId, checkbox, item, requirements }) => {
+            const reward = rewards.find((candidate) => candidate.id === rewardId);
+            requirements.textContent = reward.requirements.map(({ documentId, quantity }) => `${documentAbbreviations[documentId]} (${formatNumber(quantity, localizer.locale)})`).join(' · ');
+            requirements.title = formatAccessibleRequirements(reward.requirements, documentNames, localizer.locale);
             const claimed = claimedRewards.has(rewardId);
             const redeemable = !claimed && planRewardRedemption(
               reward,
@@ -3509,6 +3531,41 @@
         if (event.target === buyoutDialog) buyoutDialog.close();
       });
       openAboutButton.addEventListener('click', () => aboutDialog.showModal());
+      const applyPersonalRequirements = (overrides) => {
+        personalOverrides = overrides;
+        const notice = document.querySelector('.requirements-notice');
+        notice.textContent = localizer.text('requirements.notice');
+        notice.removeAttribute('role');
+        catalogs = resolvePersonalCatalogs(defaultCatalogs, overrides);
+        rewards = catalogs.battlePass.pages.flatMap((page) => page.rewards);
+        documentTotal = rewards.reduce((total, reward) => total + reward.requirements.reduce((sum, entry) => sum + entry.quantity, 0), 0);
+        refreshProgress();
+        refreshRewardRail();
+        refreshDocumentQuantities();
+        refreshOptimization();
+      };
+      mountRequirementsEditor({
+        catalogs: defaultCatalogs,
+        localizer,
+        getCatalogs: () => catalogs,
+        getOverrides: () => personalOverrides,
+        getState: () => state,
+        onImport: (preview, complete) => {
+          persistPlannerImport(preview, defaultCatalogs, complete);
+          if (complete) {
+            window.location.assign(getLocalePath(preview.state.locale));
+          } else applyPersonalRequirements(preview.requirements);
+        },
+        onSave: (overrides) => {
+          savePersonalRequirements(overrides, defaultCatalogs);
+          applyPersonalRequirements(overrides);
+        },
+      });
+      if (personal.warning) {
+        const notice = document.querySelector('.requirements-notice');
+        notice.textContent = localizer.text(personal.warning);
+        notice.setAttribute('role', 'alert');
+      }
       closeAboutButton.addEventListener('click', () => aboutDialog.close());
       aboutDialog.addEventListener('click', (event) => {
         if (event.target === aboutDialog) aboutDialog.close();
