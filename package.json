@@ -30,7 +30,7 @@
     "@testing-library/dom": "^10.4.2",
     "@types/hyphen": "^1.14.0",
     "@types/jsdom": "^30.0.0",
-    "@types/node": "^26.6.1",
+    "@types/node": "^26.6.4",
     "eslint": "^10.10.0",
     "globals": "^17.12.0",
     "jsdom": "^30.1.1",
